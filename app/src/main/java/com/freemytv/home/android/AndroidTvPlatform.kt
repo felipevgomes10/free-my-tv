@@ -267,6 +267,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override fun postSetupNotification(check: SetupCheck) = SetupNotifications.post(context, check)
 
+    override fun cancelSetupNotification(check: SetupCheck) = SetupNotifications.cancel(context, check)
+
     private suspend fun loadChecks(key: String): Set<SetupCheck> = withContext(Dispatchers.IO) {
         prefs.getString(key, null).orEmpty().split(SEPARATOR).mapNotNull { name -> SetupCheck.entries.firstOrNull { it.name == name } }.toSet()
     }

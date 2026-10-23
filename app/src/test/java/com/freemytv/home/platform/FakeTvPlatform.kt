@@ -150,6 +150,13 @@ class FakeTvPlatform(
         setupNotifications += check
     }
 
+    /** Setup notifications the Home withdrew. */
+    val withdrawnSetupNotifications = mutableListOf<SetupCheck>()
+
+    override fun cancelSetupNotification(check: SetupCheck) {
+        withdrawnSetupNotifications += check
+    }
+
     override suspend fun loadButtonAssignments() = buttonAssignments
 
     override suspend fun saveButtonAssignments(assignments: Map<ShortcutButton, ButtonTarget>) {

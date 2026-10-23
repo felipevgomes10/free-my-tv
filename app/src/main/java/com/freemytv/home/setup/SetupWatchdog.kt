@@ -50,6 +50,8 @@ class SetupWatchdog(private val platform: TvPlatform) {
         val announced = platform.loadAnnouncedRegressions()
         val lost = now.filter { (check, holds) -> !holds && check in heldBefore }.keys
         (lost - announced).forEach { platform.postSetupNotification(it) }
+        // Back in place: the warning no longer applies.
+        (announced - lost).forEach { platform.cancelSetupNotification(it) }
         // A check that holds again may be announced again if it's lost later.
         platform.saveAnnouncedRegressions(lost)
         val held = heldBefore + now.filterValues { it }.keys
