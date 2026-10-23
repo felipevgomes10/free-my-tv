@@ -1,5 +1,8 @@
 package com.freemytv.home.platform
 
+import com.freemytv.home.apkdrop.ApkInfo
+import com.freemytv.home.apkdrop.InstallResult
+import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.ShortcutButton
@@ -77,6 +80,44 @@ class FakeTvPlatform(
 
     override suspend fun saveUpNext(entries: List<UpNextEntry>) {
         upNext = entries
+    }
+
+    var address: String? = "192.168.100.18"
+
+    /** Uploads the APK Drop page receives: each is a code, a size and the file it becomes. */
+    val uploads = MutableSharedFlow<Triple<String, Long, String>>()
+    var serving = false
+    val verdicts = mutableListOf<UploadVerdict>()
+    var apkInfos: Map<String, ApkInfo> = emptyMap()
+    var installResult: InstallResult = InstallResult.Installed
+    val installed = mutableListOf<Pair<String, Boolean>>()
+    val deletedFiles = mutableListOf<String>()
+
+    override suspend fun localAddress() = address
+
+    override fun receiveApks(port: Int, verdict: (code: String, sizeBytes: Long) -> UploadVerdict) =
+        kotlinx.coroutines.flow.flow {
+            serving = true
+            try {
+                uploads.collect { (code, size, path) ->
+                    val answer = verdict(code, size)
+                    verdicts += answer
+                    if (answer == UploadVerdict.Accept) emit(path)
+                }
+            } finally {
+                serving = false
+            }
+        }
+
+    override suspend fun inspectApk(path: String) = apkInfos[path]
+
+    override suspend fun installApk(path: String, silent: Boolean): InstallResult {
+        installed += path to silent
+        return installResult
+    }
+
+    override suspend fun deleteFile(path: String) {
+        deletedFiles += path
     }
 
     val deletedArtwork = mutableListOf<String>()

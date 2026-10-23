@@ -197,7 +197,7 @@ Phase 1 made the TV usable every day, but the Home still feels bare next to an A
 
 ## Further Notes
 
-- The coverage measured on 2026-10-23 sets expectations. YouTube, Disney+ and Crunchyroll get titled entries. Netflix, Prime Video and Globoplay get "Continuar no <app>". Apps may change what they report in later versions, and the Tray picks that up without a code change.
+- The coverage measured on 2026-10-23 sets expectations. YouTube, Disney+, HBO Max and Crunchyroll get titled entries. Netflix, Prime Video and Globoplay get "Continuar no <app>". Apps may change what they report in later versions, and the Tray picks that up without a code change.
 - The Home's install of itself goes through the package installer, so the first self-update moves the installer of record from ADB to the Home. Restore is unaffected: it never uninstalls the Home.
 - APK Drop opens a port on the home network only while its screen is open, and every upload needs the code shown on the TV. Android's confirmation stays the final gate for every install from an APK, except the Home's own updates after the first one.
 - Visual references: the Top Shelf and the Up Next Tray in `docs/design/home-app-tray.png` and `docs/design/home-input-tray.png`; Update Sources in `docs/design/updates.png`. The APK Drop screen and the Update Source dialog have no design yet. They follow the Settings and dialog styles already in `design.pen`.

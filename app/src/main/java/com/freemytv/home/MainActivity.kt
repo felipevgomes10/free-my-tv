@@ -7,6 +7,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +53,8 @@ import com.freemytv.home.ui.WeatherScreen
 import com.freemytv.home.weather.WeatherWidget
 import com.freemytv.home.widgets.WidgetSettings
 import com.freemytv.home.ui.HomeScreen
+import com.freemytv.home.apkdrop.ApkDrop
+import com.freemytv.home.ui.ApkDropScreen
 import com.freemytv.home.topshelf.ShelfApp
 import com.freemytv.home.topshelf.TopShelf
 import kotlinx.coroutines.delay
@@ -59,7 +62,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, AllApps, Weather, Monitor, Settings, Updates, Switcher }
+    private enum class Screen { Home, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
 
     private var screen by mutableStateOf(Screen.Home)
     private var notificationsOpen by mutableStateOf(false)
@@ -87,6 +90,7 @@ class MainActivity : ComponentActivity() {
         multitasking = Multitasking(platform)
         val artwork = AppArtworkLoader(applicationContext)
         val topShelf = TopShelf(app.upNext.state)
+        val apkDrop = ApkDrop(platform)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -99,6 +103,7 @@ class MainActivity : ComponentActivity() {
                     }
                     home.state.value.lifted != null -> home.cancelEdit()
                     inputs.state.value.lifted != null -> inputs.cancelEdit()
+                    screen == Screen.ApkDrop -> screen = Screen.AllApps
                     else -> screen = Screen.Home
                 }
             }
@@ -201,6 +206,19 @@ class MainActivity : ComponentActivity() {
                         onUninstall = { allApps.uninstall(it.packageName) },
                         onAppInfo = { allApps.openAppInfo(it.packageName) },
                         onInstallApp = allApps::installApp,
+                        onSendApk = { screen = Screen.ApkDrop },
+                        statusWidgets = statusWidgets,
+                    )
+                }
+                Screen.ApkDrop -> {
+                    val apkDropState by apkDrop.state.collectAsStateWithLifecycle()
+                    // The page is served only while this screen is on.
+                    LaunchedEffect(Unit) { apkDrop.open() }
+                    ApkDropScreen(
+                        state = apkDropState,
+                        clock = homeState.statusClock,
+                        onInstall = { scope.launch { apkDrop.install() } },
+                        onCancel = { scope.launch { apkDrop.cancel() } },
                         statusWidgets = statusWidgets,
                     )
                 }

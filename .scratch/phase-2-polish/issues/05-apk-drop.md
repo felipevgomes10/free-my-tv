@@ -12,9 +12,9 @@ Start by designing the "Enviar APK" screen in `design.pen`, in the style of Sett
 
 **Status:** ready-for-agent
 
-- [ ] The "Enviar APK" screen matches its new design, with address, QR code and code
-- [ ] From a phone on the same network, sending an APK with the right code shows its name and version on the TV and leads to Android's confirmation
-- [ ] A wrong code is refused; repeated failures change the code; leaving the screen stops the page
-- [ ] Updates and signer mismatches are told apart from new apps; invalid and oversized files get a message
-- [ ] The received file is gone after install or cancel
-- [ ] Tests cover the session lifecycle, the code rules, the APK report kinds and the clean-up
+- [x] The "Enviar APK" screen matches its new design, with address, QR code and code
+- [x] From a phone on the same network (checked from the Mac with curl on the emulator; a real phone in 08), sending an APK with the right code shows its name and version on the TV and leads to Android's confirmation
+- [x] A wrong code is refused; repeated failures change the code; leaving the screen stops the page
+- [x] Updates and signer mismatches are told apart from new apps; invalid and oversized files get a message
+- [x] The received file is gone after install or cancel
+- [x] Tests cover the session lifecycle, the code rules, the APK report kinds and the clean-up

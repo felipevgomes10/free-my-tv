@@ -55,6 +55,8 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.tv.material)
     implementation(libs.kotlinx.coroutines.android)
+    // The APK Drop QR code.
+    implementation(libs.zxing.core)
     debugImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
