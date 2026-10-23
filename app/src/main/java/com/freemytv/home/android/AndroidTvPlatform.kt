@@ -81,6 +81,23 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     }
 
     private val weather = WeatherService(prefs)
+    private val system = SystemReader(context)
+
+    override suspend fun storageUsage() = system.storageUsage()
+
+    override suspend fun memoryUsage() = system.memoryUsage()
+
+    override suspend fun appStorage() = system.appStorage()
+
+    override suspend fun processMemory() = system.processMemory()
+
+    override suspend fun appLabel(packageName: String) = withContext(Dispatchers.IO) { system.appLabel(packageName) }
+
+    override fun closeApp(packageName: String) = system.closeApp(packageName)
+
+    override val homeFrameRate = system.homeFrameRate
+
+    override fun displayRefreshRate() = system.displayRefreshRate()
 
     override suspend fun loadWidgetPreferences(): WidgetPreferences = withContext(Dispatchers.IO) {
         WidgetPreferences(

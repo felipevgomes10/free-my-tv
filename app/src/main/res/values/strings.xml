@@ -37,6 +37,17 @@
     <string name="condition_snow">Neve</string>
     <string name="condition_thunderstorm">Tempestade</string>
 
+    <string name="system_monitor">Monitor do sistema</string>
+    <string name="used">usado</string>
+    <string name="of_total">de %1$s</string>
+    <string name="free_space">%1$s livres</string>
+    <string name="memory_left">Restam %1$s para os apps</string>
+    <string name="fps">%1$d fps</string>
+    <string name="hz">%1$d Hz</string>
+    <string name="frame_rate_window">tela a %1$d Hz, últimos 60 segundos</string>
+    <string name="close_app">Fechar</string>
+    <string name="needs_setup">Para ver os apps aqui, rode a Preparação no computador.</string>
+
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
         <item quantity="other">%d apps instalados</item>

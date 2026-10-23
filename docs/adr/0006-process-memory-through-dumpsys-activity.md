@@ -1,0 +1,5 @@
+# Per-app memory comes from `dumpsys activity processes`
+
+Since Android 10 an app can only read its own processes' memory, so the System Monitor's "apps using the most RAM" needs a way around that. Setup grants the Home two development permissions over ADB, `android.permission.DUMP` and `android.permission.PACKAGE_USAGE_STATS` (the permission itself, via `pm grant`, not only the app-op), and the Home runs `dumpsys activity processes`, which lists every process with its last measured PSS and its process state. The process state is also how the Home tells background apps (which it may close) from foreground and media-playing ones (which it never closes).
+
+`dumpsys meminfo` was the first choice but SELinux forbids apps from even finding the `meminfo` service (`avc: denied { find } ... meminfo_service`), whatever permissions they hold. Running privileged shell commands through a self-connection to adbd (Shizuku, dadb) was rejected as too much power to keep inside a launcher. Without the grants, the rankings say Setup is needed instead of showing wrong numbers.

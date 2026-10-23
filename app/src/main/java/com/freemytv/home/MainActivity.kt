@@ -23,7 +23,10 @@ import com.freemytv.home.home.HomeStateHolder
 import com.freemytv.home.inputs.InputTray
 import com.freemytv.home.ui.AllAppsScreen
 import com.freemytv.home.ui.HomeActions
+import com.freemytv.home.monitor.SystemMonitor
 import com.freemytv.home.ui.InputActions
+import com.freemytv.home.ui.MonitorPill
+import com.freemytv.home.ui.MonitorScreen
 import com.freemytv.home.ui.WeatherPill
 import com.freemytv.home.ui.WeatherScreen
 import com.freemytv.home.weather.WeatherWidget
@@ -34,7 +37,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, AllApps, Weather }
+    private enum class Screen { Home, AllApps, Weather, Monitor }
 
     private var screen by mutableStateOf(Screen.Home)
     private lateinit var home: HomeStateHolder
@@ -49,6 +52,7 @@ class MainActivity : ComponentActivity() {
         inputs = InputTray(platform, lifecycleScope)
         val widgetSettings = WidgetSettings(platform)
         val weather = WeatherWidget(platform, widgetSettings)
+        val monitor = SystemMonitor(platform, widgetSettings)
         val artwork = AppArtworkLoader(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
@@ -67,7 +71,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             widgetSettings.load()
             // Widgets only work while the Home is visible; a TV app in front never pays for them.
-            repeatOnLifecycle(Lifecycle.State.STARTED) { weather.follow() }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { weather.follow() }
+                launch { monitor.follow() }
+            }
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -85,8 +92,10 @@ class MainActivity : ComponentActivity() {
             val homeState by home.state.collectAsStateWithLifecycle()
             val inputState by inputs.state.collectAsStateWithLifecycle()
             val weatherState by weather.state.collectAsStateWithLifecycle()
+            val monitorState by monitor.state.collectAsStateWithLifecycle()
             val statusWidgets: @Composable () -> Unit = {
                 WeatherPill(weatherState) { screen = Screen.Weather }
+                MonitorPill(monitorState) { screen = Screen.Monitor }
             }
             when (screen) {
                 Screen.Home -> HomeScreen(
@@ -128,6 +137,15 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 Screen.Weather -> WeatherScreen(weatherState.report, homeState.statusClock, statusWidgets)
+                Screen.Monitor -> MonitorScreen(
+                    state = monitorState,
+                    clock = homeState.statusClock,
+                    statusWidgets = statusWidgets,
+                    onOpen = monitor::openDetail,
+                    onClose = monitor::closeDetail,
+                    onUninstall = { library.requestUninstall(it.packageName) },
+                    onCloseApp = { scope.launch { monitor.close(it) } },
+                )
             }
         }
     }

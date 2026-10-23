@@ -2,6 +2,10 @@ package com.freemytv.home.platform
 
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.TvInputSource
+import com.freemytv.home.monitor.AppStorage
+import com.freemytv.home.monitor.MemoryUsage
+import com.freemytv.home.monitor.ProcessMemory
+import com.freemytv.home.monitor.StorageUsage
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -23,6 +27,14 @@ class FakeTvPlatform(
     /** Forecast per place name; a missing place simulates being offline. */
     var forecasts: Map<String, Forecast> = emptyMap(),
     var cached: CachedForecast? = null,
+    var storage: StorageUsage = StorageUsage(totalBytes = 8_200_000_000, freeBytes = 3_600_000_000),
+    var memory: MemoryUsage = MemoryUsage(totalBytes = 2_000_000_000, availableBytes = 580_000_000),
+    /** Null simulates missing usage access. */
+    var storagePerApp: List<AppStorage>? = emptyList(),
+    /** Null simulates missing dump access. */
+    var processes: List<ProcessMemory>? = emptyList(),
+    var labels: Map<String, String> = emptyMap(),
+    var refreshRate: Int = 60,
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
 
@@ -31,6 +43,43 @@ class FakeTvPlatform(
     val appInfoOpened = mutableListOf<String>()
     var playStoreOpened = 0
     val switchedTo = mutableListOf<String>()
+
+    /** Every system measurement the Home took, in order: "storage", "memory", "apps-storage", "processes". */
+    val measurements = mutableListOf<String>()
+    val closed = mutableListOf<String>()
+
+    override suspend fun storageUsage(): StorageUsage {
+        measurements += "storage"
+        return storage
+    }
+
+    override suspend fun memoryUsage(): MemoryUsage {
+        measurements += "memory"
+        return memory
+    }
+
+    override suspend fun appStorage(): List<AppStorage>? {
+        measurements += "apps-storage"
+        return storagePerApp
+    }
+
+    override suspend fun processMemory(): List<ProcessMemory>? {
+        measurements += "processes"
+        return processes
+    }
+
+    override suspend fun appLabel(packageName: String) =
+        labels[packageName] ?: apps.firstOrNull { it.packageName == packageName }?.label ?: packageName
+
+    override fun closeApp(packageName: String) {
+        closed += packageName
+        processes = processes?.filterNot { it.packageName == packageName }
+    }
+
+    /** Emit a reading per second; [MutableSharedFlow.subscriptionCount] tells whether the Home is measuring. */
+    override val homeFrameRate = MutableSharedFlow<Int>()
+
+    override fun displayRefreshRate() = refreshRate
 
     /** Every network request the Home made, in order: "ip", "geocode:<city>", "forecast:<place>". */
     val networkRequests = mutableListOf<String>()

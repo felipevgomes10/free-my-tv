@@ -10,9 +10,9 @@ Visual reference: `docs/design/system-monitor-detail.png`.
 
 **Status:** ready-for-agent
 
-- [ ] Compact widget shows storage %, RAM used/total, Home fps and display Hz
-- [ ] Detail lists the top 5 apps by storage with Uninstall, and the top 5 by RAM with Close
-- [ ] Close never targets the foreground app or apps playing media
-- [ ] The 60-second frame chart updates live while the detail is open and stops measuring when closed
-- [ ] A Hidden Widget takes no measurements (verifiable through the fake port)
-- [ ] Tests cover ranking, the Close eligibility rule, and the hidden-means-no-measuring rule
+- [x] Compact widget shows storage %, RAM used/total, Home fps and display Hz
+- [x] Detail lists the top 5 apps by storage with Uninstall, and the top 5 by RAM with Close
+- [x] Close never targets the foreground app or apps playing media
+- [x] The 60-second frame chart updates live while the detail is open and stops measuring when closed
+- [x] A Hidden Widget takes no measurements (verifiable through the fake port)
+- [x] Tests cover ranking, the Close eligibility rule, and the hidden-means-no-measuring rule

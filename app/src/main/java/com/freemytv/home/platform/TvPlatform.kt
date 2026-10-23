@@ -2,6 +2,10 @@ package com.freemytv.home.platform
 
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.TvInputSource
+import com.freemytv.home.monitor.AppStorage
+import com.freemytv.home.monitor.MemoryUsage
+import com.freemytv.home.monitor.ProcessMemory
+import com.freemytv.home.monitor.StorageUsage
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -59,6 +63,27 @@ interface TvPlatform {
     suspend fun forecast(place: Place): Forecast?
 
     suspend fun lastForecast(): CachedForecast?
+
+    suspend fun storageUsage(): StorageUsage
+
+    suspend fun memoryUsage(): MemoryUsage
+
+    /** Storage per installed app; null without the usage access Setup grants. */
+    suspend fun appStorage(): List<AppStorage>?
+
+    /** Memory per running process with its importance; null without the dump access Setup grants. */
+    suspend fun processMemory(): List<ProcessMemory>?
+
+    /** An app's name, or its package name if it has none. */
+    suspend fun appLabel(packageName: String): String
+
+    /** Ends a background app's processes. */
+    fun closeApp(packageName: String)
+
+    /** The Home's frames per second, one reading each second, for as long as it is collected. */
+    val homeFrameRate: Flow<Int>
+
+    fun displayRefreshRate(): Int
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?
