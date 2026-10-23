@@ -184,6 +184,9 @@ interface TvPlatform {
 
     suspend fun saveUpNext(entries: List<UpNextEntry>)
 
+    /** Deletes artwork stored for an Up Next entry that is gone. */
+    suspend fun deleteArtwork(path: String)
+
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?
 

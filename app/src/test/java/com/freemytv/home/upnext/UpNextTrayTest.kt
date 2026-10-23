@@ -1,6 +1,7 @@
 package com.freemytv.home.upnext
 
 import com.freemytv.home.platform.FakeTvPlatform
+import com.freemytv.home.platform.PackageEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -155,10 +156,108 @@ class UpNextTrayTest {
         assertEquals(listOf(DISNEY), platform.resumed)
     }
 
+    @Test
+    fun `an entry leaves at 95 percent`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", positionMillis = 6_000_000, durationMillis = 6_420_000))
+
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", positionMillis = 6_098_999, durationMillis = 6_420_000))
+        assertEquals(1, tray.state.value.entries.size)
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", positionMillis = 6_099_000, durationMillis = 6_420_000))
+
+        assertEquals(emptyList<UpNextEntry>(), tray.state.value.entries)
+    }
+
+    @Test
+    fun `an entry leaves with under two minutes left, so the credits count as the end`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Episódio 4", positionMillis = 600_000, durationMillis = 1_500_000))
+
+        play(PlayingMedia(DISNEY, playing = true, title = "Episódio 4", positionMillis = 1_380_000, durationMillis = 1_500_000))
+        assertEquals(1, tray.state.value.entries.size)
+        play(PlayingMedia(DISNEY, playing = true, title = "Episódio 4", positionMillis = 1_380_001, durationMillis = 1_500_000))
+
+        assertEquals(emptyList<UpNextEntry>(), tray.state.value.entries)
+    }
+
+    @Test
+    fun `a finished title doesn't come back while its credits keep playing`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", positionMillis = 6_300_000, durationMillis = 6_420_000))
+
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", positionMillis = 6_400_000, durationMillis = 6_420_000))
+
+        assertEquals(emptyList<UpNextEntry>(), tray.state.value.entries)
+    }
+
+    @Test
+    fun `an entry left unwatched for 30 days is gone the next time the Home looks`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", artwork = "moana.jpg"))
+        later(60L * 24 * 30 - 1)
+        tray.prune()
+        assertEquals(1, tray.state.value.entries.size)
+
+        later(1)
+        tray.prune()
+
+        assertEquals(emptyList<UpNextEntry>(), tray.state.value.entries)
+        assertEquals(listOf("moana.jpg"), platform.deletedArtwork)
+    }
+
+    @Test
+    fun `the Tray holds 20 entries and the 21st pushes out the oldest`() = runTest {
+        val tray = following()
+        repeat(21) { n ->
+            play(PlayingMedia(DISNEY, playing = true, title = "Episódio ${n + 1}"))
+            later(1)
+        }
+
+        val titles = tray.state.value.entries.map { it.title }
+        assertEquals(20, titles.size)
+        assertEquals("Episódio 21", titles.first())
+        assertEquals("Episódio 2", titles.last())
+    }
+
+    @Test
+    fun `uninstalling an app takes its entries with it`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana"), PlayingMedia(NETFLIX, playing = true))
+
+        platform.packageEvents.emit(PackageEvent.Removed(DISNEY))
+
+        assertEquals(listOf(NETFLIX), tray.state.value.entries.map { it.packageName })
+    }
+
+    @Test
+    fun `music apps and short clips never become entries`() = runTest {
+        val tray = following()
+
+        play(
+            PlayingMedia(SPOTIFY, playing = true, title = "Uma música", durationMillis = 420_000, audioApp = true),
+            PlayingMedia(YOUTUBE, playing = true, title = "Um clipe", durationMillis = 4 * 60_000),
+        )
+
+        assertEquals(emptyList<UpNextEntry>(), tray.state.value.entries)
+    }
+
+    @Test
+    fun `the owner can remove an entry`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", artwork = "moana.jpg"), PlayingMedia(NETFLIX, playing = true))
+
+        tray.remove(tray.state.value.entries.first { it.packageName == DISNEY })
+
+        assertEquals(listOf(NETFLIX), tray.state.value.entries.map { it.packageName })
+        assertEquals(listOf(NETFLIX), platform.upNext.map { it.packageName })
+        assertEquals(listOf("moana.jpg"), platform.deletedArtwork)
+    }
+
     private companion object {
         const val DISNEY = "com.disney.disneyplus"
         const val NETFLIX = "com.netflix.ninja"
         const val PRIME = "com.amazon.amazonvideo.livingroom"
         const val YOUTUBE = "com.google.android.youtube.tv"
+        const val SPOTIFY = "com.spotify.tv.android"
     }
 }

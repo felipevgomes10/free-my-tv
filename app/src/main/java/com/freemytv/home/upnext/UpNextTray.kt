@@ -1,11 +1,14 @@
 package com.freemytv.home.upnext
 
+import com.freemytv.home.platform.PackageEvent
 import com.freemytv.home.platform.TvPlatform
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.Duration
 import java.time.Instant
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /** A media session as the TV reports it, with only what the app chose to say. */
@@ -19,6 +22,8 @@ data class PlayingMedia(
     val durationMillis: Long? = null,
     /** The artwork the platform stored for this title, if the app gave any. */
     val artwork: String? = null,
+    /** The app is a music or audio app, by its own declaration. */
+    val audioApp: Boolean = false,
 )
 
 /** One movie or episode on the Up Next Tray, or one app when the app doesn't say what played. */
@@ -51,7 +56,8 @@ data class UpNextState(
 /**
  * The Up Next Tray. Android keeps the apps' own "continue watching" rows from a Home like
  * this one (ADR 0007), so the Tray is built from what the Home sees playing: one entry per
- * title, or one per app for apps that don't name what is playing.
+ * title, or one per app for apps that don't name what is playing. Entries leave once
+ * finished, after [EXPIRES_AFTER] unwatched, with their app, or when the owner removes them.
  */
 class UpNextTray(private val platform: TvPlatform) {
 
@@ -60,12 +66,24 @@ class UpNextTray(private val platform: TvPlatform) {
 
     suspend fun load() {
         _state.value = UpNextState(platform.loadUpNext().sortedByDescending { it.lastWatched })
+        prune()
     }
 
     /** Follows what plays on the TV for as long as it is collected, whichever app is in front. */
-    suspend fun follow() {
+    suspend fun follow() = coroutineScope {
+        launch {
+            platform.packageEvents.collect { event ->
+                if (event is PackageEvent.Removed) change { entries -> entries.filterNot { it.packageName == event.packageName } }
+            }
+        }
         platform.nowPlaying.collect { sessions -> sessions.forEach { record(it) } }
     }
+
+    /** Drops what went unwatched for too long; run whenever the Home shows. */
+    suspend fun prune() = change { it }
+
+    /** "Remover da lista". */
+    suspend fun remove(entry: UpNextEntry) = change { entries -> entries.filterNot { it.key == entry.key } }
 
     /** Back to the entry where the owner stopped when the app allows it, or else into its app. */
     fun select(entry: UpNextEntry) = platform.resume(entry.packageName)
@@ -76,8 +94,12 @@ class UpNextTray(private val platform: TvPlatform) {
         val key = if (title == null) media.packageName else "${media.packageName}|$title"
         val entries = _state.value.entries
         val existing = entries.firstOrNull { it.key == key }
-        // Something seen only paused, never playing, isn't something the owner started.
-        if (existing == null && !media.playing) return
+        if (media.finished()) {
+            if (existing != null) change { all -> all.filterNot { it.key == key } }
+            return
+        }
+        // Something seen only paused, never playing, isn't something the owner started; nor is music or a short clip.
+        if (existing == null && (!media.playing || media.audioApp || media.isShort())) return
         val now = platform.now().toInstant()
         val entry = UpNextEntry(
             key = key,
@@ -91,14 +113,34 @@ class UpNextTray(private val platform: TvPlatform) {
             lastWatched = if (media.playing) now else existing?.lastWatched ?: now,
         )
         if (entry == existing) return
-        val others = entries.filterNot { other ->
-            other.key == key ||
-                // Apps often start playing before they name it: that nameless moment was this title.
-                (title != null && other.key == media.packageName && Duration.between(other.lastWatched, now) < SAME_PLAYBACK)
+        change { all ->
+            all.filterNot { other ->
+                other.key == key ||
+                    // Apps often start playing before they name it: that nameless moment was this title.
+                    (title != null && other.key == media.packageName && Duration.between(other.lastWatched, now) < SAME_PLAYBACK)
+            } + entry
         }
-        val updated = (others + entry).sortedByDescending { it.lastWatched }
-        _state.value = UpNextState(updated)
-        platform.saveUpNext(updated)
+    }
+
+    /** At 95%, or with under two minutes left, what remains is credits. */
+    private fun PlayingMedia.finished(): Boolean {
+        val position = positionMillis ?: return false
+        val duration = durationMillis?.takeIf { it > 0 } ?: return false
+        return position >= duration * FINISHED_AT || duration - position < CREDITS.toMillis()
+    }
+
+    private fun PlayingMedia.isShort() = durationMillis != null && durationMillis in 1 until SHORT.toMillis()
+
+    /** Applies [edit], then the Tray's limits, and saves; artwork no entry uses any more is deleted. */
+    private suspend fun change(edit: (List<UpNextEntry>) -> List<UpNextEntry>) {
+        val before = _state.value.entries
+        val oldest = platform.now().toInstant().minus(EXPIRES_AFTER)
+        val after = edit(before).filter { it.lastWatched.isAfter(oldest) }.sortedByDescending { it.lastWatched }.take(MAX_ENTRIES)
+        if (after == before) return
+        _state.value = UpNextState(after)
+        platform.saveUpNext(after)
+        val kept = after.mapNotNull { it.artwork }.toSet()
+        before.mapNotNull { it.artwork }.filter { it !in kept }.distinct().forEach { platform.deleteArtwork(it) }
     }
 
     private fun String.sameName(other: String) = normalized() == other.normalized()
@@ -107,6 +149,11 @@ class UpNextTray(private val platform: TvPlatform) {
 
     private companion object {
         val SAME_PLAYBACK: Duration = Duration.ofMinutes(2)
+        val CREDITS: Duration = Duration.ofMinutes(2)
+        val SHORT: Duration = Duration.ofMinutes(5)
+        val EXPIRES_AFTER: Duration = Duration.ofDays(30)
+        const val FINISHED_AT = 0.95
+        const val MAX_ENTRIES = 20
         val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
     }
 }

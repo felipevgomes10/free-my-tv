@@ -67,6 +67,7 @@ fun HomeScreen(
     inputs: InputTrayState,
     upNext: UpNextState,
     onUpNext: (UpNextEntry) -> Unit,
+    onRemoveUpNext: (UpNextEntry) -> Unit,
     inputTrayFocusRequest: Int,
     artwork: AppArtworkLoader,
     actions: HomeActions,
@@ -97,6 +98,7 @@ fun HomeScreen(
                 upNext,
                 artwork,
                 onSelect = onUpNext,
+                onRemove = onRemoveUpNext,
                 dimmed = state.lifted != null || inputs.lifted != null,
                 modifier = Modifier
                     .padding(top = 8.dp)
