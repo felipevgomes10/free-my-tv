@@ -122,6 +122,7 @@ class MainActivity : ComponentActivity() {
                 app.shortcutButtons.ensureKeyFilter()
                 app.setupWatchdog.check()
                 home.refresh()
+                app.upNext.prune()
                 inputs.load()
                 settings.load()
                 updates.load()
@@ -159,6 +160,7 @@ class MainActivity : ComponentActivity() {
                     inputs = inputState,
                     upNext = upNextState,
                     onUpNext = app.upNext::select,
+                    onRemoveUpNext = { scope.launch { app.upNext.remove(it) } },
                     inputTrayFocusRequest = inputTrayFocusRequest,
                     artwork = artwork,
                     actions = HomeActions(

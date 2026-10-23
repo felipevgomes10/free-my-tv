@@ -18,7 +18,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -47,11 +50,14 @@ fun UpNextTrayRow(
     state: UpNextState,
     artwork: AppArtworkLoader,
     onSelect: (UpNextEntry) -> Unit,
+    onRemove: (UpNextEntry) -> Unit,
     dimmed: Boolean,
     modifier: Modifier = Modifier,
 ) {
     if (state.entries.isEmpty()) return
     val trayFocus = rememberTrayFocus(state.entries.map { it.key })
+    // Edit Mode on this Tray has a single action, so holding OK opens it straight away.
+    var menuFor by remember { mutableStateOf<String?>(null) }
 
     Column(modifier.alpha(if (dimmed) DIMMED else 1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
@@ -69,12 +75,25 @@ fun UpNextTrayRow(
             itemsIndexed(state.entries, key = { _, entry -> entry.key }) { index, entry ->
                 TvTile(
                     onClick = { onSelect(entry) },
+                    onLongClick = { menuFor = entry.key },
                     width = TILE_WIDTH,
                     height = TILE_HEIGHT,
                     focusedScale = 1.08f,
                     modifier = trayFocus.itemModifier(entry.key, index),
                 ) {
                     UpNextTile(entry, artwork)
+                    if (menuFor == entry.key) {
+                        ItemActionsMenu(
+                            items = listOf(
+                                MenuItem(stringResource(R.string.remove_from_list), R.drawable.ic_close, destructive = true) {
+                                    menuFor = null
+                                    onRemove(entry)
+                                },
+                            ),
+                            onDismiss = { menuFor = null },
+                            placement = MenuPlacement.Above,
+                        )
+                    }
                 }
             }
         }

@@ -405,6 +405,10 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override val nowPlaying = mediaSessions.nowPlaying
 
+    override suspend fun deleteArtwork(path: String) {
+        withContext(Dispatchers.IO) { mediaSessions.deleteArtwork(path) }
+    }
+
     override fun resume(packageName: String) {
         if (!mediaSessions.resume(packageName)) launch(packageName)
     }

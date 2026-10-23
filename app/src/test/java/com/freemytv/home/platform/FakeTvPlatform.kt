@@ -78,6 +78,12 @@ class FakeTvPlatform(
     override suspend fun saveUpNext(entries: List<UpNextEntry>) {
         upNext = entries
     }
+
+    val deletedArtwork = mutableListOf<String>()
+
+    override suspend fun deleteArtwork(path: String) {
+        deletedArtwork += path
+    }
     val uninstallRequests = mutableListOf<String>()
     val appInfoOpened = mutableListOf<String>()
     var playStoreOpened = 0

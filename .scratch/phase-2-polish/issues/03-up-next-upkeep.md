@@ -10,8 +10,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] Finished entries leave at the 95% / 2-minute rule; untouched entries leave after 30 days; the 21st entry pushes out the oldest
-- [ ] Uninstalling an app removes its entries
-- [ ] Music and media shorter than a few minutes never create entries
-- [ ] Holding OK on an entry offers "Remover da lista", which removes it
-- [ ] Tests cover the finish rule at its boundaries, the expiry, the cap, the uninstall drop and the media filter
+- [x] Finished entries leave at the 95% / 2-minute rule; untouched entries leave after 30 days; the 21st entry pushes out the oldest
+- [x] Uninstalling an app removes its entries
+- [x] Music and media shorter than a few minutes never create entries
+- [x] Holding OK on an entry offers "Remover da lista", which removes it
+- [x] Tests cover the finish rule at its boundaries, the expiry, the cap, the uninstall drop and the media filter

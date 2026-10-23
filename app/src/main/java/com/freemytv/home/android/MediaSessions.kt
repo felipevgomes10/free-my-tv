@@ -2,6 +2,7 @@ package com.freemytv.home.android
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.media.MediaMetadata
 import android.media.session.MediaController
@@ -116,6 +117,8 @@ class MediaSessions(private val context: Context) {
                 subtitle = subtitle,
                 positionMillis = state?.currentPosition(),
                 durationMillis = meta?.getLong(MediaMetadata.METADATA_KEY_DURATION)?.takeIf { it > 0 },
+                audioApp = runCatching { context.packageManager.getApplicationInfo(packageName, 0).category == ApplicationInfo.CATEGORY_AUDIO }
+                    .getOrDefault(false),
             ),
             art,
         )
@@ -142,6 +145,11 @@ class MediaSessions(private val context: Context) {
             file.outputStream().use { scaled.compress(Bitmap.CompressFormat.JPEG, 85, it) }
             file.absolutePath
         }.getOrNull()
+    }
+
+    fun deleteArtwork(path: String) {
+        // Only ever files this class stored.
+        File(path).takeIf { it.parentFile == artworkDir }?.delete()
     }
 
     private fun hash(text: String) = MessageDigest.getInstance("SHA-1").digest(text.toByteArray()).joinToString("") { "%02x".format(it) }
