@@ -81,7 +81,11 @@ class FakeTvPlatform(
         return memory
     }
 
+    /** How long ranking per-app storage takes; over a second on the owner's TV. */
+    var appStorageTakes: kotlin.time.Duration = kotlin.time.Duration.ZERO
+
     override suspend fun appStorage(): List<AppStorage>? {
+        kotlinx.coroutines.delay(appStorageTakes)
         measurements += "apps-storage"
         return storagePerApp
     }

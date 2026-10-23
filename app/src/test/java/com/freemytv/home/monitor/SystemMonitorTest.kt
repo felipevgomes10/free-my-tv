@@ -14,6 +14,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -124,6 +126,24 @@ class SystemMonitorTest {
 
         assertEquals(listOf(globoplay.packageName), platform.closed)
         assertFalse(monitor.state.value.detail!!.topMemory!!.any { it.packageName == globoplay.packageName })
+    }
+
+    @Test
+    fun `the rankings show up even when measuring them takes longer than a frame-rate reading`() = runTest(UnconfinedTestDispatcher()) {
+        val platform = platform().apply { appStorageTakes = 1_500.milliseconds }
+        val monitor = monitor(platform).monitor
+        backgroundScope.launch {
+            while (true) {
+                platform.homeFrameRate.emit(60)
+                delay(1.seconds)
+            }
+        }
+
+        monitor.openDetail()
+        advanceTimeBy(3.seconds)
+
+        assertEquals(5, monitor.state.value.detail!!.topStorage!!.size)
+        assertEquals(5, monitor.state.value.detail!!.topMemory!!.size)
     }
 
     @Test

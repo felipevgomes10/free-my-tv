@@ -120,7 +120,8 @@ class SystemReader(private val context: Context) {
 object ProcessesParser {
 
     private val RECORD = Regex("""^\s+\*(APP|PERS)\* UID \d+ ProcessRecord\{\w+ \d+:([^/\s}]+)""")
-    private val PSS = Regex("""\blastPss=([\d.]+)(KB|MB|GB)?""")
+    // Decimals follow the TV's language: "4,0MB" on the owner's pt-BR TV, "4.0MB" elsewhere.
+    private val PSS = Regex("""\blastPss=([\d.,]+)(KB|MB|GB)?""")
     private val STATE = Regex("""\bcurProcState=(-?\d+)""")
 
     fun parse(output: String): List<ProcessMemory> {
@@ -142,7 +143,7 @@ object ProcessesParser {
                 bytes = null
                 return@forEach
             }
-            PSS.find(line)?.let { bytes = toBytes(it.groupValues[1].toDouble(), it.groupValues[2]) }
+            PSS.find(line)?.let { bytes = toBytes(it.groupValues[1].replace(',', '.').toDouble(), it.groupValues[2]) }
             STATE.find(line)?.let { flush(it.groupValues[1].toInt()) }
         }
         return processes

@@ -44,6 +44,18 @@ class ProcessesParserTest {
     }
 
     @Test
+    fun `decimals written with a comma, as on the owner's pt-BR TV, keep their unit`() {
+        val tv = """
+            All known processes:
+              *APP* UID 10096 ProcessRecord{f88d141 1234:com.google.android.ext.services/u0a96}
+                lastPss=4,5MB lastSwapPss=3,0MB lastCachedPss=0,00 lastCachedSwapPss=0,00 lastRss=70MB
+                curProcState=5 mRepProcState=5 setProcState=5 lastStateTime=-3d0h14m57s614ms
+        """.trimIndent()
+
+        assertEquals(listOf(ProcessMemory("com.google.android.ext.services", (4.5 * 1_048_576).toLong(), Importance.Perceptible)), ProcessesParser.parse(tv))
+    }
+
+    @Test
     fun `a permission denial yields nothing`() {
         assertEquals(emptyList<ProcessMemory>(), ProcessesParser.parse("Permission Denial: can't dump ActivityManager from pid=1"))
     }
