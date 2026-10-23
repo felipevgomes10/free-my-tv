@@ -24,7 +24,11 @@ import com.freemytv.home.inputs.InputTray
 import com.freemytv.home.ui.AllAppsScreen
 import com.freemytv.home.ui.HomeActions
 import com.freemytv.home.monitor.SystemMonitor
+import com.freemytv.home.settings.SettingsStateHolder
 import com.freemytv.home.ui.InputActions
+import com.freemytv.home.ui.SettingsActions
+import com.freemytv.home.ui.SettingsScreen
+import com.freemytv.home.ui.StatusIconButton
 import com.freemytv.home.ui.MonitorPill
 import com.freemytv.home.ui.MonitorScreen
 import com.freemytv.home.ui.WeatherPill
@@ -37,7 +41,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, AllApps, Weather, Monitor }
+    private enum class Screen { Home, AllApps, Weather, Monitor, Settings }
 
     private var screen by mutableStateOf(Screen.Home)
     private lateinit var home: HomeStateHolder
@@ -53,6 +57,7 @@ class MainActivity : ComponentActivity() {
         val widgetSettings = WidgetSettings(platform)
         val weather = WeatherWidget(platform, widgetSettings)
         val monitor = SystemMonitor(platform, widgetSettings)
+        val settings = SettingsStateHolder(platform, widgetSettings, lifecycleScope)
         val artwork = AppArtworkLoader(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
@@ -80,6 +85,7 @@ class MainActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 home.refresh()
                 inputs.load()
+                settings.load()
                 while (true) {
                     home.tick()
                     delay(CLOCK_TICK_MILLIS)
@@ -96,6 +102,7 @@ class MainActivity : ComponentActivity() {
             val statusWidgets: @Composable () -> Unit = {
                 WeatherPill(weatherState) { screen = Screen.Weather }
                 MonitorPill(monitorState) { screen = Screen.Monitor }
+                StatusIconButton(R.drawable.ic_settings, getString(R.string.settings)) { screen = Screen.Settings }
             }
             when (screen) {
                 Screen.Home -> HomeScreen(
@@ -137,6 +144,20 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 Screen.Weather -> WeatherScreen(weatherState.report, homeState.statusClock, statusWidgets)
+                Screen.Settings -> {
+                    val settingsState by settings.state.collectAsStateWithLifecycle()
+                    SettingsScreen(
+                        state = settingsState,
+                        clock = homeState.statusClock,
+                        statusWidgets = statusWidgets,
+                        actions = SettingsActions(
+                            onWeatherVisible = { scope.launch { settings.setWeatherVisible(it) } },
+                            onMonitorVisible = { scope.launch { settings.setMonitorVisible(it) } },
+                            onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },
+                            onOpenAndroidSettings = settings::openAndroidSettings,
+                        ),
+                    )
+                }
                 Screen.Monitor -> MonitorScreen(
                     state = monitorState,
                     clock = homeState.statusClock,

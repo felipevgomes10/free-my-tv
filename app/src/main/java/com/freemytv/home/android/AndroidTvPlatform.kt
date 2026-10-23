@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.UserHandle
@@ -21,6 +22,8 @@ import com.freemytv.home.inputs.TvInputSource
 import com.freemytv.home.platform.InstalledApp
 import com.freemytv.home.platform.PackageEvent
 import com.freemytv.home.platform.TvPlatform
+import com.freemytv.home.settings.DeviceInfo
+import com.freemytv.home.settings.PackageState
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +33,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 class AndroidTvPlatform(private val context: Context) : TvPlatform {
@@ -122,6 +126,32 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     override suspend fun forecast(place: Place) = weather.forecast(place)
 
     override suspend fun lastForecast() = weather.lastForecast()
+
+    override suspend fun packageState(packageName: String): PackageState = withContext(Dispatchers.IO) {
+        val info = try {
+            packageManager.getApplicationInfo(packageName, PackageManager.MATCH_DISABLED_COMPONENTS)
+        } catch (e: PackageManager.NameNotFoundException) {
+            return@withContext PackageState.NotInstalled
+        }
+        if (info.enabled) PackageState.Enabled else PackageState.Disabled
+    }
+
+    override suspend fun tvName(): String? = withContext(Dispatchers.IO) {
+        Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME)?.takeIf { it.isNotBlank() }
+    }
+
+    override suspend fun deviceInfo(): DeviceInfo = withContext(Dispatchers.IO) {
+        DeviceInfo(
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            androidVersion = Build.VERSION.RELEASE,
+            securityPatch = runCatching { LocalDate.parse(Build.VERSION.SECURITY_PATCH) }.getOrNull(),
+            build = Build.DISPLAY,
+            homeVersion = packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty(),
+        )
+    }
+
+    override fun openAndroidSettings() = start(Intent(Settings.ACTION_SETTINGS))
 
     private val tvInputManager: TvInputManager? = context.getSystemService(TvInputManager::class.java)
 

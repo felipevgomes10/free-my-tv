@@ -6,11 +6,14 @@ import com.freemytv.home.monitor.AppStorage
 import com.freemytv.home.monitor.MemoryUsage
 import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
+import com.freemytv.home.settings.DeviceInfo
+import com.freemytv.home.settings.PackageState
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
 import kotlinx.coroutines.flow.MutableSharedFlow
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -35,6 +38,9 @@ class FakeTvPlatform(
     var processes: List<ProcessMemory>? = emptyList(),
     var labels: Map<String, String> = emptyMap(),
     var refreshRate: Int = 60,
+    var packageStates: Map<String, PackageState> = emptyMap(),
+    var name: String? = "TCL Smart TV Pro",
+    var device: DeviceInfo = DeviceInfo("TCL", "Smart TV Pro", "12", LocalDate.of(2025, 12, 5), "STT2.230203.001.AS24", "0.1.0"),
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
 
@@ -80,6 +86,18 @@ class FakeTvPlatform(
     override val homeFrameRate = MutableSharedFlow<Int>()
 
     override fun displayRefreshRate() = refreshRate
+
+    var androidSettingsOpened = 0
+
+    override suspend fun packageState(packageName: String) = packageStates[packageName] ?: PackageState.NotInstalled
+
+    override suspend fun tvName() = name
+
+    override suspend fun deviceInfo() = device
+
+    override fun openAndroidSettings() {
+        androidSettingsOpened++
+    }
 
     /** Every network request the Home made, in order: "ip", "geocode:<city>", "forecast:<place>". */
     val networkRequests = mutableListOf<String>()

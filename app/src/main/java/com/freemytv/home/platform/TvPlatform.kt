@@ -6,6 +6,8 @@ import com.freemytv.home.monitor.AppStorage
 import com.freemytv.home.monitor.MemoryUsage
 import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
+import com.freemytv.home.settings.DeviceInfo
+import com.freemytv.home.settings.PackageState
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -84,6 +86,15 @@ interface TvPlatform {
     val homeFrameRate: Flow<Int>
 
     fun displayRefreshRate(): Int
+
+    suspend fun packageState(packageName: String): PackageState
+
+    /** The name other devices see on the network, or null if the system has none. */
+    suspend fun tvName(): String?
+
+    suspend fun deviceInfo(): DeviceInfo
+
+    fun openAndroidSettings()
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

@@ -1,0 +1,80 @@
+package com.freemytv.home.settings
+
+import com.freemytv.home.platform.TvPlatform
+import com.freemytv.home.widgets.WidgetPreferences
+import com.freemytv.home.widgets.WidgetSettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import java.time.LocalDate
+
+/** The packages behind each kind of Cast on the owner's TV (ADR 0002). */
+enum class CastReceiver(val packages: List<String>) {
+    Chromecast(listOf("com.google.android.apps.mediashell")),
+    AirPlay(listOf("com.tcl.airplay2", "com.amlogic.airplay")),
+    Miracast(listOf("com.tcl.miracast")),
+}
+
+enum class PackageState { NotInstalled, Disabled, Enabled }
+
+data class CastReceiverStatus(val receiver: CastReceiver, val state: PackageState)
+
+/** What the TV and the Home are. */
+data class DeviceInfo(
+    val manufacturer: String,
+    val model: String,
+    val androidVersion: String,
+    val securityPatch: LocalDate?,
+    val build: String,
+    val homeVersion: String,
+)
+
+data class SettingsState(
+    val widgets: WidgetPreferences = WidgetPreferences(),
+    /** The name other devices see when they Cast to this TV. */
+    val tvName: String? = null,
+    val cast: List<CastReceiverStatus> = emptyList(),
+    val device: DeviceInfo? = null,
+)
+
+class SettingsStateHolder(
+    private val platform: TvPlatform,
+    private val widgetSettings: WidgetSettings,
+    scope: CoroutineScope,
+) {
+
+    private val system = MutableStateFlow(SettingsState())
+
+    val state: StateFlow<SettingsState> = combine(system, widgetSettings.preferences) { system, widgets -> system.copy(widgets = widgets) }
+        .stateIn(scope, SharingStarted.Eagerly, SettingsState())
+
+    suspend fun load() {
+        system.value = SettingsState(
+            tvName = platform.tvName(),
+            cast = CastReceiver.entries.map { CastReceiverStatus(it, stateOf(it)) },
+            device = platform.deviceInfo(),
+        )
+    }
+
+    suspend fun setWeatherVisible(visible: Boolean) = widgetSettings.setWeatherVisible(visible)
+
+    suspend fun setMonitorVisible(visible: Boolean) = widgetSettings.setMonitorVisible(visible)
+
+    /** A blank city means "Automático". */
+    suspend fun setWeatherCity(city: String?) = widgetSettings.setWeatherCity(city)
+
+    fun openAndroidSettings() = platform.openAndroidSettings()
+
+    /** A receiver works only when every one of its installed packages is enabled. */
+    private suspend fun stateOf(receiver: CastReceiver): PackageState {
+        val installed = receiver.packages.map { platform.packageState(it) }.filter { it != PackageState.NotInstalled }
+        return when {
+            installed.isEmpty() -> PackageState.NotInstalled
+            installed.any { it == PackageState.Disabled } -> PackageState.Disabled
+            else -> PackageState.Enabled
+        }
+    }
+}

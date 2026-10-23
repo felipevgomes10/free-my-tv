@@ -48,6 +48,36 @@
     <string name="close_app">Fechar</string>
     <string name="needs_setup">Para ver os apps aqui, rode a Preparação no computador.</string>
 
+    <string name="settings">Configurações</string>
+    <string name="section_widgets">Widgets</string>
+    <string name="section_cast">Transmitir para esta TV</string>
+    <string name="section_setup">Preparação</string>
+    <string name="section_about">Sobre</string>
+    <string name="section_android_settings">Configurações do Android</string>
+    <string name="weather_widget">Widget de tempo</string>
+    <string name="weather_widget_detail">Temperatura e máxima e mínima do dia na barra do topo</string>
+    <string name="weather_city">Cidade</string>
+    <string name="weather_city_hint">Deixe em branco para descobrir a cidade pela internet da TV.</string>
+    <string name="automatic">Automático</string>
+    <string name="monitor_widget">Monitor do sistema</string>
+    <string name="monitor_widget_detail">Armazenamento, memória, fps e taxa da tela</string>
+    <string name="hidden_widget_note">Um widget desligado some da tela e deixa de consultar a internet e de medir o sistema.</string>
+    <string name="tv_name">Nome da TV</string>
+    <string name="this_tv">esta TV</string>
+    <string name="chromecast">Chromecast</string>
+    <string name="airplay">AirPlay</string>
+    <string name="miracast">Miracast</string>
+    <string name="receiver_on">Ativo</string>
+    <string name="receiver_off">Desativado</string>
+    <string name="receiver_missing">Não disponível</string>
+    <string name="cast_note">No celular ou no computador, escolha %1$s na lista de transmissão.</string>
+    <string name="setup_pending">A situação da Preparação desta TV aparece aqui.</string>
+    <string name="android_settings_note">Rede, imagem, som e contas ficam nas configurações do Android. Pressione OK para abrir.</string>
+    <string name="tv">TV</string>
+    <string name="android">Android</string>
+    <string name="security_patch">Patch de segurança</string>
+    <string name="firmware">Firmware</string>
+
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
         <item quantity="other">%d apps instalados</item>

@@ -9,13 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,25 +19,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.tv.material3.Icon
 import androidx.tv.material3.Text
 import com.freemytv.home.R
@@ -129,7 +115,9 @@ fun InputTrayRow(
     }
 
     renaming?.let { input ->
-        RenameDialog(
+        TextInputDialog(
+            title = stringResource(R.string.rename_input),
+            hint = stringResource(R.string.rename_input_hint),
             current = input.displayName(),
             onDone = { actions.onRename(it); renaming = null },
             onDismiss = { renaming = null; actions.onCancel() },
@@ -171,42 +159,6 @@ private fun InputTileContent(input: InputTile, highlighted: Boolean) {
     }
 }
 
-@Composable
-private fun RenameDialog(current: String, onDone: (String) -> Unit, onDismiss: () -> Unit) {
-    var value by remember { mutableStateOf(TextFieldValue(current, TextRange(current.length))) }
-    val field = remember { FocusRequester() }
-    val keyboard = LocalSoftwareKeyboardController.current
-    Dialog(onDismissRequest = onDismiss) {
-        Column(
-            Modifier
-                .width(280.dp)
-                .background(Tokens.Menu, RoundedCornerShape(16.dp))
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(stringResource(R.string.rename_input), color = Tokens.TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            BasicTextField(
-                value = value,
-                onValueChange = { value = it },
-                singleLine = true,
-                textStyle = TextStyle(color = Tokens.TextPrimary, fontSize = 14.sp),
-                cursorBrush = SolidColor(Tokens.TextPrimary),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { onDone(value.text) }),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Tokens.Glass, RoundedCornerShape(8.dp))
-                    .padding(horizontal = 12.dp, vertical = 10.dp)
-                    .focusRequester(field),
-            )
-            Text(stringResource(R.string.rename_input_hint), color = Tokens.TextSecondary, fontSize = 10.sp)
-        }
-    }
-    LaunchedEffect(Unit) {
-        runCatching { field.requestFocus() }
-        keyboard?.show()
-    }
-}
 
 private val TILE_WIDTH = 138.dp
 private val TILE_HEIGHT = 75.dp

@@ -14,9 +14,9 @@ Visual reference: `docs/design/settings.png`.
 
 **Status:** ready-for-agent
 
-- [ ] Each Widget can be turned off and on; the change is immediate and persists
-- [ ] Choosing a city or "Automático" updates the Weather Widget
-- [ ] Cast status reflects the presence and enabled state of Chromecast, AirPlay and Miracast receivers
-- [ ] "Configurações do Android" opens Android Settings
-- [ ] Settings is built so later tickets can add sections (Botões do controle in 11) and rows (open app limit in 10)
-- [ ] Tests cover widget toggling end to end with the Status Bar and the Cast status mapping
+- [x] Each Widget can be turned off and on; the change is immediate and persists
+- [x] Choosing a city or "Automático" updates the Weather Widget
+- [x] Cast status reflects the presence and enabled state of Chromecast, AirPlay and Miracast receivers
+- [x] "Configurações do Android" opens Android Settings
+- [x] Settings is built so later tickets can add sections (Botões do controle in 11) and rows (open app limit in 10)
+- [x] Tests cover widget toggling end to end with the Status Bar and the Cast status mapping
