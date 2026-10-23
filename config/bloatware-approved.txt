@@ -1,0 +1,3 @@
+# Packages Setup disables (pm disable-user) besides the Stock Launcher, one per line.
+# Approved by the owner, package by package, from the candidate list (ticket 14).
+# Protected packages (Chromecast, AirPlay, Miracast, TV inputs, ...) are refused even if listed here.

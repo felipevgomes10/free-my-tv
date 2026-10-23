@@ -20,9 +20,9 @@ Per the owner's rule, nothing in this ticket is run against the TV except read-o
 
 **Status:** ready-for-agent
 
-- [ ] Setup and Restore both support dry run, printing the full plan
-- [ ] No plan ever touches a protected package, whatever the approved list says
-- [ ] Every package change is `disable-user`; no plan uninstalls anything
-- [ ] Restore's plan is the exact inverse of the Setup that was applied
-- [ ] The candidate bloatware list is produced from the TV's read-only package listing, with a one-line reason per package
-- [ ] Tests cover the protected-list rule, the disable-only rule and Setup/Restore symmetry
+- [x] Setup and Restore both support dry run, printing the full plan
+- [x] No plan ever touches a protected package, whatever the approved list says
+- [x] Every package change is `disable-user`; no plan uninstalls anything
+- [x] Restore's plan is the exact inverse of the Setup that was applied
+- [x] The candidate bloatware list is produced from the TV's read-only package listing, with a one-line reason per package
+- [x] Tests cover the protected-list rule, the disable-only rule and Setup/Restore symmetry
