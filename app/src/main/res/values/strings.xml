@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Free My TV</string>
+    <string name="all_apps">Todos os apps</string>
+</resources>

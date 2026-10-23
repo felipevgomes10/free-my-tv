@@ -10,10 +10,10 @@ Visual reference: `docs/design/home-app-tray.png` (Top Shelf and Up Next Tray ar
 
 **Status:** ready-for-agent
 
-- [ ] The app declares itself as a HOME/launcher activity and opens when Home is pressed on the emulator
-- [ ] All Home logic reaches Android only through the TV platform port; the Android adapter behind it holds no decisions
-- [ ] A fake port and a JVM test harness exist; tests drive the Home state holder in glossary language (e.g. "the App Tray shows the pinned apps in the owner's order", "OK on a tile asks the platform to launch that app")
-- [ ] App Banners are used when present; apps without one show their icon over a derived color
-- [ ] Pinned apps and their order persist across Home restarts
-- [ ] The install script refuses any device that is not an emulator (it never targets the TV)
-- [ ] UI strings live in resources, in pt-BR only
+- [x] The app declares itself as a HOME/launcher activity and opens when Home is pressed on the emulator
+- [x] All Home logic reaches Android only through the TV platform port; the Android adapter behind it holds no decisions
+- [x] A fake port and a JVM test harness exist; tests drive the Home state holder in glossary language (e.g. "the App Tray shows the pinned apps in the owner's order", "OK on a tile asks the platform to launch that app")
+- [x] App Banners are used when present; apps without one show their icon over a derived color
+- [x] Pinned apps and their order persist across Home restarts
+- [x] The install script refuses any device that is not an emulator (it never targets the TV)
+- [x] UI strings live in resources, in pt-BR only
