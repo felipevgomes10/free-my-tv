@@ -284,13 +284,30 @@ def confirm_on_tv(state: DeviceState, serial: str, ask: Callable[[str], str] = i
     return ask(f"This changes the TV at {serial}. Type 'sim' to continue: ").strip().lower() == "sim"
 
 
-def apply(adb: Adb, steps: Sequence[Step], out: Callable[[str], None] = print) -> List[Step]:
-    """Runs the steps in order, stopping at the first failure; returns the ones that ran."""
+class StepFailed(Exception):
+    """A step failed; everything before it ran, and the step itself may or may not have."""
+
+    def __init__(self, step: Step, cause: Exception):
+        super().__init__(f"{' '.join(step.command)}: {cause}")
+        self.step = step
+
+
+def apply(adb: Adb, steps: Sequence[Step], out: Callable[[str], None] = print, record: Callable[[Step], None] = lambda _: None) -> List[Step]:
+    """Runs the steps in order, recording each as it runs, and stops at the first failure.
+
+    A failed step is recorded too: the connection can drop after the TV carried it out (it did on
+    the owner's TV), and undoing a step that never happened is harmless.
+    """
     check_plan(steps)
     done: List[Step] = []
     for step in steps:
         out(f"  running: adb shell {' '.join(step.command)}")
-        adb.run(step.command)
+        try:
+            adb.run(step.command)
+        except RuntimeError as e:
+            record(step)
+            raise StepFailed(step, e) from e
+        record(step)
         done.append(step)
     return done
 
@@ -332,9 +349,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if not confirm_on_tv(state, args.serial):
         print("Nothing changed.")
         return 1
-    done = apply(adb, steps)
+    record = (lambda step: save_journal(args.serial, [step])) if args.action == "setup" else (lambda _: None)
+    try:
+        apply(adb, steps, record=record)
+    except StepFailed as e:
+        print(f"\nStopped: {e}", file=sys.stderr)
+        if args.action == "setup":
+            print(f"What ran so far is in the journal ({journal_path(args.serial)}). Check the TV, then run Setup again to finish, or Restore to undo.", file=sys.stderr)
+        else:
+            print("Restore stopped part-way; the journal is kept. Check the TV and run Restore again.", file=sys.stderr)
+        return 1
     if args.action == "setup":
-        print(f"Setup applied. Journal: {save_journal(args.serial, done)}")
+        print(f"Setup applied. Journal: {journal_path(args.serial)}")
     else:
         journal_path(args.serial).unlink(missing_ok=True)
         print("Restore applied.")

@@ -302,6 +302,29 @@ class CommandLineTest(unittest.TestCase):
         self.assertEqual(before[:4], tv.snapshot()[:4])
         self.assertEqual("com.google.android.apps.tv.launcherx/.home.HomeActivity", tv.home())
 
+    def test_a_dropped_connection_mid_setup_keeps_the_journal_and_restore_still_undoes_everything(self):
+        tv = FakeTv(emulator=True)
+        before = copy.deepcopy(tv.snapshot())
+        run = tv.run
+
+        def drop_after_disabling_the_launcher(command):
+            run(command)
+            if command[-1] == STOCK_LAUNCHER and command[1] == "disable-user":
+                raise RuntimeError("adb: device offline")
+            return ""
+
+        with TemporaryDirectory() as home:
+            tv.run = drop_after_disabling_the_launcher
+            code, _ = self.run_main(tv, "setup", "--apply", home=home)
+            tv.run = run
+            journal = json.loads((Path(home) / ".freemytv" / "setup-emulator-5554.json").read_text())
+            restore_code, _ = self.run_main(tv, "restore", "--apply", home=home)
+
+        self.assertEqual(1, code)
+        self.assertIn(["pm", "disable-user", "--user", "0", STOCK_LAUNCHER], [e["command"] for e in journal])
+        self.assertEqual(0, restore_code)
+        self.assertEqual(before[:4], tv.snapshot()[:4])
+
     def test_restore_without_a_journal_asks_for_the_flag(self):
         tv = FakeTv()
 
