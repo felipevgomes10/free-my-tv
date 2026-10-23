@@ -18,7 +18,7 @@ _Avoid_: App drawer, library
 The strip at the top of the Home showing time, connectivity and notifications.
 
 **Top Shelf**:
-The large area at the top of the Home that shows content from the app currently focused in the App Tray, as on Apple TV.
+The large area at the top of the Home that shows content from the app currently focused in the App Tray, as on Apple TV: what the owner last watched in that app, or the app's banner enlarged when there is nothing.
 _Avoid_: Hero, banner, featured
 
 **Settings** (Configurações):
@@ -58,7 +58,7 @@ A physical signal source the TV can switch to: an HDMI port or the antenna. Live
 _Avoid_: Source, port, channel
 
 **Up Next Tray** (Continuar assistindo):
-The Tray holding movies and episodes the owner has started in other apps and not finished.
+The Tray holding movies and episodes the owner has started in other apps and not finished, as the Home saw them play (ADR 0007); an app that doesn't say what is playing gets one entry for the app instead.
 _Avoid_: Continue watching, watch next, recents
 
 ### App lifecycle
@@ -73,6 +73,14 @@ Putting a new app on the TV, from the Play Store or from an APK sent from anothe
 **Uninstall** (Desinstalar):
 Removing an app from the TV entirely.
 _Avoid_: Delete, remove
+
+**APK Drop** (Enviar APK):
+Installing an app by sending its APK from a phone or computer to a page the TV serves on the home network while the owner has it open.
+_Avoid_: Upload, sideload server
+
+**Update Source** (Origem):
+Where a sideloaded app's new versions come from (a GitHub repository's releases), associated by the owner; the Home itself always has its own repository as its Update Source.
+_Avoid_: Repo, feed, channel
 
 **App Banner**:
 The 16:9 artwork an app supplies for TV home screens, shown as its tile; apps without one show their icon over a color taken from it.

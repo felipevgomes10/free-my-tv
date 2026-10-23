@@ -1,0 +1,7 @@
+# Up Next and the Top Shelf come from media sessions, not the TV provider
+
+The apps on this TV do publish "continue watching" rows and home-screen channels to Android's TV provider: Netflix, Prime Video, Disney+, Globoplay and YouTube all hold `WRITE_EPG_DATA`. Reading rows written by other apps, though, takes `ACCESS_ALL_EPG_DATA` and `ACCESS_WATCHED_PROGRAMS`, which are `signature|privileged` (on the owner's TV only the TV provider, `launcherx`, Katniss, Gboard and TCL's system apps hold them). ADB can't grant them, and the shell can't read the rows either (`content query` returns nothing). Google TV's own "continue watching" also comes through the Engage SDK, which only Google's surfaces can read.
+
+So the Up Next Tray and the Top Shelf are built from what the Home sees playing. Through the notification access Setup already grants, the Home watches the TV's active media sessions and keeps its own history of what played: app, title, artwork, position and duration. Selecting an entry reopens it through the session's activity while the app is still alive, and otherwise opens the app.
+
+The cost is coverage. Measured on the owner's TV (2026-10-23): YouTube, Disney+ and Crunchyroll report a title and a position; Netflix reports a position with no metadata; Prime Video reports only "PrimeVideo"; Globoplay reports no title. Entries from apps that don't name what is playing are kept per app ("Continuar no Netflix") rather than per title, and only what played after the Home started watching ever shows up.
