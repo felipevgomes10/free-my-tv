@@ -23,6 +23,9 @@ enum class SetupCheck {
 
     /** WRITE_SECURE_SETTINGS and the key filter: Shortcut Buttons and long-press Home. */
     KeyFilter,
+
+    /** The "install unknown apps" app-op: APK Drop, Update Sources and the Home's own updates. */
+    InstallApps,
 }
 
 data class SetupState(

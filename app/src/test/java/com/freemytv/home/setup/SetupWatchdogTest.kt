@@ -98,4 +98,14 @@ class SetupWatchdogTest {
         assertFalse(state.active)
         assertEquals(emptyList<SetupCheck>(), platform.setupNotifications)
     }
+
+    @Test
+    fun `a TV set up before installing apps was part of Setup shows it missing without an alarm`() = runTest {
+        val platform = FakeTvPlatform(setup = all + (SetupCheck.InstallApps to false))
+
+        val state = platform.check().state.value
+
+        assertEquals(setOf(SetupCheck.InstallApps), state.missing)
+        assertEquals(emptyList<SetupCheck>(), platform.setupNotifications)
+    }
 }
