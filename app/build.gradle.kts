@@ -19,6 +19,9 @@ android {
 
     buildTypes {
         release {
+            // The TV runs this build: the debug one is several times slower on its CPU. It keeps the
+            // debug key the Home was first installed with, so updates install over it.
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))

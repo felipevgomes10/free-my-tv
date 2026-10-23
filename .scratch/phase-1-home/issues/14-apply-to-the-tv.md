@@ -5,7 +5,7 @@
 **How (prepared in 13):** all from the repo root on the Mac, with the TV at `192.168.100.18:5555`.
 
 1. Review `config/bloatware-candidates.md` with the owner and copy each approved package into `config/bloatware-approved.txt`.
-2. Build and install the Home: `./gradlew :app:assembleDebug`, then `adb -s 192.168.100.18:5555 install -r app/build/outputs/apk/debug/app-debug.apk` (debug-signed: later updates must be signed with the same key; `scripts/install-emulator.sh` refuses the TV on purpose).
+2. Build and install the Home: `./gradlew :app:assembleRelease`, then `adb -s 192.168.100.18:5555 install -r app/build/outputs/apk/release/app-release.apk` (the release build, signed with the debug key: the debug build is several times slower on the TV, and later updates must be signed with the same key; `scripts/install-emulator.sh` refuses the TV on purpose).
 3. Dry run: `scripts/setup.sh --serial 192.168.100.18:5555` and `scripts/restore.sh --serial 192.168.100.18:5555 --without-journal`; read both plans with the owner.
 4. Apply: `scripts/setup.sh --serial 192.168.100.18:5555 --apply` (asks to type "sim"); the journal lands in `~/.freemytv/`.
 5. Walk the checklist below; Settings → Preparação must show every item Ativo.
