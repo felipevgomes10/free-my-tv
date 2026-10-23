@@ -106,7 +106,7 @@
     <string name="open_apps">Apps abertos</string>
     <string name="open_apps_limit">%1$d de %2$d no limite. Ao abrir outro, o usado há mais tempo é fechado.</string>
     <string name="no_open_apps">Nenhum app aberto.</string>
-    <string name="playing_not_closed">Tocando, não fecha sozinho</string>
+    <string name="playing_not_closed">Aberto, não fecha sozinho</string>
     <string name="used_when">Usado %1$s</string>
     <string name="ok_to_open">OK para abrir</string>
     <string name="home_to_go_back">Voltar para sair</string>
