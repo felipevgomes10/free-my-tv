@@ -12,9 +12,9 @@ Visual reference: `docs/design/home-app-tray.png` and `docs/design/home-input-tr
 
 **Status:** ready-for-agent
 
-- [ ] Focusing an app with entries shows its most recent one; with several, they cycle with dots
-- [ ] Focusing an app without entries shows its enlarged, blurred banner
-- [ ] Scrolling fast across the App Tray settles on the focused app without loading the ones passed
-- [ ] Moving to the lower Trays shrinks and dims the Top Shelf
-- [ ] The Home stays under 150 MB on the TV with the Top Shelf in use
-- [ ] Tests cover the entries per app, the fallback, cycling while focus rests and the debounce
+- [x] Focusing an app with entries shows its most recent one; with several, they cycle with dots
+- [x] Focusing an app without entries shows its enlarged, blurred banner
+- [x] Scrolling fast across the App Tray settles on the focused app without loading the ones passed
+- [x] Moving to the lower Trays shrinks and dims the Top Shelf
+- [ ] The Home stays under 150 MB on the TV with the Top Shelf in use (checked in Phase 2 ticket 08)
+- [x] Tests cover the entries per app, the fallback, cycling while focus rests and the debounce

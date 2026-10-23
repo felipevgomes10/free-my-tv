@@ -120,7 +120,7 @@ private fun UpNextTile(entry: UpNextEntry, artwork: AppArtworkLoader) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            detail(entry)?.let { Text(it, color = Color(0xCCFFFFFF), fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            upNextDetail(entry)?.let { Text(it, color = Color(0xCCFFFFFF), fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             entry.progress?.let { progress ->
                 Box(Modifier.padding(top = 4.dp).fillMaxWidth().height(2.dp).background(Color(0x40FFFFFF), RoundedCornerShape(1.dp))) {
                     Box(Modifier.fillMaxWidth(progress).fillMaxHeight().background(Tokens.TextPrimary, RoundedCornerShape(1.dp)))
@@ -132,7 +132,7 @@ private fun UpNextTile(entry: UpNextEntry, artwork: AppArtworkLoader) {
 
 /** "Episódio 4, faltam 18 min": the app's subtitle and the time left, whichever are known. */
 @Composable
-private fun detail(entry: UpNextEntry): String? {
+internal fun upNextDetail(entry: UpNextEntry): String? {
     val left = entry.remainingMillis?.let { millis ->
         val minutes = ((millis + 59_999) / 60_000).toInt()
         if (minutes < 60) stringResource(R.string.left_minutes, minutes) else stringResource(R.string.left_hours, minutes / 60, minutes % 60)
