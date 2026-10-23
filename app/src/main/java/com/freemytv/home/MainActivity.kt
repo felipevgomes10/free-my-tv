@@ -26,7 +26,10 @@ import com.freemytv.home.ui.AllAppsScreen
 import com.freemytv.home.ui.HomeActions
 import com.freemytv.home.monitor.SystemMonitor
 import com.freemytv.home.settings.SettingsStateHolder
+import com.freemytv.home.multitasking.HomePresses
+import com.freemytv.home.multitasking.Multitasking
 import com.freemytv.home.notifications.NotificationCenter
+import com.freemytv.home.ui.AppSwitcherScreen
 import com.freemytv.home.ui.InputActions
 import com.freemytv.home.ui.NotificationBanner
 import com.freemytv.home.ui.NotificationPanel
@@ -49,16 +52,19 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, AllApps, Weather, Monitor, Settings, Updates }
+    private enum class Screen { Home, AllApps, Weather, Monitor, Settings, Updates, Switcher }
 
     private var screen by mutableStateOf(Screen.Home)
     private var notificationsOpen by mutableStateOf(false)
+    private val homePresses = HomePresses()
+    private lateinit var multitasking: Multitasking
+    private lateinit var platform: AndroidTvPlatform
     private lateinit var home: HomeStateHolder
     private lateinit var inputs: InputTray
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val platform = AndroidTvPlatform(applicationContext)
+        platform = AndroidTvPlatform(applicationContext)
         val library = AppLibrary(platform)
         home = HomeStateHolder(platform, library, lifecycleScope)
         val allApps = AllAppsStateHolder(platform, library, lifecycleScope)
@@ -69,6 +75,7 @@ class MainActivity : ComponentActivity() {
         val settings = SettingsStateHolder(platform, widgetSettings, lifecycleScope)
         val updates = UpdatesStateHolder(platform)
         val notifications = NotificationCenter(platform)
+        multitasking = Multitasking(platform)
         val artwork = AppArtworkLoader(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
@@ -76,6 +83,10 @@ class MainActivity : ComponentActivity() {
             override fun handleOnBackPressed() {
                 when {
                     notificationsOpen -> notificationsOpen = false
+                    screen == Screen.Switcher -> {
+                        multitasking.closeSwitcher()
+                        screen = Screen.Home
+                    }
                     home.state.value.lifted != null -> home.cancelEdit()
                     inputs.state.value.lifted != null -> inputs.cancelEdit()
                     else -> screen = Screen.Home
@@ -86,6 +97,11 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch { library.followPackageEvents() }
         lifecycleScope.launch { inputs.followInputChanges() }
         lifecycleScope.launch { notifications.follow() }
+        lifecycleScope.launch {
+            multitasking.load()
+            // The Open App Limit holds while the Home is alive, whichever app is in front.
+            multitasking.keepLimit()
+        }
         lifecycleScope.launch {
             widgetSettings.load()
             // Widgets only work while the Home is visible; a TV app in front never pays for them.
@@ -115,6 +131,8 @@ class MainActivity : ComponentActivity() {
             val monitorState by monitor.state.collectAsStateWithLifecycle()
             val updatesState by updates.state.collectAsStateWithLifecycle()
             val notificationsState by notifications.state.collectAsStateWithLifecycle()
+            val switcherState by multitasking.switcher.collectAsStateWithLifecycle()
+            val openAppLimit by multitasking.limit.collectAsStateWithLifecycle()
             val statusWidgets: @Composable () -> Unit = {
                 NotificationsBell(notificationsState) { notificationsOpen = true }
                 WeatherPill(weatherState) { screen = Screen.Weather }
@@ -167,6 +185,7 @@ class MainActivity : ComponentActivity() {
                     val settingsState by settings.state.collectAsStateWithLifecycle()
                     SettingsScreen(
                         state = settingsState,
+                        openAppLimit = openAppLimit,
                         clock = homeState.statusClock,
                         statusWidgets = statusWidgets,
                         actions = SettingsActions(
@@ -174,9 +193,20 @@ class MainActivity : ComponentActivity() {
                             onMonitorVisible = { scope.launch { settings.setMonitorVisible(it) } },
                             onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },
                             onOpenAndroidSettings = settings::openAndroidSettings,
+                            onOpenAppLimit = { scope.launch { multitasking.setLimit(it) } },
                         ),
                     )
                 }
+                Screen.Switcher -> AppSwitcherScreen(
+                    state = switcherState,
+                    artwork = artwork,
+                    now = platform.now().toInstant(),
+                    onSwitch = { app ->
+                        screen = Screen.Home
+                        multitasking.switchTo(app)
+                    },
+                    onClose = multitasking::close,
+                )
                 Screen.Updates -> UpdatesScreen(
                     state = updatesState,
                     clock = homeState.statusClock,
@@ -216,7 +246,15 @@ class MainActivity : ComponentActivity() {
         home.cancelEdit()
         inputs.cancelEdit()
         notificationsOpen = false
-        screen = Screen.Home
+        if (intent.hasCategory(Intent.CATEGORY_HOME) && homePresses.press(platform.now().toInstant())) {
+            lifecycleScope.launch {
+                multitasking.openSwitcher()
+                screen = Screen.Switcher
+            }
+        } else {
+            multitasking.closeSwitcher()
+            screen = Screen.Home
+        }
     }
 
     private companion object {

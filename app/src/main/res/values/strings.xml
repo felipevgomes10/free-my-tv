@@ -104,6 +104,19 @@
     <string name="hours_ago">há %1$d h</string>
     <string name="yesterday">ontem</string>
 
+    <string name="open_apps">Apps abertos</string>
+    <string name="open_apps_limit">%1$d de %2$d no limite. Ao abrir outro, o usado há mais tempo é fechado.</string>
+    <string name="no_open_apps">Nenhum app aberto.</string>
+    <string name="playing_not_closed">Tocando, não fecha sozinho</string>
+    <string name="used_when">Usado %1$s</string>
+    <string name="ok_to_open">OK para abrir</string>
+    <string name="home_to_go_back">Voltar para sair</string>
+    <string name="section_open_apps">Apps abertos</string>
+    <string name="open_app_limit">Limite de apps abertos</string>
+    <string name="open_app_limit_detail">Quantos apps podem ficar abertos ao mesmo tempo</string>
+    <string name="open_app_limit_value">%1$d apps</string>
+    <string name="open_app_limit_note">Ao passar do limite, ou com pouca memória livre, o app usado há mais tempo é fechado. Apps tocando música e o app na tela nunca são fechados. Aperte Home duas vezes para ver os apps abertos.</string>
+
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
         <item quantity="other">%d apps instalados</item>

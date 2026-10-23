@@ -3,6 +3,8 @@ package com.freemytv.home.android
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.app.usage.UsageEvents
+import android.app.usage.UsageStatsManager
 import android.content.pm.ApplicationInfo
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
@@ -20,6 +22,7 @@ import com.freemytv.home.inputs.InputKind
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.Signal
 import com.freemytv.home.inputs.TvInputSource
+import com.freemytv.home.multitasking.OpenAppLimit
 import com.freemytv.home.notifications.TvNotification
 import com.freemytv.home.platform.InstalledApp
 import com.freemytv.home.platform.PackageEvent
@@ -36,6 +39,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
@@ -155,6 +159,23 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     }
 
     override fun openAndroidSettings() = start(Intent(Settings.ACTION_SETTINGS))
+
+    /** The last time each app came to the front, from usage events (needs the usage access Setup grants). */
+    override suspend fun recentUsage(since: Instant): Map<String, Instant> = withContext(Dispatchers.IO) {
+        val usage = context.getSystemService(UsageStatsManager::class.java)
+        val events = runCatching { usage.queryEvents(since.toEpochMilli(), System.currentTimeMillis()) }.getOrNull() ?: return@withContext emptyMap()
+        val last = HashMap<String, Instant>()
+        val event = UsageEvents.Event()
+        while (events.hasNextEvent()) {
+            events.getNextEvent(event)
+            if (event.eventType == UsageEvents.Event.ACTIVITY_RESUMED) last[event.packageName] = Instant.ofEpochMilli(event.timeStamp)
+        }
+        last
+    }
+
+    override suspend fun loadOpenAppLimit(): Int = withContext(Dispatchers.IO) { prefs.getInt(OPEN_APP_LIMIT, OpenAppLimit.DEFAULT) }
+
+    override suspend fun saveOpenAppLimit(limit: Int) = withContext(Dispatchers.IO) { prefs.edit().putInt(OPEN_APP_LIMIT, limit).apply() }
 
     override val notificationAccess: Flow<Boolean> = HomeNotificationListener.isConnected
 
@@ -309,6 +330,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val WEATHER_VISIBLE = "weather_visible"
         const val MONITOR_VISIBLE = "monitor_visible"
         const val WEATHER_CITY = "weather_city"
+        const val OPEN_APP_LIMIT = "open_app_limit"
         const val SEPARATOR = ","
         const val PLAY_STORE = "com.android.vending"
         const val PLAY_STORE_MY_APPS = "com.google.android.finsky.VIEW_MY_DOWNLOADS"

@@ -156,7 +156,7 @@ private fun NotificationContent(notification: TvNotification, artwork: AppArtwor
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(notification.appLabel, color = color.copy(alpha = 0.6f), fontSize = 9.sp, fontWeight = FontWeight.SemiBold)
-                Text(whenPosted(notification.postedAt, now), color = color.copy(alpha = 0.6f), fontSize = 9.sp)
+                Text(ago(notification.postedAt, now), color = color.copy(alpha = 0.6f), fontSize = 9.sp)
             }
             if (notification.title.isNotBlank()) Text(notification.title, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (notification.text.isNotBlank()) Text(notification.text, color = color.copy(alpha = 0.8f), fontSize = 10.sp, lineHeight = 13.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
@@ -195,8 +195,9 @@ private fun PanelNote(text: String, modifier: Modifier) {
     }
 }
 
+/** How long ago, Brazilian style: "agora", "há 5 min", "há 2 h", "ontem", "21 out". */
 @Composable
-private fun whenPosted(posted: Instant, now: Instant): String {
+fun ago(posted: Instant, now: Instant): String {
     val ago = Duration.between(posted, now)
     val zone = ZoneId.systemDefault()
     return when {

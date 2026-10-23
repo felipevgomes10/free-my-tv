@@ -12,10 +12,10 @@ Visual reference: `docs/design/app-switcher.png`.
 
 **Status:** ready-for-agent
 
-- [ ] Home pressed twice within a short interval opens the App Switcher; a single press still goes to the Home
-- [ ] Focus starts on the previous app; OK switches to the focused app
-- [ ] Up on a card closes that app and removes it from the row
-- [ ] The limit (2–5, default 3) is adjustable in Settings and persists
-- [ ] Exceeding the limit or dropping below 300 MB free closes the least recently used eligible app
-- [ ] Apps playing media, foreground services, system services and Cast Receivers are never closed nor counted
-- [ ] Tests cover LRU ordering, both triggers, all exemptions, and double-press detection
+- [x] Home pressed twice within a short interval opens the App Switcher; a single press still goes to the Home
+- [x] Focus starts on the previous app; OK switches to the focused app
+- [x] Up on a card closes that app and removes it from the row
+- [x] The limit (2–5, default 3) is adjustable in Settings and persists
+- [x] Exceeding the limit or dropping below 300 MB free closes the least recently used eligible app
+- [x] Apps playing media, foreground services, system services and Cast Receivers are never closed nor counted
+- [x] Tests cover LRU ordering, both triggers, all exemptions, and double-press detection

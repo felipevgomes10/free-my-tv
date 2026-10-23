@@ -16,6 +16,7 @@ import com.freemytv.home.widgets.WidgetPreferences
 import com.freemytv.home.notifications.TvNotification
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -44,6 +45,8 @@ class FakeTvPlatform(
     var packageStates: Map<String, PackageState> = emptyMap(),
     var name: String? = "TCL Smart TV Pro",
     var packages: List<InstalledPackage> = emptyList(),
+    var lastUsed: Map<String, Instant> = emptyMap(),
+    var openAppLimit: Int = 3,
     var device: DeviceInfo = DeviceInfo("TCL", "Smart TV Pro", "12", LocalDate.of(2025, 12, 5), "STT2.230203.001.AS24", "0.1.0"),
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
@@ -106,6 +109,14 @@ class FakeTvPlatform(
     /** An app posts (or updates) a notification. */
     fun post(notification: TvNotification) {
         activeNotifications.value = activeNotifications.value.filterNot { it.key == notification.key } + notification
+    }
+
+    override suspend fun recentUsage(since: Instant) = lastUsed.filterValues { !it.isBefore(since) }
+
+    override suspend fun loadOpenAppLimit() = openAppLimit
+
+    override suspend fun saveOpenAppLimit(limit: Int) {
+        openAppLimit = limit
     }
 
     var androidSettingsOpened = 0

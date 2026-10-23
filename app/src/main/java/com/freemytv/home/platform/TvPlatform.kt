@@ -15,6 +15,7 @@ import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 import java.time.ZonedDateTime
 
 /**
@@ -118,6 +119,13 @@ interface TvPlatform {
 
     /** Dismisses every clearable notification. */
     fun clearNotifications()
+
+    /** When each app was last in front, for apps used since [since]; empty without usage access. */
+    suspend fun recentUsage(since: Instant): Map<String, Instant>
+
+    suspend fun loadOpenAppLimit(): Int
+
+    suspend fun saveOpenAppLimit(limit: Int)
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

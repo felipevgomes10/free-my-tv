@@ -38,6 +38,7 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.freemytv.home.R
 import com.freemytv.home.home.StatusClock
+import com.freemytv.home.multitasking.OpenAppLimit
 import com.freemytv.home.settings.CastReceiver
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.settings.SettingsState
@@ -48,6 +49,7 @@ import java.util.Locale
 /** The sections of Settings, in the order the owner sees them. */
 enum class SettingsSection(val title: Int, val icon: Int) {
     Widgets(R.string.section_widgets, R.drawable.ic_widgets),
+    OpenApps(R.string.section_open_apps, R.drawable.ic_apps),
     Cast(R.string.section_cast, R.drawable.ic_cast),
     Setup(R.string.section_setup, R.drawable.ic_build),
     About(R.string.section_about, R.drawable.ic_info),
@@ -59,11 +61,13 @@ class SettingsActions(
     val onMonitorVisible: (Boolean) -> Unit,
     val onWeatherCity: (String) -> Unit,
     val onOpenAndroidSettings: () -> Unit,
+    val onOpenAppLimit: (Int) -> Unit,
 )
 
 @Composable
 fun SettingsScreen(
     state: SettingsState,
+    openAppLimit: Int,
     clock: StatusClock,
     statusWidgets: @Composable () -> Unit,
     actions: SettingsActions,
@@ -97,6 +101,12 @@ fun SettingsScreen(
             Column(Modifier.weight(1f).padding(top = 48.dp)) {
                 when (section) {
                     SettingsSection.Widgets -> WidgetsPanel(state, actions)
+                    SettingsSection.OpenApps -> {
+                        ValueRow(stringResource(R.string.open_app_limit), stringResource(R.string.open_app_limit_detail), stringResource(R.string.open_app_limit_value, openAppLimit)) {
+                            actions.onOpenAppLimit(if (openAppLimit >= OpenAppLimit.RANGE.last) OpenAppLimit.RANGE.first else openAppLimit + 1)
+                        }
+                        Note(stringResource(R.string.open_app_limit_note))
+                    }
                     SettingsSection.Cast -> CastPanel(state)
                     SettingsSection.Setup -> Note(stringResource(R.string.setup_pending))
                     SettingsSection.About -> AboutPanel(state)
