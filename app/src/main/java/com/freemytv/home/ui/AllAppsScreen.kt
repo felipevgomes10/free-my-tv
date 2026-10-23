@@ -59,6 +59,7 @@ fun AllAppsScreen(
     onUninstall: (AllAppsItem) -> Unit,
     onAppInfo: (AllAppsItem) -> Unit,
     onInstallApp: () -> Unit,
+    statusWidgets: @Composable () -> Unit,
 ) {
     var actionsFor by remember { mutableStateOf<AllAppsItem?>(null) }
     val firstApp = remember { FocusRequester() }
@@ -73,7 +74,7 @@ fun AllAppsScreen(
             .background(Tokens.Background)
             .padding(top = Tokens.SafeAreaTop),
     ) {
-        StatusBar(clock, Modifier.padding(start = Tokens.SafeAreaHorizontal))
+        StatusBar(clock, Modifier.padding(horizontal = Tokens.SafeAreaHorizontal), statusWidgets)
         Row(
             Modifier.fillMaxWidth().padding(horizontal = Tokens.SafeAreaHorizontal, vertical = 20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,

@@ -10,9 +10,9 @@ Visual reference: `docs/design/weather-detail.png` and the Status Bar in `docs/d
 
 **Status:** ready-for-agent
 
-- [ ] The compact widget shows icon, temperature and today's high/low
-- [ ] The detail screen shows humidity, chance of rain, 12 hours and 7 days
-- [ ] Location uses the chosen city, falling back to IP-based location when set to automatic
-- [ ] When the network is unavailable, last known values are shown and no error banner appears on the Home
-- [ ] A Hidden Widget performs no network requests (verifiable through the fake port)
-- [ ] Tests cover city vs automatic location, offline behaviour and the hidden-means-no-fetch rule
+- [x] The compact widget shows icon, temperature and today's high/low
+- [x] The detail screen shows humidity, chance of rain, 12 hours and 7 days
+- [x] Location uses the chosen city, falling back to IP-based location when set to automatic
+- [x] When the network is unavailable, last known values are shown and no error banner appears on the Home
+- [x] A Hidden Widget performs no network requests (verifiable through the fake port)
+- [x] Tests cover city vs automatic location, offline behaviour and the hidden-means-no-fetch rule

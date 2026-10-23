@@ -21,6 +21,8 @@ import com.freemytv.home.inputs.TvInputSource
 import com.freemytv.home.platform.InstalledApp
 import com.freemytv.home.platform.PackageEvent
 import com.freemytv.home.platform.TvPlatform
+import com.freemytv.home.weather.Place
+import com.freemytv.home.widgets.WidgetPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +79,32 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         launcherApps.registerCallback(callback, Handler(Looper.getMainLooper()))
         awaitClose { launcherApps.unregisterCallback(callback) }
     }
+
+    private val weather = WeatherService(prefs)
+
+    override suspend fun loadWidgetPreferences(): WidgetPreferences = withContext(Dispatchers.IO) {
+        WidgetPreferences(
+            weatherVisible = prefs.getBoolean(WEATHER_VISIBLE, true),
+            monitorVisible = prefs.getBoolean(MONITOR_VISIBLE, true),
+            weatherCity = prefs.getString(WEATHER_CITY, null),
+        )
+    }
+
+    override suspend fun saveWidgetPreferences(preferences: WidgetPreferences) = withContext(Dispatchers.IO) {
+        prefs.edit()
+            .putBoolean(WEATHER_VISIBLE, preferences.weatherVisible)
+            .putBoolean(MONITOR_VISIBLE, preferences.monitorVisible)
+            .putString(WEATHER_CITY, preferences.weatherCity)
+            .apply()
+    }
+
+    override suspend fun locateByIp() = weather.locateByIp()
+
+    override suspend fun geocode(city: String) = weather.geocode(city)
+
+    override suspend fun forecast(place: Place) = weather.forecast(place)
+
+    override suspend fun lastForecast() = weather.lastForecast()
 
     private val tvInputManager: TvInputManager? = context.getSystemService(TvInputManager::class.java)
 
@@ -192,6 +220,9 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val TAG = "AndroidTvPlatform"
         const val PINNED_APPS = "pinned_apps"
         const val INPUT_PREFERENCES = "input_preferences"
+        const val WEATHER_VISIBLE = "weather_visible"
+        const val MONITOR_VISIBLE = "monitor_visible"
+        const val WEATHER_CITY = "weather_city"
         const val SEPARATOR = ","
         const val PLAY_STORE = "com.android.vending"
     }

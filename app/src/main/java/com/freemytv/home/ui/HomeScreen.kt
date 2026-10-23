@@ -66,6 +66,7 @@ fun HomeScreen(
     artwork: AppArtworkLoader,
     actions: HomeActions,
     inputActions: InputActions,
+    statusWidgets: @Composable () -> Unit,
 ) {
     var inputsFocused by remember { mutableStateOf(false) }
     // The top of the Home recedes when focus moves down to the Input Tray, so every tray fits.
@@ -79,7 +80,7 @@ fun HomeScreen(
     ) {
         // Laid out at full height and clipped by the screen: trays below the fold peek in, nothing scrolls.
         Column(Modifier.fillMaxSize().wrapContentHeight(Alignment.Top, unbounded = true)) {
-            StatusBar(state.statusClock, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop))
+            StatusBar(state.statusClock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
             Box(Modifier.height(topArea)) {
                 val hint = state.lifted?.let { stringResource(R.string.app_tray) to it.label }
                     ?: inputs.lifted?.let { stringResource(R.string.inputs) to it.displayName() }
@@ -98,11 +99,15 @@ fun HomeScreen(
     }
 }
 
+/** The clock on the left and the compact Widgets and system icons on the right. */
 @Composable
-fun StatusBar(clock: StatusClock, modifier: Modifier = Modifier) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(1.dp)) {
-        Text(clock.time, color = Tokens.TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.25).sp)
-        Text(clock.date, color = Tokens.TextSecondary, fontSize = 9.sp)
+fun StatusBar(clock: StatusClock, modifier: Modifier = Modifier, trailing: @Composable () -> Unit = {}) {
+    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            Text(clock.time, color = Tokens.TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.25).sp)
+            Text(clock.date, color = Tokens.TextSecondary, fontSize = 9.sp)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) { trailing() }
     }
 }
 

@@ -2,6 +2,10 @@ package com.freemytv.home.platform
 
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.TvInputSource
+import com.freemytv.home.weather.CachedForecast
+import com.freemytv.home.weather.Forecast
+import com.freemytv.home.weather.Place
+import com.freemytv.home.widgets.WidgetPreferences
 import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 
@@ -40,6 +44,21 @@ interface TvPlatform {
     suspend fun loadInputPreferences(): InputPreferences
 
     suspend fun saveInputPreferences(preferences: InputPreferences)
+
+    suspend fun loadWidgetPreferences(): WidgetPreferences
+
+    suspend fun saveWidgetPreferences(preferences: WidgetPreferences)
+
+    /** Where the TV is, from its public IP; null when offline or unknown. */
+    suspend fun locateByIp(): Place?
+
+    /** The place for a city name; null when offline or not found. */
+    suspend fun geocode(city: String): Place?
+
+    /** Current conditions plus hourly and daily forecasts; null when offline. Each success is kept as [lastForecast]. */
+    suspend fun forecast(place: Place): Forecast?
+
+    suspend fun lastForecast(): CachedForecast?
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

@@ -23,6 +23,20 @@
     <string name="rename_input_hint">Deixe em branco para voltar ao nome original.</string>
     <string name="edit_mode_hint">Use ← e → para mover %1$s. Pressione OK para soltar ou Voltar para sair.</string>
 
+    <string name="now">Agora</string>
+    <string name="today">Hoje</string>
+    <string name="humidity">Umidade %1$d%%</string>
+    <string name="rain_chance">Chuva %1$d%%</string>
+    <string name="weather_unavailable">Ainda não há previsão. A TV precisa de internet para buscar o tempo.</string>
+    <string name="condition_clear">Céu limpo</string>
+    <string name="condition_partly_cloudy">Parcialmente nublado</string>
+    <string name="condition_cloudy">Nublado</string>
+    <string name="condition_fog">Neblina</string>
+    <string name="condition_drizzle">Garoa</string>
+    <string name="condition_rain">Chuva</string>
+    <string name="condition_snow">Neve</string>
+    <string name="condition_thunderstorm">Tempestade</string>
+
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
         <item quantity="other">%d apps instalados</item>

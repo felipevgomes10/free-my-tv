@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,13 +24,17 @@ import com.freemytv.home.inputs.InputTray
 import com.freemytv.home.ui.AllAppsScreen
 import com.freemytv.home.ui.HomeActions
 import com.freemytv.home.ui.InputActions
+import com.freemytv.home.ui.WeatherPill
+import com.freemytv.home.ui.WeatherScreen
+import com.freemytv.home.weather.WeatherWidget
+import com.freemytv.home.widgets.WidgetSettings
 import com.freemytv.home.ui.HomeScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, AllApps }
+    private enum class Screen { Home, AllApps, Weather }
 
     private var screen by mutableStateOf(Screen.Home)
     private lateinit var home: HomeStateHolder
@@ -42,6 +47,8 @@ class MainActivity : ComponentActivity() {
         home = HomeStateHolder(platform, library, lifecycleScope)
         val allApps = AllAppsStateHolder(platform, library, lifecycleScope)
         inputs = InputTray(platform, lifecycleScope)
+        val widgetSettings = WidgetSettings(platform)
+        val weather = WeatherWidget(platform, widgetSettings)
         val artwork = AppArtworkLoader(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
@@ -58,6 +65,11 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch { library.followPackageEvents() }
         lifecycleScope.launch { inputs.followInputChanges() }
         lifecycleScope.launch {
+            widgetSettings.load()
+            // Widgets only work while the Home is visible; a TV app in front never pays for them.
+            repeatOnLifecycle(Lifecycle.State.STARTED) { weather.follow() }
+        }
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 home.refresh()
                 inputs.load()
@@ -72,6 +84,10 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             val homeState by home.state.collectAsStateWithLifecycle()
             val inputState by inputs.state.collectAsStateWithLifecycle()
+            val weatherState by weather.state.collectAsStateWithLifecycle()
+            val statusWidgets: @Composable () -> Unit = {
+                WeatherPill(weatherState) { screen = Screen.Weather }
+            }
             when (screen) {
                 Screen.Home -> HomeScreen(
                     state = homeState,
@@ -95,6 +111,7 @@ class MainActivity : ComponentActivity() {
                         onShowHidden = { scope.launch { inputs.showHidden() } },
                         onCancel = inputs::cancelEdit,
                     ),
+                    statusWidgets = statusWidgets,
                 )
                 Screen.AllApps -> {
                     val allAppsState by allApps.state.collectAsStateWithLifecycle()
@@ -107,8 +124,10 @@ class MainActivity : ComponentActivity() {
                         onUninstall = { allApps.uninstall(it.packageName) },
                         onAppInfo = { allApps.openAppInfo(it.packageName) },
                         onInstallApp = allApps::installApp,
+                        statusWidgets = statusWidgets,
                     )
                 }
+                Screen.Weather -> WeatherScreen(weatherState.report, homeState.statusClock, statusWidgets)
             }
         }
     }
