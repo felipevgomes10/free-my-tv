@@ -1,0 +1,3 @@
+# The Home does not implement an AirPlay receiver
+
+Casting is handled by Cast Receivers we don't own: the system's Chromecast built-in, the TV's native AirPlay 2 if the firmware has it, otherwise a third-party receiver app (e.g. AirScreen) that the Home keeps running and reports on. Writing our own AirPlay receiver was rejected: the open implementations (UxPlay and friends) are reverse-engineered, break when iOS changes, and would cost more than the rest of the project combined. The owner's TCL (Google TV, Android 12) ships a native AirPlay 2 receiver (`com.tcl.airplay2`, backed by `com.amlogic.airplay`) and Miracast (`com.tcl.miracast`); the ADB setup must never disable these or the Chromecast service (`com.google.android.apps.mediashell`) while removing bloatware.
