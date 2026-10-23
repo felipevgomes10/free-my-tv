@@ -19,8 +19,8 @@
 - [x] Restore dry run printed a plan that matches the Setup about to be applied
 - [x] Pressing Home opens our Home; holding Home opens the Notification Panel; Home twice opens the App Switcher
 - [x] Netflix, Globoplay, Prime Video, Disney+, YouTube and Input buttons all work
-- [ ] Each Input switches correctly, including the antenna
-- [ ] Chromecast, AirPlay and Miracast still receive a Cast
-- [ ] Screensaver and Assistant still work
+- [x] Each Input switches correctly, including the antenna
+- [x] Chromecast, AirPlay and Miracast still receive a Cast
+- [x] Screensaver and Assistant still work
 - [ ] The Home stays under 150 MB in use after an hour of normal use
 - [x] Restore is known to work (rehearsed on the emulator) and its command is written down for the owner
