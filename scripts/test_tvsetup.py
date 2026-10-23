@@ -27,7 +27,7 @@ class FakeTv:
         self.enabled = {HOME, STOCK_LAUNCHER, SETUP_WRAITH, *BLOAT, "com.tcl.miracast", "com.google.android.apps.mediashell", "com.android.vending"}
         self.disabled = {"com.tcl.exhibit"}
         self.granted = set()
-        self.appop = "default"
+        self.appops = {"GET_USAGE_STATS": "default", "REQUEST_INSTALL_PACKAGES": "default"}
         self.secure = {
             "enabled_notification_listeners": "com.google.android.apps.tv.launcherx/.coreservices.notificationlistener.TvNotificationListenerService",
             "enabled_accessibility_services": "",
@@ -37,7 +37,7 @@ class FakeTv:
 
 
     def snapshot(self):
-        return (sorted(self.enabled), sorted(self.disabled), sorted(self.granted), self.appop, dict(self.secure))
+        return (sorted(self.enabled), sorted(self.disabled), sorted(self.granted), dict(self.appops), dict(self.secure))
 
     def home(self):
         """What Home opens, as on the owner's TV: setupwraith's RecoveryActivity outranks any third-party Home once the launcher is gone."""
@@ -55,8 +55,8 @@ class FakeTv:
             return "".join(f"package:{p}\n" for p in sorted(self.disabled))
         if c == ["dumpsys", "package", HOME]:
             return "".join(f"      {p}: granted=true\n" for p in sorted(self.granted))
-        if c == ["appops", "get", HOME, "GET_USAGE_STATS"]:
-            return f"GET_USAGE_STATS: {self.appop}\n"
+        if c[:3] == ["appops", "get", HOME] and c[3] in self.appops:
+            return f"{c[3]}: {self.appops[c[3]]}\n"
         if c[:3] == ["settings", "get", "secure"]:
             return self.secure.get(c[3]) or "null"
         if c == ["getprop", "ro.kernel.qemu"]:
@@ -70,8 +70,8 @@ class FakeTv:
             self.granted.add(c[3])
         elif c[:3] == ["pm", "revoke", HOME]:
             self.granted.discard(c[3])
-        elif c[:4] == ["appops", "set", HOME, "GET_USAGE_STATS"]:
-            self.appop = c[4]
+        elif c[:3] == ["appops", "set", HOME] and c[3] in self.appops:
+            self.appops[c[3]] = c[4]
         elif c[:3] == ["cmd", "notification", "allow_listener"]:
             self._listeners(lambda items: items + [c[3]])
         elif c[:3] == ["cmd", "notification", "disallow_listener"]:
@@ -112,7 +112,7 @@ class SetupTest(unittest.TestCase):
         tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
 
         self.assertEqual(set(tvsetup.GRANTED_PERMISSIONS), tv.granted)
-        self.assertEqual("allow", tv.appop)
+        self.assertEqual({"GET_USAGE_STATS": "allow", "REQUEST_INSTALL_PACKAGES": "allow"}, tv.appops)
         self.assertIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertTrue({STOCK_LAUNCHER, *BLOAT} <= tv.disabled)
         self.assertEqual(KEY_FILTER, tv.secure["enabled_accessibility_services"])
@@ -220,6 +220,19 @@ class RestoreTest(unittest.TestCase):
 
         self.assertEqual("com.example/.Reader", tv.secure["enabled_accessibility_services"])
 
+    def test_a_tv_set_up_before_installing_was_allowed_gets_only_that_step_and_restore_takes_it_back(self):
+        tv = FakeTv()
+        first = [s for s in setup_plan(tv) if "REQUEST_INSTALL_PACKAGES" not in s.command]
+        tvsetup.apply(tv, first, out=lambda _: None)
+
+        second = setup_plan(tv)
+        tvsetup.apply(tv, second, out=lambda _: None)
+
+        self.assertEqual([["appops", "set", HOME, "REQUEST_INSTALL_PACKAGES", "allow"]], [s.command for s in second if s.undo])
+        self.assertEqual("allow", tv.appops["REQUEST_INSTALL_PACKAGES"])
+        tvsetup.apply(tv, tvsetup.plan_restore(first + second, tvsetup.read_state(tv)), out=lambda _: None)
+        self.assertEqual("default", tv.appops["REQUEST_INSTALL_PACKAGES"])
+
     def test_without_the_journal_restore_still_brings_back_the_stock_launcher_and_revokes_everything(self):
         tv = FakeTv()
         tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
@@ -228,6 +241,7 @@ class RestoreTest(unittest.TestCase):
 
         self.assertTrue({STOCK_LAUNCHER, SETUP_WRAITH, *BLOAT} <= tv.enabled)
         self.assertEqual(set(), tv.granted)
+        self.assertEqual({"GET_USAGE_STATS": "default", "REQUEST_INSTALL_PACKAGES": "default"}, tv.appops)
         self.assertNotIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertEqual("", tv.secure["enabled_accessibility_services"])
 

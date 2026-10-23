@@ -137,6 +137,7 @@
     <string name="check_usage_access">Histórico de uso dos apps</string>
     <string name="check_notification_access">Notificações</string>
     <string name="check_key_filter">Botões do controle</string>
+    <string name="check_install_apps">Instalação de apps</string>
     <string name="check_ok">Ativo</string>
     <string name="check_missing">Falta</string>
     <string name="setup_lost_launcher_title">O launcher original voltou</string>

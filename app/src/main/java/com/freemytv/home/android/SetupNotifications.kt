@@ -49,6 +49,7 @@ object SetupNotifications {
         SetupCheck.UsageAccess -> R.string.check_usage_access
         SetupCheck.NotificationAccess -> R.string.check_notification_access
         SetupCheck.KeyFilter -> R.string.check_key_filter
+        SetupCheck.InstallApps -> R.string.check_install_apps
     }
 
     private const val NOTIFICATION_BASE = 4200

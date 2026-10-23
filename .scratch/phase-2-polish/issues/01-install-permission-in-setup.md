@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] The Setup plan grants the install app-op, and the Restore plan resets it (dry run shows both)
-- [ ] Settings → Preparação lists the install permission with the other checks
-- [ ] Losing the grant raises one Setup notification, which is withdrawn once the grant is back
-- [ ] Python tests cover the new step in Setup and its inverse in Restore; Kotlin tests cover the new check in the Setup Watchdog
+- [x] The Setup plan grants the install app-op, and the Restore plan resets it (dry run shows both)
+- [x] Settings → Preparação lists the install permission with the other checks
+- [x] Losing the grant raises one Setup notification, which is withdrawn once the grant is back
+- [x] Python tests cover the new step in Setup and its inverse in Restore; Kotlin tests cover the new check in the Setup Watchdog

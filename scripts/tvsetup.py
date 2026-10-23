@@ -35,6 +35,12 @@ GRANTED_PERMISSIONS = [
     "android.permission.PACKAGE_USAGE_STATS",
     "android.permission.WRITE_SECURE_SETTINGS",
 ]
+# App-ops Setup allows, with what each is for.
+ALLOWED_APP_OPS = {
+    "GET_USAGE_STATS": "usage history",
+    # APK Drop, Update Sources and the Home's own updates.
+    "REQUEST_INSTALL_PACKAGES": "installing apps",
+}
 
 # Never disabled, whatever the approved list says (ADR 0002 and ticket 13).
 PROTECTED = {
@@ -117,7 +123,7 @@ class DeviceState:
     enabled: Set[str]
     disabled: Set[str]
     granted: Set[str]
-    usage_appop_allowed: bool
+    allowed_app_ops: Set[str]
     notification_listeners: List[str]
     accessibility_services: List[str]
     is_emulator: bool
@@ -136,7 +142,6 @@ def read_state(adb: Adb) -> DeviceState:
 
     dump = tolerant(["dumpsys", "package", HOME])
     granted = {p for p in GRANTED_PERMISSIONS if f"{p}: granted=true" in dump}
-    appop = tolerant(["appops", "get", HOME, "GET_USAGE_STATS"])
 
     def secure_list(name: str) -> List[str]:
         value = adb.query(["settings", "get", "secure", name]).strip()
@@ -146,7 +151,7 @@ def read_state(adb: Adb) -> DeviceState:
         enabled=packages("-e"),
         disabled=packages("-d"),
         granted=granted,
-        usage_appop_allowed="allow" in appop,
+        allowed_app_ops={op for op in ALLOWED_APP_OPS if f"{op}: allow" in tolerant(["appops", "get", HOME, op])},
         notification_listeners=secure_list("enabled_notification_listeners"),
         accessibility_services=secure_list("enabled_accessibility_services"),
         is_emulator=adb.query(["getprop", "ro.kernel.qemu"]).strip() == "1",
@@ -169,8 +174,9 @@ def plan_setup(state: DeviceState, approved: Sequence[str]) -> List[Step]:
     for permission in GRANTED_PERMISSIONS:
         if permission not in state.granted:
             steps.append(Step(["pm", "grant", HOME, permission], ["pm", "revoke", HOME, permission], f"grant {permission.rsplit('.', 1)[1]}"))
-    if not state.usage_appop_allowed:
-        steps.append(Step(["appops", "set", HOME, "GET_USAGE_STATS", "allow"], ["appops", "set", HOME, "GET_USAGE_STATS", "default"], "allow usage history"))
+    for op, what in ALLOWED_APP_OPS.items():
+        if op not in state.allowed_app_ops:
+            steps.append(Step(["appops", "set", HOME, op, "allow"], ["appops", "set", HOME, op, "default"], f"allow {what}"))
     if NOTIFICATION_LISTENER not in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "allow_listener", NOTIFICATION_LISTENER], ["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], "allow reading notifications"))
     for package in [*sorted(set(approved) - set(STOCK_HOME)), *STOCK_HOME]:
@@ -215,8 +221,9 @@ def plan_restore_without_journal(state: DeviceState, approved: Sequence[str]) ->
             steps.append(Step(["pm", "enable", package], None, f"enable {package}"))
     if NOTIFICATION_LISTENER in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], None, "stop reading notifications"))
-    if state.usage_appop_allowed:
-        steps.append(Step(["appops", "set", HOME, "GET_USAGE_STATS", "default"], None, "reset usage history access"))
+    for op, what in reversed(list(ALLOWED_APP_OPS.items())):
+        if op in state.allowed_app_ops:
+            steps.append(Step(["appops", "set", HOME, op, "default"], None, f"reset access to {what}"))
     for permission in reversed(GRANTED_PERMISSIONS):
         if permission in state.granted:
             steps.append(Step(["pm", "revoke", HOME, permission], None, f"revoke {permission.rsplit('.', 1)[1]}"))
