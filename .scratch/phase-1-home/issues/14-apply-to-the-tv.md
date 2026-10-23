@@ -13,7 +13,7 @@
 
 **Blocked by:** 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13 (all of Phase 1)
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] Owner approved the bloatware list
 - [x] Restore dry run printed a plan that matches the Setup about to be applied
@@ -22,5 +22,19 @@
 - [x] Each Input switches correctly, including the antenna
 - [x] Chromecast, AirPlay and Miracast still receive a Cast
 - [x] Screensaver and Assistant still work
-- [ ] The Home stays under 150 MB in use after an hour of normal use
+- [x] The Home stays under 150 MB in use after an hour of normal use (waived by the owner: they will report it if they notice anything; readings were 92–108 MB)
 - [x] Restore is known to work (rehearsed on the emulator) and its command is written down for the owner
+
+## Comments
+
+**2026-10-23, applied.** Setup is applied on the TV and the owner walked the checklist. On the way:
+
+- The setup app's recovery screen took Home over once the Stock Launcher was off. Setup now disables `setupwraith` before `launcherx`.
+- The TV lost Wi-Fi mid-Setup. The journal is now written step by step.
+- Setup notifications are withdrawn once that part holds again.
+- The System Monitor rankings never landed on the TV (measured inside a state update that kept retrying). Comma decimals in `dumpsys` are parsed too.
+- The focus moved twice per press and the frame rate dropped. The TV now runs the release build (janky frames 76% → ~4%), and the key filter answers on its own thread.
+- The App Switcher label now says "Aberto, não fecha sozinho".
+
+Restore: `scripts/restore.sh --serial 192.168.100.18:5555 --apply` (journal in `~/.freemytv/`).
+
