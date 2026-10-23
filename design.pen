@@ -11767,7 +11767,7 @@
                           "id": "C0Ct6",
                           "name": "Text",
                           "fill": "#30D158",
-                          "content": "Tocando, não fecha sozinho",
+                          "content": "Aberto, não fecha sozinho",
                           "fontFamily": "$font",
                           "fontSize": 20,
                           "fontWeight": "normal"
