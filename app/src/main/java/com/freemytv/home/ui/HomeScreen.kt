@@ -1,18 +1,19 @@
 package com.freemytv.home.ui
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,8 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -47,6 +46,7 @@ import com.freemytv.home.android.AppArtworkLoader
 import com.freemytv.home.home.AppTrayItem
 import com.freemytv.home.home.HomeState
 import com.freemytv.home.home.StatusClock
+import com.freemytv.home.inputs.InputTrayState
 import com.freemytv.home.ui.theme.Tokens
 
 /** Everything the owner can do from the Home. */
@@ -62,20 +62,38 @@ class HomeActions(
 @Composable
 fun HomeScreen(
     state: HomeState,
+    inputs: InputTrayState,
     artwork: AppArtworkLoader,
     actions: HomeActions,
+    inputActions: InputActions,
 ) {
+    var inputsFocused by remember { mutableStateOf(false) }
+    // The top of the Home recedes when focus moves down to the Input Tray, so every tray fits.
+    val topArea by animateDpAsState(if (inputsFocused) 24.dp else 236.dp, label = "top area")
+
     Box(
         Modifier
             .fillMaxSize()
             .background(Tokens.Background)
             .background(Brush.verticalGradient(0f to Color(0xFF14161C), 0.6f to Tokens.Background)),
     ) {
-        Column(Modifier.fillMaxSize()) {
+        // Laid out at full height and clipped by the screen: trays below the fold peek in, nothing scrolls.
+        Column(Modifier.fillMaxSize().wrapContentHeight(Alignment.Top, unbounded = true)) {
             StatusBar(state.statusClock, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop))
-            state.lifted?.let { EditModeHint(it.label, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 64.dp)) }
-            Spacer(Modifier.weight(1f))
-            AppTray(state, artwork, actions, Modifier.padding(bottom = 80.dp))
+            Box(Modifier.height(topArea)) {
+                val hint = state.lifted?.let { stringResource(R.string.app_tray) to it.label }
+                    ?: inputs.lifted?.let { stringResource(R.string.inputs) to it.displayName() }
+                hint?.let { (tray, item) -> EditModeHint(tray, item, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 40.dp)) }
+            }
+            AppTray(state, artwork, actions, dimmed = inputs.lifted != null)
+            InputTrayRow(
+                inputs,
+                inputActions,
+                dimmed = state.lifted != null,
+                modifier = Modifier
+                    .padding(top = 8.dp, bottom = 48.dp)
+                    .onFocusChanged { inputsFocused = it.hasFocus },
+            )
         }
     }
 }
@@ -89,11 +107,11 @@ fun StatusBar(clock: StatusClock, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EditModeHint(appLabel: String, modifier: Modifier = Modifier) {
+private fun EditModeHint(tray: String, item: String, modifier: Modifier = Modifier) {
     Column(modifier.width(260.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
         Text(stringResource(R.string.edit_mode), color = Tokens.TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-        Text(stringResource(R.string.app_tray), color = Tokens.TextPrimary, fontSize = 28.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.75).sp)
-        Text(stringResource(R.string.edit_mode_hint, appLabel), color = Color(0xCCFFFFFF), fontSize = 12.sp, lineHeight = 17.sp)
+        Text(tray, color = Tokens.TextPrimary, fontSize = 28.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.75).sp)
+        Text(stringResource(R.string.edit_mode_hint, item), color = Color(0xCCFFFFFF), fontSize = 12.sp, lineHeight = 17.sp)
     }
 }
 
@@ -102,27 +120,29 @@ private fun AppTray(
     state: HomeState,
     artwork: AppArtworkLoader,
     actions: HomeActions,
+    dimmed: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val items = state.appTray
     val lifted = state.lifted
-    val firstTile = remember { FocusRequester() }
+    val keys = items.map { it.key() }
+    val trayFocus = rememberTrayFocus(keys)
     var focused by remember { mutableStateOf<AppTrayItem?>(null) }
     var menuOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(items.isNotEmpty()) {
-        if (items.isNotEmpty() && focused == null) runCatching { firstTile.requestFocus() }
+        if (items.isNotEmpty() && focused == null) runCatching { trayFocus.requester(keys.first()).requestFocus() }
     }
     LaunchedEffect(lifted) {
         if (lifted == null) menuOpen = false
     }
 
     LazyRow(
-        modifier.fillMaxWidth().height(TILE_HEIGHT * FOCUSED_SCALE + 32.dp),
+        modifier.fillMaxWidth().height(TILE_HEIGHT * FOCUSED_SCALE + 32.dp).alpha(if (dimmed) DIMMED else 1f).then(trayFocus.trayModifier()),
         contentPadding = PaddingValues(horizontal = Tokens.SafeAreaHorizontal, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        itemsIndexed(items, key = { _, item -> (item as? AppTrayItem.App)?.packageName ?: "all-apps" }) { index, item ->
+        itemsIndexed(items, key = { _, item -> item.key() }) { index, item ->
             val isLifted = lifted != null && item == lifted
             Column(
                 Modifier.alpha(if (lifted == null || isLifted) 1f else DIMMED),
@@ -136,9 +156,9 @@ private fun AppTray(
                     height = TILE_HEIGHT,
                     focusedScale = FOCUSED_SCALE,
                     modifier = Modifier
-                        .then(if (index == 0) Modifier.focusRequester(firstTile) else Modifier)
-                        .onFocusChanged { if (it.isFocused) focused = item }
-                        .onPreviewKeyEvent { event -> lifted != null && editKey(event.key, event.type, actions) { menuOpen = true } },
+                        .then(trayFocus.itemModifier(item.key(), index))
+                        .onFocusChanged { if (it.isFocused) focused = item else if (focused == item) focused = null }
+                        .onPreviewKeyEvent { event -> lifted != null && editKey(event.key, event.type, actions.onMove) { menuOpen = true } },
                 ) {
                     when (item) {
                         is AppTrayItem.App -> AppArt(item.packageName, item.label, item.art, artwork)
@@ -171,16 +191,18 @@ private fun AppTray(
 }
 
 /**
- * While an app is lifted, arrows move it instead of moving focus, and Menu opens its actions.
+ * While an item is lifted, arrows move it instead of moving focus, and Menu opens its actions.
  * Returns whether the key was used.
  */
-private fun editKey(key: Key, type: KeyEventType, actions: HomeActions, openMenu: () -> Unit): Boolean = when (key) {
-    Key.DirectionLeft -> true.also { if (type == KeyEventType.KeyDown) actions.onMove(-1) }
-    Key.DirectionRight -> true.also { if (type == KeyEventType.KeyDown) actions.onMove(+1) }
+internal fun editKey(key: Key, type: KeyEventType, onMove: (Int) -> Unit, openMenu: () -> Unit): Boolean = when (key) {
+    Key.DirectionLeft -> true.also { if (type == KeyEventType.KeyDown) onMove(-1) }
+    Key.DirectionRight -> true.also { if (type == KeyEventType.KeyDown) onMove(+1) }
     Key.DirectionUp, Key.DirectionDown -> true
     Key.Menu -> true.also { if (type == KeyEventType.KeyUp) openMenu() }
     else -> false
 }
+
+private fun AppTrayItem.key(): String = (this as? AppTrayItem.App)?.packageName ?: "all-apps"
 
 @Composable
 private fun MoveHint(label: String) {

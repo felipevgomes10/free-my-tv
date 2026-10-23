@@ -1,5 +1,7 @@
 package com.freemytv.home.platform
 
+import com.freemytv.home.inputs.InputPreferences
+import com.freemytv.home.inputs.TvInputSource
 import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 
@@ -26,6 +28,18 @@ interface TvPlatform {
     fun openAppInfo(packageName: String)
 
     fun openPlayStore()
+
+    /** Every TV input Android publishes, physical or not; the Input Tray decides which are Inputs. */
+    suspend fun tvInputs(): List<TvInputSource>
+
+    /** Fires whenever an input appears, disappears or changes signal. */
+    val inputChanges: Flow<Unit>
+
+    fun switchToInput(inputId: String, isPassthrough: Boolean)
+
+    suspend fun loadInputPreferences(): InputPreferences
+
+    suspend fun saveInputPreferences(preferences: InputPreferences)
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

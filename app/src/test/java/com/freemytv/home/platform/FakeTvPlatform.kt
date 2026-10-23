@@ -1,5 +1,7 @@
 package com.freemytv.home.platform
 
+import com.freemytv.home.inputs.InputPreferences
+import com.freemytv.home.inputs.TvInputSource
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -7,6 +9,8 @@ import java.time.ZonedDateTime
 class FakeTvPlatform(
     var apps: List<InstalledApp> = emptyList(),
     var pinned: List<String>? = null,
+    var inputs: List<TvInputSource> = emptyList(),
+    var inputPreferences: InputPreferences = InputPreferences(),
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
 
@@ -14,6 +18,27 @@ class FakeTvPlatform(
     val uninstallRequests = mutableListOf<String>()
     val appInfoOpened = mutableListOf<String>()
     var playStoreOpened = 0
+    val switchedTo = mutableListOf<String>()
+
+    override val inputChanges = MutableSharedFlow<Unit>()
+
+    override suspend fun tvInputs() = inputs
+
+    override fun switchToInput(inputId: String, isPassthrough: Boolean) {
+        switchedTo += inputId
+    }
+
+    override suspend fun loadInputPreferences() = inputPreferences
+
+    override suspend fun saveInputPreferences(preferences: InputPreferences) {
+        inputPreferences = preferences
+    }
+
+    /** Something was plugged in, unplugged or switched on. */
+    suspend fun changeInputs(newInputs: List<TvInputSource>) {
+        inputs = newInputs
+        inputChanges.emit(Unit)
+    }
 
     override val packageEvents = MutableSharedFlow<PackageEvent>()
 

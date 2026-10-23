@@ -10,8 +10,8 @@ Visual reference: `docs/design/home-input-tray.png`.
 
 **Status:** ready-for-agent
 
-- [ ] Only physical Inputs (HDMI ports and the antenna) appear; app-provided channel inputs never do
-- [ ] CEC device names are used when available; disconnected HDMI ports are dimmed
-- [ ] OK switches to the Input through the platform port
-- [ ] Edit Mode supports Move, Rename and Hide for Inputs; names, order and hidden state persist
-- [ ] Tests cover the input filtering rule, CEC naming, rename, hide and unhide
+- [x] Only physical Inputs (HDMI ports and the antenna) appear; app-provided channel inputs never do
+- [x] CEC device names are used when available; disconnected HDMI ports are dimmed
+- [x] OK switches to the Input through the platform port
+- [x] Edit Mode supports Move, Rename and Hide for Inputs; names, order and hidden state persist
+- [x] Tests cover the input filtering rule, CEC naming, rename, hide and unhide

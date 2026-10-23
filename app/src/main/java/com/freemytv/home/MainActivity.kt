@@ -19,8 +19,10 @@ import com.freemytv.home.apps.AllAppsStateHolder
 import com.freemytv.home.apps.AppLibrary
 import com.freemytv.home.home.AppTrayItem
 import com.freemytv.home.home.HomeStateHolder
+import com.freemytv.home.inputs.InputTray
 import com.freemytv.home.ui.AllAppsScreen
 import com.freemytv.home.ui.HomeActions
+import com.freemytv.home.ui.InputActions
 import com.freemytv.home.ui.HomeScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -31,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
     private var screen by mutableStateOf(Screen.Home)
     private lateinit var home: HomeStateHolder
+    private lateinit var inputs: InputTray
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,19 +41,26 @@ class MainActivity : ComponentActivity() {
         val library = AppLibrary(platform)
         home = HomeStateHolder(platform, library, lifecycleScope)
         val allApps = AllAppsStateHolder(platform, library, lifecycleScope)
+        inputs = InputTray(platform, lifecycleScope)
         val artwork = AppArtworkLoader(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (home.state.value.lifted != null) home.cancelEdit() else screen = Screen.Home
+                when {
+                    home.state.value.lifted != null -> home.cancelEdit()
+                    inputs.state.value.lifted != null -> inputs.cancelEdit()
+                    else -> screen = Screen.Home
+                }
             }
         })
 
         lifecycleScope.launch { library.followPackageEvents() }
+        lifecycleScope.launch { inputs.followInputChanges() }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 home.refresh()
+                inputs.load()
                 while (true) {
                     home.tick()
                     delay(CLOCK_TICK_MILLIS)
@@ -61,9 +71,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             val scope = rememberCoroutineScope()
             val homeState by home.state.collectAsStateWithLifecycle()
+            val inputState by inputs.state.collectAsStateWithLifecycle()
             when (screen) {
                 Screen.Home -> HomeScreen(
                     state = homeState,
+                    inputs = inputState,
                     artwork = artwork,
                     actions = HomeActions(
                         onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
@@ -72,6 +84,16 @@ class MainActivity : ComponentActivity() {
                         onDrop = { scope.launch { home.drop() } },
                         onUnpin = { scope.launch { home.unpinLifted() } },
                         onUninstall = home::uninstallLifted,
+                    ),
+                    inputActions = InputActions(
+                        onSelect = inputs::select,
+                        onStartEdit = inputs::startEdit,
+                        onMove = inputs::move,
+                        onDrop = { scope.launch { inputs.drop() } },
+                        onRename = { name -> scope.launch { inputs.renameLifted(name) } },
+                        onHide = { scope.launch { inputs.hideLifted() } },
+                        onShowHidden = { scope.launch { inputs.showHidden() } },
+                        onCancel = inputs::cancelEdit,
                     ),
                 )
                 Screen.AllApps -> {
@@ -95,6 +117,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         home.cancelEdit()
+        inputs.cancelEdit()
         screen = Screen.Home
     }
 

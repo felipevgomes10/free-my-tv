@@ -11,7 +11,17 @@
     <string name="move">Mover</string>
     <string name="edit_mode">Modo de edição</string>
     <string name="app_tray">Bandeja de apps</string>
-    <string name="edit_mode_hint">Use ← e → para mover o %1$s. Pressione OK para soltar ou Voltar para sair.</string>
+    <string name="inputs">Entradas</string>
+    <string name="antenna">Antena</string>
+    <string name="broadcast_tv">TV aberta</string>
+    <string name="nothing_connected">Nada conectado</string>
+    <string name="connected">Conectado</string>
+    <string name="rename">Renomear</string>
+    <string name="hide">Ocultar</string>
+    <string name="show_hidden">Mostrar ocultas (%1$d)</string>
+    <string name="rename_input">Renomear entrada</string>
+    <string name="rename_input_hint">Deixe em branco para voltar ao nome original.</string>
+    <string name="edit_mode_hint">Use ← e → para mover %1$s. Pressione OK para soltar ou Voltar para sair.</string>
 
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
