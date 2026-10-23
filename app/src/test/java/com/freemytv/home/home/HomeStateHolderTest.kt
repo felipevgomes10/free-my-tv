@@ -2,6 +2,9 @@ package com.freemytv.home.home
 
 import com.freemytv.home.platform.FakeTvPlatform
 import com.freemytv.home.platform.app
+import com.freemytv.home.apps.AppLibrary
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -18,13 +21,13 @@ class HomeStateHolderTest {
     private val twitch = app("tv.twitch.android.app", "Twitch")
     private val steam = app("com.valvesoftware.steamlink", "Steam Link")
 
-    private fun FakeTvPlatform.home() = HomeStateHolder(this)
+    private fun FakeTvPlatform.home(scope: TestScope) = HomeStateHolder(this, AppLibrary(this), scope.backgroundScope)
 
     private fun HomeState.trayPackages() = appTray.map { (it as? AppTrayItem.App)?.packageName ?: "AllApps" }
 
     @Test
-    fun `the App Tray shows the pinned apps in the owner's order, with All Apps last`() = runTest {
-        val home = FakeTvPlatform(apps = listOf(netflix, youtube, kodi), pinned = listOf(kodi.packageName, netflix.packageName)).home()
+    fun `the App Tray shows the pinned apps in the owner's order, with All Apps last`() = runTest(UnconfinedTestDispatcher()) {
+        val home = FakeTvPlatform(apps = listOf(netflix, youtube, kodi), pinned = listOf(kodi.packageName, netflix.packageName)).home(this)
 
         home.refresh()
 
@@ -32,9 +35,9 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `on first run the App Tray pins known streaming apps first, then fills alphabetically, and remembers it`() = runTest {
+    fun `on first run the App Tray pins known streaming apps first, then fills alphabetically, and remembers it`() = runTest(UnconfinedTestDispatcher()) {
         val platform = FakeTvPlatform(apps = listOf(vlc, twitch, youtube, steam, kodi, apple, netflix))
-        val home = platform.home()
+        val home = platform.home(this)
 
         home.refresh()
 
@@ -44,8 +47,8 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `an owner who unpinned everything keeps an empty App Tray instead of getting defaults again`() = runTest {
-        val home = FakeTvPlatform(apps = listOf(netflix, youtube), pinned = emptyList()).home()
+    fun `an owner who unpinned everything keeps an empty App Tray instead of getting defaults again`() = runTest(UnconfinedTestDispatcher()) {
+        val home = FakeTvPlatform(apps = listOf(netflix, youtube), pinned = emptyList()).home(this)
 
         home.refresh()
 
@@ -53,8 +56,8 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `a pinned app that is no longer installed does not appear on the App Tray`() = runTest {
-        val home = FakeTvPlatform(apps = listOf(netflix), pinned = listOf(kodi.packageName, netflix.packageName)).home()
+    fun `a pinned app that is no longer installed does not appear on the App Tray`() = runTest(UnconfinedTestDispatcher()) {
+        val home = FakeTvPlatform(apps = listOf(netflix), pinned = listOf(kodi.packageName, netflix.packageName)).home(this)
 
         home.refresh()
 
@@ -62,8 +65,8 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `apps with an App Banner show it, apps without one show their icon over a color`() = runTest {
-        val home = FakeTvPlatform(apps = listOf(netflix, kodi), pinned = listOf(netflix.packageName, kodi.packageName)).home()
+    fun `apps with an App Banner show it, apps without one show their icon over a color`() = runTest(UnconfinedTestDispatcher()) {
+        val home = FakeTvPlatform(apps = listOf(netflix, kodi), pinned = listOf(netflix.packageName, kodi.packageName)).home(this)
 
         home.refresh()
 
@@ -72,9 +75,9 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `selecting an app on the App Tray opens it`() = runTest {
+    fun `selecting an app on the App Tray opens it`() = runTest(UnconfinedTestDispatcher()) {
         val platform = FakeTvPlatform(apps = listOf(netflix), pinned = listOf(netflix.packageName))
-        val home = platform.home()
+        val home = platform.home(this)
         home.refresh()
 
         home.select(home.state.value.appTray.first())
@@ -83,9 +86,9 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `selecting All Apps opens no app`() = runTest {
+    fun `selecting All Apps opens no app`() = runTest(UnconfinedTestDispatcher()) {
         val platform = FakeTvPlatform(apps = listOf(netflix), pinned = listOf(netflix.packageName))
-        val home = platform.home()
+        val home = platform.home(this)
         home.refresh()
 
         home.select(AppTrayItem.AllApps)
@@ -94,8 +97,8 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `the App Tray is empty until the Home has loaded the owner's apps`() = runTest {
-        val home = FakeTvPlatform(apps = listOf(netflix), pinned = listOf(netflix.packageName)).home()
+    fun `the App Tray is empty until the Home has loaded the owner's apps`() = runTest(UnconfinedTestDispatcher()) {
+        val home = FakeTvPlatform(apps = listOf(netflix), pinned = listOf(netflix.packageName)).home(this)
 
         assertEquals(emptyList<AppTrayItem>(), home.state.value.appTray)
         home.refresh()
@@ -103,16 +106,16 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `the Status Bar shows the time and the date in Portuguese`() {
-        val home = FakeTvPlatform().home()
+    fun `the Status Bar shows the time and the date in Portuguese`() = runTest(UnconfinedTestDispatcher()) {
+        val home = FakeTvPlatform().home(this)
 
         assertEquals(StatusClock("21:40", "sexta, 23 de outubro"), home.state.value.statusClock)
     }
 
     @Test
-    fun `the Status Bar clock follows the platform clock on each tick`() {
+    fun `the Status Bar clock follows the platform clock on each tick`() = runTest(UnconfinedTestDispatcher()) {
         val platform = FakeTvPlatform()
-        val home = platform.home()
+        val home = platform.home(this)
 
         platform.clock = ZonedDateTime.of(2026, 10, 25, 9, 5, 0, 0, ZoneId.of("America/Sao_Paulo"))
         home.tick()

@@ -8,9 +8,9 @@ Visual reference: `docs/design/all-apps.png`.
 
 **Status:** ready-for-agent
 
-- [ ] All Apps lists every launchable TV app alphabetically, with a pin badge on pinned apps
-- [ ] Pin adds the app to the end of the App Tray; Unpin removes it from the App Tray and it remains in All Apps
-- [ ] Uninstall requests Android's confirmation; only a completed uninstall removes the app from All Apps and the App Tray
-- [ ] A newly installed app appears in All Apps and is not pinned
-- [ ] "Instalar app" opens the Play Store
-- [ ] Tests cover Pin, Unpin, completed and cancelled Uninstall, and a new Install, through the fake port
+- [x] All Apps lists every launchable TV app alphabetically, with a pin badge on pinned apps
+- [x] Pin adds the app to the end of the App Tray; Unpin removes it from the App Tray and it remains in All Apps
+- [x] Uninstall requests Android's confirmation; only a completed uninstall removes the app from All Apps and the App Tray
+- [x] A newly installed app appears in All Apps and is not pinned
+- [x] "Instalar app" opens the Play Store
+- [x] Tests cover Pin, Unpin, completed and cancelled Uninstall, and a new Install, through the fake port

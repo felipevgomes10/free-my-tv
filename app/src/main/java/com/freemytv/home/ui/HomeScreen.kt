@@ -71,7 +71,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun StatusBar(clock: StatusClock, modifier: Modifier = Modifier) {
+fun StatusBar(clock: StatusClock, modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(1.dp)) {
         Text(clock.time, color = Tokens.TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.25).sp)
         Text(clock.date, color = Tokens.TextSecondary, fontSize = 9.sp)
@@ -99,14 +99,17 @@ private fun AppTray(
     ) {
         itemsIndexed(items, key = { _, item -> (item as? AppTrayItem.App)?.packageName ?: "all-apps" }) { index, item ->
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                TrayTile(
+                TvTile(
                     onClick = { onSelect(item) },
+                    width = TILE_WIDTH,
+                    height = TILE_HEIGHT,
+                    focusedScale = FOCUSED_SCALE,
                     modifier = Modifier
                         .then(if (index == 0) Modifier.focusRequester(firstTile) else Modifier)
                         .onFocusChanged { if (it.isFocused) focused = item },
                 ) {
                     when (item) {
-                        is AppTrayItem.App -> AppTileArt(item, artwork)
+                        is AppTrayItem.App -> AppArt(item.packageName, item.label, item.art, artwork)
                         AppTrayItem.AllApps -> AllAppsTileArt()
                     }
                 }
@@ -119,37 +122,6 @@ private fun AppTray(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun TrayTile(onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.size(TILE_WIDTH, TILE_HEIGHT),
-        shape = CardDefaults.shape(RoundedCornerShape(11.dp)),
-        scale = CardDefaults.scale(focusedScale = FOCUSED_SCALE),
-        border = CardDefaults.border(focusedBorder = Border(BorderStroke(1.dp, Tokens.FocusRing))),
-        colors = CardDefaults.colors(containerColor = Tokens.Glass, focusedContainerColor = Tokens.Glass),
-    ) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { content() }
-    }
-}
-
-@Composable
-private fun AppTileArt(app: AppTrayItem.App, loader: AppArtworkLoader) {
-    val art by produceState<AppArtwork?>(null, app.packageName) { value = loader.load(app.packageName, app.art) }
-    when (val loaded = art) {
-        is AppArtwork.Banner -> Image(
-            bitmap = loaded.bitmap.asImageBitmap(),
-            contentDescription = app.label,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-        is AppArtwork.IconOnColor -> Box(Modifier.fillMaxSize().background(Color(loaded.color)), contentAlignment = Alignment.Center) {
-            Image(bitmap = loaded.icon.asImageBitmap(), contentDescription = app.label, modifier = Modifier.size(40.dp))
-        }
-        null -> if (app.art == TileArt.Banner) Unit else Text(app.label, color = Tokens.TextPrimary, fontSize = 12.sp)
     }
 }
 

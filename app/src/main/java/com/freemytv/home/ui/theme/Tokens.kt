@@ -13,6 +13,9 @@ object Tokens {
     val TextSecondary = Color(0x8CFFFFFF)
     val Attention = Color(0xFFFFB340)
     val FocusRing = Color(0x59FFFFFF)
+    val Menu = Color(0xFA2C2C2E)
+    val Destructive = Color(0xFFFF6961)
+    val DestructiveOnLight = Color(0xFFD70015)
 
     val SafeAreaHorizontal = 48.dp
     val SafeAreaTop = 24.dp
