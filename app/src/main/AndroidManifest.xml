@@ -17,6 +17,11 @@
         android:name="android.permission.DUMP"
         tools:ignore="ProtectedPermissions" />
 
+    <!-- Lets the Home turn its key filter back on if the system turns it off; granted by Setup. -->
+    <uses-permission
+        android:name="android.permission.WRITE_SECURE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
     <!-- Uninstall goes through Android's own confirmation dialog. -->
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
@@ -38,6 +43,7 @@
     </queries>
 
     <application
+        android:name=".HomeApplication"
         android:allowBackup="false"
         android:label="@string/app_name"
         android:supportsRtl="false"
@@ -58,6 +64,20 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Remote keys: Shortcut Buttons and long-press Home (ADR 0005); Setup turns it on. -->
+        <service
+            android:name=".android.KeyFilterService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/key_filter_service" />
+        </service>
 
         <!-- Notifications for the Home's Notification Panel; Setup grants the access. -->
         <service

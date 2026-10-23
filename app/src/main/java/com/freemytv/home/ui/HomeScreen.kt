@@ -63,6 +63,7 @@ class HomeActions(
 fun HomeScreen(
     state: HomeState,
     inputs: InputTrayState,
+    inputTrayFocusRequest: Int,
     artwork: AppArtworkLoader,
     actions: HomeActions,
     inputActions: InputActions,
@@ -91,6 +92,7 @@ fun HomeScreen(
                 inputs,
                 inputActions,
                 dimmed = state.lifted != null,
+                focusRequest = inputTrayFocusRequest,
                 modifier = Modifier
                     .padding(top = 8.dp, bottom = 48.dp)
                     .onFocusChanged { inputsFocused = it.hasFocus },

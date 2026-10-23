@@ -38,6 +38,8 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.freemytv.home.R
 import com.freemytv.home.home.StatusClock
+import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.multitasking.OpenAppLimit
 import com.freemytv.home.settings.CastReceiver
 import com.freemytv.home.settings.PackageState
@@ -50,6 +52,7 @@ import java.util.Locale
 enum class SettingsSection(val title: Int, val icon: Int) {
     Widgets(R.string.section_widgets, R.drawable.ic_widgets),
     OpenApps(R.string.section_open_apps, R.drawable.ic_apps),
+    Buttons(R.string.section_buttons, R.drawable.ic_settings_remote),
     Cast(R.string.section_cast, R.drawable.ic_cast),
     Setup(R.string.section_setup, R.drawable.ic_build),
     About(R.string.section_about, R.drawable.ic_info),
@@ -62,12 +65,14 @@ class SettingsActions(
     val onWeatherCity: (String) -> Unit,
     val onOpenAndroidSettings: () -> Unit,
     val onOpenAppLimit: (Int) -> Unit,
+    val onAssignButton: (ShortcutButton, ButtonTarget?) -> Unit,
 )
 
 @Composable
 fun SettingsScreen(
     state: SettingsState,
     openAppLimit: Int,
+    buttons: ButtonsPanelState,
     clock: StatusClock,
     statusWidgets: @Composable () -> Unit,
     actions: SettingsActions,
@@ -107,6 +112,7 @@ fun SettingsScreen(
                         }
                         Note(stringResource(R.string.open_app_limit_note))
                     }
+                    SettingsSection.Buttons -> ButtonsPanel(buttons, actions.onAssignButton)
                     SettingsSection.Cast -> CastPanel(state)
                     SettingsSection.Setup -> Note(stringResource(R.string.setup_pending))
                     SettingsSection.About -> AboutPanel(state)

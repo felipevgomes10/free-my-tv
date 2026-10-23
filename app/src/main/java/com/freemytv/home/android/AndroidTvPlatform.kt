@@ -1,6 +1,7 @@
 package com.freemytv.home.android
 
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.app.usage.UsageEvents
@@ -18,6 +19,10 @@ import android.media.tv.TvInputInfo
 import android.media.tv.TvInputManager
 import android.provider.Settings
 import android.util.Log
+import com.freemytv.home.MainActivity
+import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.buttons.HomeDestination
+import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputKind
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.Signal
@@ -177,6 +182,67 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override suspend fun saveOpenAppLimit(limit: Int) = withContext(Dispatchers.IO) { prefs.edit().putInt(OPEN_APP_LIMIT, limit).apply() }
 
+    override suspend fun loadButtonAssignments(): Map<ShortcutButton, ButtonTarget> = withContext(Dispatchers.IO) {
+        val json = prefs.getString(BUTTON_ASSIGNMENTS, null)?.let(::JSONObject) ?: return@withContext emptyMap()
+        json.keys().asSequence().mapNotNull { name ->
+            val button = runCatching { ShortcutButton.valueOf(name) }.getOrNull() ?: return@mapNotNull null
+            val value = json.getString(name)
+            val target = when {
+                value == "switcher" -> ButtonTarget.AppSwitcher
+                value == "inputs" -> ButtonTarget.InputTray
+                value.startsWith("app:") -> ButtonTarget.App(value.removePrefix("app:"))
+                value.startsWith("input:") -> ButtonTarget.TvInput(value.removePrefix("input:"))
+                else -> return@mapNotNull null
+            }
+            button to target
+        }.toMap()
+    }
+
+    override suspend fun saveButtonAssignments(assignments: Map<ShortcutButton, ButtonTarget>) = withContext(Dispatchers.IO) {
+        val json = JSONObject()
+        assignments.forEach { (button, target) ->
+            json.put(
+                button.name,
+                when (target) {
+                    ButtonTarget.AppSwitcher -> "switcher"
+                    ButtonTarget.InputTray -> "inputs"
+                    is ButtonTarget.App -> "app:${target.packageName}"
+                    is ButtonTarget.TvInput -> "input:${target.inputId}"
+                },
+            )
+        }
+        prefs.edit().putString(BUTTON_ASSIGNMENTS, json.toString()).apply()
+    }
+
+    override fun isLaunchable(packageName: String): Boolean =
+        packageManager.getLeanbackLaunchIntentForPackage(packageName) != null || packageManager.getLaunchIntentForPackage(packageName) != null
+
+    override fun switchToInputById(inputId: String) {
+        val passthrough = runCatching { tvInputManager?.getTvInputInfo(inputId)?.isPassthroughInput }.getOrNull() ?: true
+        switchToInput(inputId, passthrough)
+    }
+
+    override fun openHome(destination: HomeDestination) {
+        start(Intent(context, MainActivity::class.java).putExtra(MainActivity.EXTRA_DESTINATION, destination.name))
+    }
+
+    override fun isKeyFilterEnabled(): Boolean {
+        val enabled = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES).orEmpty()
+        return enabled.split(':').any { ComponentName.unflattenFromString(it) == keyFilter }
+    }
+
+    override fun enableKeyFilter(): Boolean {
+        if (context.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED) return false
+        val resolver = context.contentResolver
+        val enabled = Settings.Secure.getString(resolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES).orEmpty()
+        val services = (enabled.split(':').filter { it.isNotBlank() } + keyFilter.flattenToString()).distinct()
+        Settings.Secure.putString(resolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, services.joinToString(":"))
+        Settings.Secure.putInt(resolver, Settings.Secure.ACCESSIBILITY_ENABLED, 1)
+        return true
+    }
+
+    private val keyFilter = ComponentName(context, KeyFilterService::class.java)
+
     override val notificationAccess: Flow<Boolean> = HomeNotificationListener.isConnected
 
     override val activeNotifications: Flow<List<TvNotification>> = HomeNotificationListener.notifications
@@ -331,6 +397,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val MONITOR_VISIBLE = "monitor_visible"
         const val WEATHER_CITY = "weather_city"
         const val OPEN_APP_LIMIT = "open_app_limit"
+        const val BUTTON_ASSIGNMENTS = "button_assignments"
         const val SEPARATOR = ","
         const val PLAY_STORE = "com.android.vending"
         const val PLAY_STORE_MY_APPS = "com.google.android.finsky.VIEW_MY_DOWNLOADS"

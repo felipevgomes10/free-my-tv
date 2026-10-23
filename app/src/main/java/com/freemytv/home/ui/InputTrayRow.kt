@@ -57,6 +57,7 @@ fun InputTrayRow(
     state: InputTrayState,
     actions: InputActions,
     dimmed: Boolean,
+    focusRequest: Int,
     modifier: Modifier = Modifier,
 ) {
     val lifted = state.lifted
@@ -64,6 +65,10 @@ fun InputTrayRow(
     var renaming by remember { mutableStateOf<InputTile?>(null) }
     LaunchedEffect(lifted) { if (lifted == null) menuOpen = false }
     val trayFocus = rememberTrayFocus(state.inputs.map { it.id })
+    // The Input button asks for the tray: focus its first Input once the tray is there.
+    LaunchedEffect(focusRequest, state.inputs.isNotEmpty()) {
+        if (focusRequest > 0) state.inputs.firstOrNull()?.let { runCatching { trayFocus.requester(it.id).requestFocus() } }
+    }
 
     Column(modifier.alpha(if (dimmed) DIMMED else 1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(

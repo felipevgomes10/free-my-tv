@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -19,7 +20,11 @@ import com.freemytv.home.android.AndroidTvPlatform
 import com.freemytv.home.android.AppArtworkLoader
 import com.freemytv.home.apps.AllAppsStateHolder
 import com.freemytv.home.apps.AppLibrary
+import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.home.AppTrayItem
+import com.freemytv.home.home.TileArt
+import com.freemytv.home.platform.InstalledApp
+import com.freemytv.home.ui.ButtonsPanelState
 import com.freemytv.home.home.HomeStateHolder
 import com.freemytv.home.inputs.InputTray
 import com.freemytv.home.ui.AllAppsScreen
@@ -56,6 +61,7 @@ class MainActivity : ComponentActivity() {
 
     private var screen by mutableStateOf(Screen.Home)
     private var notificationsOpen by mutableStateOf(false)
+    private var inputTrayFocusRequest by mutableIntStateOf(0)
     private val homePresses = HomePresses()
     private lateinit var multitasking: Multitasking
     private lateinit var platform: AndroidTvPlatform
@@ -64,7 +70,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        platform = AndroidTvPlatform(applicationContext)
+        val app = application as HomeApplication
+        platform = app.platform
         val library = AppLibrary(platform)
         home = HomeStateHolder(platform, library, lifecycleScope)
         val allApps = AllAppsStateHolder(platform, library, lifecycleScope)
@@ -112,6 +119,7 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                app.shortcutButtons.ensureKeyFilter()
                 home.refresh()
                 inputs.load()
                 settings.load()
@@ -122,6 +130,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        intent?.getStringExtra(EXTRA_DESTINATION)?.let { name -> runCatching { HomeDestination.valueOf(name) }.getOrNull()?.let(::open) }
 
         setContent {
             val scope = rememberCoroutineScope()
@@ -145,6 +155,7 @@ class MainActivity : ComponentActivity() {
                 Screen.Home -> HomeScreen(
                     state = homeState,
                     inputs = inputState,
+                    inputTrayFocusRequest = inputTrayFocusRequest,
                     artwork = artwork,
                     actions = HomeActions(
                         onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
@@ -183,9 +194,17 @@ class MainActivity : ComponentActivity() {
                 Screen.Weather -> WeatherScreen(weatherState.report, homeState.statusClock, statusWidgets)
                 Screen.Settings -> {
                     val settingsState by settings.state.collectAsStateWithLifecycle()
+                    val assignments by app.shortcutButtons.assignments.collectAsStateWithLifecycle()
+                    val allAppsState by allApps.state.collectAsStateWithLifecycle()
                     SettingsScreen(
                         state = settingsState,
                         openAppLimit = openAppLimit,
+                        buttons = ButtonsPanelState(
+                            assignments = assignments,
+                            targetOf = app.shortcutButtons::targetOf,
+                            apps = allAppsState.apps.map { InstalledApp(it.packageName, it.label, it.art == TileArt.Banner) },
+                            inputs = inputState.inputs,
+                        ),
                         clock = homeState.statusClock,
                         statusWidgets = statusWidgets,
                         actions = SettingsActions(
@@ -194,6 +213,11 @@ class MainActivity : ComponentActivity() {
                             onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },
                             onOpenAndroidSettings = settings::openAndroidSettings,
                             onOpenAppLimit = { scope.launch { multitasking.setLimit(it) } },
+                            onAssignButton = { button, target ->
+                                scope.launch {
+                                    if (target == null) app.shortcutButtons.restoreFactory(button) else app.shortcutButtons.assign(button, target)
+                                }
+                            },
                         ),
                     )
                 }
@@ -246,18 +270,37 @@ class MainActivity : ComponentActivity() {
         home.cancelEdit()
         inputs.cancelEdit()
         notificationsOpen = false
-        if (intent.hasCategory(Intent.CATEGORY_HOME) && homePresses.press(platform.now().toInstant())) {
-            lifecycleScope.launch {
-                multitasking.openSwitcher()
-                screen = Screen.Switcher
+        val destination = intent.getStringExtra(EXTRA_DESTINATION)?.let { runCatching { HomeDestination.valueOf(it) }.getOrNull() }
+        when {
+            destination != null -> open(destination)
+            intent.hasCategory(Intent.CATEGORY_HOME) && homePresses.press(platform.now().toInstant()) -> open(HomeDestination.AppSwitcher)
+            else -> {
+                multitasking.closeSwitcher()
+                screen = Screen.Home
             }
-        } else {
-            multitasking.closeSwitcher()
-            screen = Screen.Home
         }
     }
 
-    private companion object {
-        const val CLOCK_TICK_MILLIS = 1_000L
+    /** Where a Shortcut Button, long-press Home or a double Home press sends the owner. */
+    private fun open(destination: HomeDestination) {
+        when (destination) {
+            HomeDestination.NotificationPanel -> notificationsOpen = true
+            HomeDestination.InputTray -> {
+                multitasking.closeSwitcher()
+                screen = Screen.Home
+                inputTrayFocusRequest++
+            }
+            HomeDestination.AppSwitcher -> lifecycleScope.launch {
+                multitasking.openSwitcher()
+                screen = Screen.Switcher
+            }
+        }
+    }
+
+    companion object {
+        /** A [HomeDestination] name; the Home opens there. */
+        const val EXTRA_DESTINATION = "com.freemytv.home.DESTINATION"
+
+        private const val CLOCK_TICK_MILLIS = 1_000L
     }
 }

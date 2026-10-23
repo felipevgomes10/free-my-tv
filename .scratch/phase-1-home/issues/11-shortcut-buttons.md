@@ -16,10 +16,10 @@ Visual reference: `docs/design/settings-remote-buttons.png`.
 
 **Status:** ready-for-agent
 
-- [ ] With default assignments, each Shortcut Button opens its own app even when the Stock Launcher is disabled
-- [ ] Input opens the Home focused on the Input Tray
-- [ ] Each button can be reassigned to an app, an Input or the App Switcher, and the change persists
-- [ ] Long-press Home opens the Notification Panel; a short Home press is untouched
-- [ ] Keys not assigned through this feature pass through untouched
-- [ ] The Home re-enables its accessibility service when it finds it disabled and holds the permission to do so
-- [ ] Tests cover assignment resolution for every target kind and the pass-through rule
+- [x] With default assignments, each Shortcut Button opens its own app even when the Stock Launcher is disabled (unit-tested by scan code; the emulator can't produce TCL scan codes, so the real remote is checked in 14)
+- [x] Input opens the Home focused on the Input Tray
+- [x] Each button can be reassigned to an app, an Input or the App Switcher, and the change persists
+- [x] Long-press Home opens the Notification Panel; a short Home press is untouched
+- [x] Keys not assigned through this feature pass through untouched
+- [x] The Home re-enables its accessibility service when it finds it disabled and holds the permission to do so
+- [x] Tests cover assignment resolution for every target kind and the pass-through rule

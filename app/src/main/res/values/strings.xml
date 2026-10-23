@@ -117,6 +117,19 @@
     <string name="open_app_limit_value">%1$d apps</string>
     <string name="open_app_limit_note">Ao passar do limite, ou com pouca memória livre, o app usado há mais tempo é fechado. Apps tocando música e o app na tela nunca são fechados. Aperte Home duas vezes para ver os apps abertos.</string>
 
+    <string name="key_filter_description">Faz os botões de atalho do controle funcionarem e permite trocar o que cada um abre.</string>
+
+    <string name="section_buttons">Botões do controle</string>
+    <string name="changed">alterado</string>
+    <string name="home_held">Home segurado</string>
+    <string name="buttons_note">Cada botão pode abrir um app, uma entrada ou o alternador de apps. O padrão é o que vem de fábrica.</string>
+    <string name="factory_default">Padrão de fábrica (%1$s)</string>
+    <string name="app_switcher">Alternador de apps</string>
+    <string name="input_tray">Bandeja de entradas</string>
+    <string name="input_named">Entrada: %1$s</string>
+    <string name="button_opens">O botão %1$s abre</string>
+    <string name="input_button">Input</string>
+
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
         <item quantity="other">%d apps instalados</item>

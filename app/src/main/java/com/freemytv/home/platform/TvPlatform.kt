@@ -1,5 +1,8 @@
 package com.freemytv.home.platform
 
+import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.buttons.HomeDestination
+import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.TvInputSource
 import com.freemytv.home.monitor.AppStorage
@@ -126,6 +129,25 @@ interface TvPlatform {
     suspend fun loadOpenAppLimit(): Int
 
     suspend fun saveOpenAppLimit(limit: Int)
+
+    suspend fun loadButtonAssignments(): Map<ShortcutButton, ButtonTarget>
+
+    suspend fun saveButtonAssignments(assignments: Map<ShortcutButton, ButtonTarget>)
+
+    /** Whether an app is installed and can be opened. */
+    fun isLaunchable(packageName: String): Boolean
+
+    /** Switches to an Input known only by its id, as a remapped Shortcut Button does. */
+    fun switchToInputById(inputId: String)
+
+    /** Brings the Home to the front at [destination]. */
+    fun openHome(destination: HomeDestination)
+
+    /** Whether the accessibility service that filters remote keys is on. */
+    fun isKeyFilterEnabled(): Boolean
+
+    /** Turns the key filter on; needs WRITE_SECURE_SETTINGS (granted by Setup). Returns whether it worked. */
+    fun enableKeyFilter(): Boolean
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

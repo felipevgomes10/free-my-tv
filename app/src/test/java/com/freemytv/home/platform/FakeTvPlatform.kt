@@ -1,5 +1,8 @@
 package com.freemytv.home.platform
 
+import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.buttons.HomeDestination
+import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.TvInputSource
 import com.freemytv.home.monitor.AppStorage
@@ -47,6 +50,9 @@ class FakeTvPlatform(
     var packages: List<InstalledPackage> = emptyList(),
     var lastUsed: Map<String, Instant> = emptyMap(),
     var openAppLimit: Int = 3,
+    var buttonAssignments: Map<ShortcutButton, ButtonTarget> = emptyMap(),
+    var keyFilterEnabled: Boolean = true,
+    var canWriteSecureSettings: Boolean = true,
     var device: DeviceInfo = DeviceInfo("TCL", "Smart TV Pro", "12", LocalDate.of(2025, 12, 5), "STT2.230203.001.AS24", "0.1.0"),
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
@@ -117,6 +123,31 @@ class FakeTvPlatform(
 
     override suspend fun saveOpenAppLimit(limit: Int) {
         openAppLimit = limit
+    }
+
+    val homeOpenedAt = mutableListOf<HomeDestination>()
+
+    override suspend fun loadButtonAssignments() = buttonAssignments
+
+    override suspend fun saveButtonAssignments(assignments: Map<ShortcutButton, ButtonTarget>) {
+        buttonAssignments = assignments
+    }
+
+    override fun isLaunchable(packageName: String) = apps.any { it.packageName == packageName }
+
+    override fun switchToInputById(inputId: String) {
+        switchedTo += inputId
+    }
+
+    override fun openHome(destination: HomeDestination) {
+        homeOpenedAt += destination
+    }
+
+    override fun isKeyFilterEnabled() = keyFilterEnabled
+
+    override fun enableKeyFilter(): Boolean {
+        if (canWriteSecureSettings) keyFilterEnabled = true
+        return canWriteSecureSettings
     }
 
     var androidSettingsOpened = 0

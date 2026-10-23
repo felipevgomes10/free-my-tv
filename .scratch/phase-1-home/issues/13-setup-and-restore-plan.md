@@ -8,6 +8,8 @@ Grants discovered while building the Home (all verified on the emulator):
 
 - `cmd notification allow_listener com.freemytv.home/com.freemytv.home.android.HomeNotificationListener` — Notification Panel and Banner.
 
+- `pm grant com.freemytv.home android.permission.WRITE_SECURE_SETTINGS` — lets the Home turn its key filter on and back on; on its first start it enables `com.freemytv.home/com.freemytv.home.android.KeyFilterService` itself, so Setup only needs to grant the permission (Restore must also remove the service from `enabled_accessibility_services`).
+
 A protected-package list is hard-wired and can never appear in a plan: Chromecast (`com.google.android.apps.mediashell`), AirPlay (`com.tcl.airplay2`, `com.amlogic.airplay`), Miracast (`com.tcl.miracast`), TV inputs and player (`com.tcl.tvinput`, `com.tcl.tv`), `com.tcl.systemserver`, `com.tcl.guard`, the screensaver (`com.google.android.apps.tv.dreamx`), Assistant (`com.google.android.katniss`), the system updater and Play Store.
 
 The ticket also produces the candidate bloatware list for the owner to approve package by package in 14; the approved list is an input to Setup, not hard-coded.
