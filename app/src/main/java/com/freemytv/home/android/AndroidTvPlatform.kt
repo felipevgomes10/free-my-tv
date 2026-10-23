@@ -21,6 +21,9 @@ import android.media.tv.TvInputManager
 import android.provider.Settings
 import android.util.Log
 import com.freemytv.home.MainActivity
+import com.freemytv.home.apkdrop.ApkInfo
+import com.freemytv.home.apkdrop.InstallResult
+import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.ShortcutButton
@@ -56,6 +59,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     private val packageManager = context.packageManager
     private val prefs = context.getSharedPreferences("home", Context.MODE_PRIVATE)
     private val mediaSessions = MediaSessions(context)
+    private val apkDropServer = ApkDropServer(java.io.File(context.cacheDir, "apkdrop"))
+    private val apkInstaller = ApkInstaller(context)
 
     override suspend fun installedApps(): List<InstalledApp> = withContext(Dispatchers.IO) {
         val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
@@ -404,6 +409,24 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     override fun openPlayStore() = launch(PLAY_STORE)
 
     override val nowPlaying = mediaSessions.nowPlaying
+
+    override suspend fun localAddress(): String? = withContext(Dispatchers.IO) {
+        val connectivity = context.getSystemService(android.net.ConnectivityManager::class.java)
+        runCatching { connectivity.getLinkProperties(connectivity.activeNetwork) }.getOrNull()?.linkAddresses
+            ?.map { it.address }
+            ?.firstOrNull { it is java.net.Inet4Address && !it.isLoopbackAddress }
+            ?.hostAddress
+    }
+
+    override fun receiveApks(port: Int, verdict: (code: String, sizeBytes: Long) -> UploadVerdict): Flow<String> = apkDropServer.serve(port, verdict)
+
+    override suspend fun inspectApk(path: String): ApkInfo? = apkInstaller.inspect(path)
+
+    override suspend fun installApk(path: String, silent: Boolean): InstallResult = apkInstaller.install(path, silent)
+
+    override suspend fun deleteFile(path: String) {
+        withContext(Dispatchers.IO) { java.io.File(path).delete() }
+    }
 
     override suspend fun deleteArtwork(path: String) {
         withContext(Dispatchers.IO) { mediaSessions.deleteArtwork(path) }

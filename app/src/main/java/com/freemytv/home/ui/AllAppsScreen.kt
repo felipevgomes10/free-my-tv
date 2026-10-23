@@ -59,6 +59,7 @@ fun AllAppsScreen(
     onUninstall: (AllAppsItem) -> Unit,
     onAppInfo: (AllAppsItem) -> Unit,
     onInstallApp: () -> Unit,
+    onSendApk: () -> Unit,
     statusWidgets: @Composable () -> Unit,
 ) {
     var actionsFor by remember { mutableStateOf<AllAppsItem?>(null) }
@@ -89,7 +90,10 @@ fun AllAppsScreen(
                     fontSize = 11.sp,
                 )
             }
-            PillButton(stringResource(R.string.install_app), R.drawable.ic_add, onInstallApp)
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                PillButton(stringResource(R.string.install_app), R.drawable.ic_add, onInstallApp)
+                PillButton(stringResource(R.string.send_apk), R.drawable.ic_phone, onSendApk)
+            }
         }
         LazyVerticalGrid(
             columns = GridCells.Fixed(COLUMNS),
@@ -168,25 +172,6 @@ private fun AllAppsTile(
             fontWeight = if (focused) FontWeight.Bold else FontWeight.Medium,
             maxLines = 1,
         )
-    }
-}
-
-@Composable
-private fun PillButton(label: String, icon: Int, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = ClickableSurfaceDefaults.shape(CircleShape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Tokens.Glass,
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
-    ) {
-        Row(Modifier.padding(horizontal = 14.dp, vertical = 9.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(13.dp))
-            Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-        }
     }
 }
 

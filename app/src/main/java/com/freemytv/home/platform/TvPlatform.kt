@@ -1,5 +1,8 @@
 package com.freemytv.home.platform
 
+import com.freemytv.home.apkdrop.ApkInfo
+import com.freemytv.home.apkdrop.InstallResult
+import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.ShortcutButton
@@ -186,6 +189,27 @@ interface TvPlatform {
 
     /** Deletes artwork stored for an Up Next entry that is gone. */
     suspend fun deleteArtwork(path: String)
+
+    /** The TV's IPv4 address on the home network, or null when it has none. */
+    suspend fun localAddress(): String?
+
+    /**
+     * Serves the APK Drop page on [port] for as long as it is collected, emitting the path of
+     * each APK received. [verdict] decides each upload, from its code and size, before the file
+     * is accepted; the page shows the answer.
+     */
+    fun receiveApks(port: Int, verdict: (code: String, sizeBytes: Long) -> UploadVerdict): Flow<String>
+
+    /** What an APK file is, compared with what is installed; null when it isn't a valid APK. */
+    suspend fun inspectApk(path: String): ApkInfo?
+
+    /**
+     * Installs an APK through Android's package installer. Android asks the owner to confirm,
+     * unless [silent] and the system allows it (the Home updating itself, once it installed itself).
+     */
+    suspend fun installApk(path: String, silent: Boolean = false): InstallResult
+
+    suspend fun deleteFile(path: String)
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?
