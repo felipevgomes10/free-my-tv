@@ -22,9 +22,12 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Set
 
 HOME = "com.freemytv.home"
-HOME_ACTIVITY = f"{HOME}/.MainActivity"
 STOCK_LAUNCHER = "com.google.android.apps.tv.launcherx"
-STOCK_LAUNCHER_ACTIVITY = f"{STOCK_LAUNCHER}/.home.HomeActivity"
+# Google TV's setup app. Once the Stock Launcher is gone it enables a RecoveryActivity that outranks
+# any third-party Home, tries to bring the launcher back, fails and closes, over and over (seen on
+# the owner's TV, 2026-10-23). Disabled together with the launcher, and before it.
+SETUP_WRAITH = "com.google.android.tungsten.setupwraith"
+STOCK_HOME = [SETUP_WRAITH, STOCK_LAUNCHER]
 NOTIFICATION_LISTENER = f"{HOME}/{HOME}.android.HomeNotificationListener"
 KEY_FILTER = f"{HOME}/{HOME}.android.KeyFilterService"
 GRANTED_PERMISSIONS = [
@@ -118,9 +121,6 @@ class DeviceState:
     notification_listeners: List[str]
     accessibility_services: List[str]
     is_emulator: bool
-    # What the HOME intent opens now; on the owner's TV Google TV's RecoveryActivity outranks
-    # every third-party Home unless the Home is the preferred one.
-    home_activity: str = ""
 
 
 def read_state(adb: Adb) -> DeviceState:
@@ -150,7 +150,6 @@ def read_state(adb: Adb) -> DeviceState:
         notification_listeners=secure_list("enabled_notification_listeners"),
         accessibility_services=secure_list("enabled_accessibility_services"),
         is_emulator=adb.query(["getprop", "ro.kernel.qemu"]).strip() == "1",
-        home_activity=adb.query(["cmd", "package", "resolve-activity", "--brief", "-a", "android.intent.action.MAIN", "-c", "android.intent.category.HOME"]).strip().splitlines()[-1].strip(),
     )
 
 
@@ -174,12 +173,12 @@ def plan_setup(state: DeviceState, approved: Sequence[str]) -> List[Step]:
         steps.append(Step(["appops", "set", HOME, "GET_USAGE_STATS", "allow"], ["appops", "set", HOME, "GET_USAGE_STATS", "default"], "allow usage history"))
     if NOTIFICATION_LISTENER not in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "allow_listener", NOTIFICATION_LISTENER], ["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], "allow reading notifications"))
-    if state.home_activity != HOME_ACTIVITY:
-        # Before disabling the Stock Launcher, so Restore points Home back at it only once it's enabled again.
-        steps.append(Step(["cmd", "package", "set-home-activity", HOME_ACTIVITY], ["cmd", "package", "set-home-activity", STOCK_LAUNCHER_ACTIVITY], "make the Home the preferred Home"))
-    for package in [*sorted(set(approved) - {STOCK_LAUNCHER}), STOCK_LAUNCHER]:
+    for package in [*sorted(set(approved) - set(STOCK_HOME)), *STOCK_HOME]:
         if package in state.enabled:
-            why = "disable the Stock Launcher" if package == STOCK_LAUNCHER else f"disable {package} ({CANDIDATES.get(package, 'approved by the owner')})"
+            why = {
+                STOCK_LAUNCHER: "disable the Stock Launcher",
+                SETUP_WRAITH: "disable Google TV's setup app, whose recovery screen would take over Home",
+            }.get(package) or f"disable {package} ({CANDIDATES.get(package, 'approved by the owner')})"
             steps.append(Step(["pm", "disable-user", "--user", "0", package], ["pm", "enable", package], why))
     # The Home turns its key filter on itself once it holds WRITE_SECURE_SETTINGS; opening it does that now.
     steps.append(Step(["am", "start", "-n", f"{HOME}/.MainActivity"], None, "open the Home, which turns on its key filter"))
@@ -192,12 +191,6 @@ def plan_restore(journal: List[Step], state: DeviceState) -> List[Step]:
     The key filter goes last: once WRITE_SECURE_SETTINGS is revoked the Home can't turn it back on.
     """
     steps = [Step(step.undo, None, f"undo: {step.why}") for step in reversed(journal) if step.undo is not None]
-    # Home can only point at the Stock Launcher once it is enabled again, wherever the journal recorded it.
-    homes = [s for s in steps if s.command[:3] == ["cmd", "package", "set-home-activity"]]
-    others = [s for s in steps if s not in homes]
-    enables = [i for i, s in enumerate(others) if s.command[:2] == ["pm", "enable"]]
-    at = enables[-1] + 1 if enables else 0
-    steps = others[:at] + homes + others[at:]
     return steps + key_filter_off(state)
 
 
@@ -217,11 +210,9 @@ def plan_restore_without_journal(state: DeviceState, approved: Sequence[str]) ->
     """When the journal is lost: undo whatever of Setup's changes is in place now."""
     check_approved(approved)
     steps: List[Step] = []
-    for package in [STOCK_LAUNCHER, *sorted(set(approved) - {STOCK_LAUNCHER})]:
+    for package in [STOCK_LAUNCHER, SETUP_WRAITH, *sorted(set(approved) - set(STOCK_HOME))]:
         if package in state.disabled:
             steps.append(Step(["pm", "enable", package], None, f"enable {package}"))
-    if state.home_activity == HOME_ACTIVITY:
-        steps.append(Step(["cmd", "package", "set-home-activity", STOCK_LAUNCHER_ACTIVITY], None, "make the Stock Launcher the preferred Home again"))
     if NOTIFICATION_LISTENER in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], None, "stop reading notifications"))
     if state.usage_appop_allowed:

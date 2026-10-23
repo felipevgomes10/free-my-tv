@@ -9,7 +9,7 @@ import kotlin.time.Duration.Companion.minutes
 
 /** What Setup puts in place on the TV; each can be lost, e.g. to a system update (ADR 0003). */
 enum class SetupCheck {
-    /** The Stock Launcher is disabled, so Home opens the Home. */
+    /** The Stock Launcher, and Google TV's setup app that would bring up its recovery screen, are disabled, so Home opens the Home. */
     StockLauncherDisabled,
 
     /** DUMP and PACKAGE_USAGE_STATS: the System Monitor rankings and the Open App Limit. */
