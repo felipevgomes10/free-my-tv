@@ -3,6 +3,8 @@ package com.freemytv.home.home
 data class HomeState(
     val statusClock: StatusClock,
     val appTray: List<AppTrayItem>,
+    /** The app lifted in the App Tray's Edit Mode, or null outside Edit Mode. */
+    val lifted: AppTrayItem.App? = null,
 )
 
 data class StatusClock(

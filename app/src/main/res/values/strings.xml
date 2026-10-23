@@ -8,6 +8,10 @@
     <string name="pinned">Na bandeja</string>
     <string name="uninstall">Desinstalar</string>
     <string name="app_info">Informações do app</string>
+    <string name="move">Mover</string>
+    <string name="edit_mode">Modo de edição</string>
+    <string name="app_tray">Bandeja de apps</string>
+    <string name="edit_mode_hint">Use ← e → para mover o %1$s. Pressione OK para soltar ou Voltar para sair.</string>
 
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>

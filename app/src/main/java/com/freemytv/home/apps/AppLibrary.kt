@@ -50,6 +50,9 @@ class AppLibrary(private val platform: TvPlatform) {
 
     suspend fun unpin(packageName: String) = editPins { it - packageName }
 
+    /** Puts the App Tray in [trayOrder]; pins of apps not installed right now keep their place at the end. */
+    suspend fun reorderTray(trayOrder: List<String>) = editPins { pinned -> trayOrder.filter { it in pinned } + (pinned - trayOrder.toSet()) }
+
     fun requestUninstall(packageName: String) = platform.requestUninstall(packageName)
 
     private suspend fun editPins(edit: (List<String>) -> List<String>) {

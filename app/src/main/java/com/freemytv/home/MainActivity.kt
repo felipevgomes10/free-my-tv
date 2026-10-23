@@ -20,6 +20,7 @@ import com.freemytv.home.apps.AppLibrary
 import com.freemytv.home.home.AppTrayItem
 import com.freemytv.home.home.HomeStateHolder
 import com.freemytv.home.ui.AllAppsScreen
+import com.freemytv.home.ui.HomeActions
 import com.freemytv.home.ui.HomeScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,19 +30,20 @@ class MainActivity : ComponentActivity() {
     private enum class Screen { Home, AllApps }
 
     private var screen by mutableStateOf(Screen.Home)
+    private lateinit var home: HomeStateHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val platform = AndroidTvPlatform(applicationContext)
         val library = AppLibrary(platform)
-        val home = HomeStateHolder(platform, library, lifecycleScope)
+        home = HomeStateHolder(platform, library, lifecycleScope)
         val allApps = AllAppsStateHolder(platform, library, lifecycleScope)
         val artwork = AppArtworkLoader(applicationContext)
 
-        // Back leaves All Apps; on the Home itself it has nowhere to go.
+        // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                screen = Screen.Home
+                if (home.state.value.lifted != null) home.cancelEdit() else screen = Screen.Home
             }
         })
 
@@ -63,7 +65,14 @@ class MainActivity : ComponentActivity() {
                 Screen.Home -> HomeScreen(
                     state = homeState,
                     artwork = artwork,
-                    onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
+                    actions = HomeActions(
+                        onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
+                        onStartEdit = home::startEdit,
+                        onMove = home::move,
+                        onDrop = { scope.launch { home.drop() } },
+                        onUnpin = { scope.launch { home.unpinLifted() } },
+                        onUninstall = home::uninstallLifted,
+                    ),
                 )
                 Screen.AllApps -> {
                     val allAppsState by allApps.state.collectAsStateWithLifecycle()
@@ -85,6 +94,7 @@ class MainActivity : ComponentActivity() {
     /** Pressing Home while the Home is already in front always returns to the Home screen. */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        home.cancelEdit()
         screen = Screen.Home
     }
 

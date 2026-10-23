@@ -10,9 +10,9 @@ Visual reference: `docs/design/home-edit-mode.png`.
 
 **Status:** ready-for-agent
 
-- [ ] Holding OK on a tile enters Edit Mode; Back leaves it without changes beyond moves already dropped
-- [ ] Left/right moves the lifted tile; OK drops it; the order survives a Home restart
-- [ ] The actions menu offers Move, Unpin and Uninstall, behaving as in 02
-- [ ] "Todos os apps" always stays last and cannot be moved
-- [ ] Edit Mode is generic over the Tray and its item actions, so another Tray can supply different actions
-- [ ] Tests cover moving to each end, dropping, cancelling, and Unpin from Edit Mode
+- [x] Holding OK on a tile enters Edit Mode; Back leaves it without changes beyond moves already dropped
+- [x] Left/right moves the lifted tile; OK drops it; the order survives a Home restart
+- [x] The actions menu offers Move, Unpin and Uninstall, behaving as in 02
+- [x] "Todos os apps" always stays last and cannot be moved
+- [x] Edit Mode is generic over the Tray and its item actions, so another Tray can supply different actions
+- [x] Tests cover moving to each end, dropping, cancelling, and Unpin from Edit Mode
