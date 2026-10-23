@@ -5,6 +5,7 @@ Run with: python3 -m unittest discover -s scripts
 
 import copy
 import io
+import json
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -33,9 +34,16 @@ class FakeTv:
             "accessibility_enabled": "0",
         }
         self.ran = []
+        # Google TV's RecoveryActivity answers HOME on the owner's TV until a Home is preferred.
+        self.preferred_home = None
 
     def snapshot(self):
-        return (sorted(self.enabled), sorted(self.disabled), sorted(self.granted), self.appop, dict(self.secure))
+        return (sorted(self.enabled), sorted(self.disabled), sorted(self.granted), self.appop, dict(self.secure), self.home())
+
+    def home(self):
+        if self.preferred_home and self.preferred_home.split("/")[0] in self.enabled:
+            return self.preferred_home
+        return "com.google.android.tungsten.setupwraith/.RecoveryActivity"
 
     def query(self, command):
         c = list(command)
@@ -49,6 +57,8 @@ class FakeTv:
             return f"GET_USAGE_STATS: {self.appop}\n"
         if c[:3] == ["settings", "get", "secure"]:
             return self.secure.get(c[3]) or "null"
+        if c[:3] == ["cmd", "package", "resolve-activity"]:
+            return f"priority=0 preferredOrder=0 match=0x108000\n{self.home()}\n"
         if c == ["getprop", "ro.kernel.qemu"]:
             return "1\n" if self.emulator else "\n"
         raise AssertionError(f"unexpected query {command}")
@@ -72,6 +82,10 @@ class FakeTv:
         elif c[:2] == ["pm", "enable"]:
             self.disabled.discard(c[2])
             self.enabled.add(c[2])
+        elif c[:3] == ["cmd", "package", "set-home-activity"]:
+            if c[3].split("/")[0] not in self.enabled:
+                raise AssertionError(f"set-home-activity to a disabled app: {c[3]}")
+            self.preferred_home = c[3]
         elif c[:3] == ["am", "start", "-n"]:
             # The Home turns its key filter on as soon as it can.
             if "android.permission.WRITE_SECURE_SETTINGS" in self.granted:
@@ -106,6 +120,7 @@ class SetupTest(unittest.TestCase):
         self.assertIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertTrue({STOCK_LAUNCHER, *BLOAT} <= tv.disabled)
         self.assertEqual(KEY_FILTER, tv.secure["enabled_accessibility_services"])
+        self.assertEqual(tvsetup.HOME_ACTIVITY, tv.home())
 
     def test_every_package_change_is_disable_user_and_nothing_is_ever_uninstalled(self):
         tv = FakeTv()
@@ -147,6 +162,16 @@ class SetupTest(unittest.TestCase):
             setup_plan(tv)
 
 
+    def test_a_tv_set_up_before_the_preferred_home_existed_only_gets_that_step(self):
+        tv = FakeTv()
+        tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
+        tv.preferred_home = None  # Setup applied by the version without this step
+
+        again = [s.command for s in setup_plan(tv)]
+
+        self.assertEqual([["cmd", "package", "set-home-activity", tvsetup.HOME_ACTIVITY], ["am", "start", "-n", f"{HOME}/.MainActivity"]], again)
+
+
 class RestoreTest(unittest.TestCase):
 
     def test_restore_from_the_journal_puts_the_tv_back_exactly_as_it_was(self):
@@ -157,6 +182,7 @@ class RestoreTest(unittest.TestCase):
         tvsetup.apply(tv, tvsetup.plan_restore(done, tvsetup.read_state(tv)), out=lambda _: None)
 
         self.assertEqual(before[:4], tv.snapshot()[:4])
+        self.assertEqual(tvsetup.STOCK_LAUNCHER_ACTIVITY, tv.home())
         self.assertEqual(before[4]["enabled_notification_listeners"], tv.secure["enabled_notification_listeners"])
         self.assertEqual("", tv.secure["enabled_accessibility_services"])
         self.assertEqual("0", tv.secure["accessibility_enabled"])
@@ -179,6 +205,9 @@ class RestoreTest(unittest.TestCase):
 
         commands = [s.command for s in restore]
         self.assertEqual(["pm", "enable", STOCK_LAUNCHER], commands[0])
+        enable_launcher = commands.index(["pm", "enable", STOCK_LAUNCHER])
+        prefer_launcher = commands.index(["cmd", "package", "set-home-activity", tvsetup.STOCK_LAUNCHER_ACTIVITY])
+        self.assertLess(enable_launcher, prefer_launcher)
         revoke = commands.index(["pm", "revoke", HOME, "android.permission.WRITE_SECURE_SETTINGS"])
         key_filter = commands.index(["settings", "delete", "secure", "enabled_accessibility_services"])
         self.assertLess(revoke, key_filter)
@@ -199,6 +228,7 @@ class RestoreTest(unittest.TestCase):
         tvsetup.apply(tv, tvsetup.plan_restore_without_journal(tvsetup.read_state(tv), BLOAT), out=lambda _: None)
 
         self.assertTrue({STOCK_LAUNCHER, *BLOAT} <= tv.enabled)
+        self.assertEqual(tvsetup.STOCK_LAUNCHER_ACTIVITY, tv.home())
         self.assertEqual(set(), tv.granted)
         self.assertNotIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertEqual("", tv.secure["enabled_accessibility_services"])
@@ -255,6 +285,24 @@ class CommandLineTest(unittest.TestCase):
             self.assertEqual(0, code)
             self.assertFalse(journal.exists())
         self.assertIn(STOCK_LAUNCHER, tv.enabled)
+
+    def test_running_setup_again_adds_to_the_journal_and_restore_still_undoes_everything(self):
+        tv = FakeTv(emulator=True)
+        before = copy.deepcopy(tv.snapshot())
+        with TemporaryDirectory() as home:
+            self.run_main(tv, "setup", "--apply", home=home)
+            journal = Path(home) / ".freemytv" / "setup-emulator-5554.json"
+            # As if the first Setup came from the version without the preferred-Home step.
+            entries = [e for e in json.loads(journal.read_text()) if e["command"][:3] != ["cmd", "package", "set-home-activity"]]
+            journal.write_text(json.dumps(entries))
+            tv.preferred_home = None
+            self.run_main(tv, "setup", "--apply", home=home)
+            self.assertEqual(len(entries) + 1, len(json.loads(journal.read_text())))
+            code, _ = self.run_main(tv, "restore", "--apply", home=home)
+
+        self.assertEqual(0, code)
+        self.assertEqual(before[:4], tv.snapshot()[:4])
+        self.assertEqual(tvsetup.STOCK_LAUNCHER_ACTIVITY, tv.home())
 
     def test_restore_without_a_journal_asks_for_the_flag(self):
         tv = FakeTv()

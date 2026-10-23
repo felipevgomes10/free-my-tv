@@ -22,7 +22,9 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Set
 
 HOME = "com.freemytv.home"
+HOME_ACTIVITY = f"{HOME}/.MainActivity"
 STOCK_LAUNCHER = "com.google.android.apps.tv.launcherx"
+STOCK_LAUNCHER_ACTIVITY = f"{STOCK_LAUNCHER}/.home.HomeActivity"
 NOTIFICATION_LISTENER = f"{HOME}/{HOME}.android.HomeNotificationListener"
 KEY_FILTER = f"{HOME}/{HOME}.android.KeyFilterService"
 GRANTED_PERMISSIONS = [
@@ -116,6 +118,9 @@ class DeviceState:
     notification_listeners: List[str]
     accessibility_services: List[str]
     is_emulator: bool
+    # What the HOME intent opens now; on the owner's TV Google TV's RecoveryActivity outranks
+    # every third-party Home unless the Home is the preferred one.
+    home_activity: str = ""
 
 
 def read_state(adb: Adb) -> DeviceState:
@@ -145,6 +150,7 @@ def read_state(adb: Adb) -> DeviceState:
         notification_listeners=secure_list("enabled_notification_listeners"),
         accessibility_services=secure_list("enabled_accessibility_services"),
         is_emulator=adb.query(["getprop", "ro.kernel.qemu"]).strip() == "1",
+        home_activity=adb.query(["cmd", "package", "resolve-activity", "--brief", "-a", "android.intent.action.MAIN", "-c", "android.intent.category.HOME"]).strip().splitlines()[-1].strip(),
     )
 
 
@@ -168,6 +174,9 @@ def plan_setup(state: DeviceState, approved: Sequence[str]) -> List[Step]:
         steps.append(Step(["appops", "set", HOME, "GET_USAGE_STATS", "allow"], ["appops", "set", HOME, "GET_USAGE_STATS", "default"], "allow usage history"))
     if NOTIFICATION_LISTENER not in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "allow_listener", NOTIFICATION_LISTENER], ["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], "allow reading notifications"))
+    if state.home_activity != HOME_ACTIVITY:
+        # Before disabling the Stock Launcher, so Restore points Home back at it only once it's enabled again.
+        steps.append(Step(["cmd", "package", "set-home-activity", HOME_ACTIVITY], ["cmd", "package", "set-home-activity", STOCK_LAUNCHER_ACTIVITY], "make the Home the preferred Home"))
     for package in [*sorted(set(approved) - {STOCK_LAUNCHER}), STOCK_LAUNCHER]:
         if package in state.enabled:
             why = "disable the Stock Launcher" if package == STOCK_LAUNCHER else f"disable {package} ({CANDIDATES.get(package, 'approved by the owner')})"
@@ -183,6 +192,12 @@ def plan_restore(journal: List[Step], state: DeviceState) -> List[Step]:
     The key filter goes last: once WRITE_SECURE_SETTINGS is revoked the Home can't turn it back on.
     """
     steps = [Step(step.undo, None, f"undo: {step.why}") for step in reversed(journal) if step.undo is not None]
+    # Home can only point at the Stock Launcher once it is enabled again, wherever the journal recorded it.
+    homes = [s for s in steps if s.command[:3] == ["cmd", "package", "set-home-activity"]]
+    others = [s for s in steps if s not in homes]
+    enables = [i for i, s in enumerate(others) if s.command[:2] == ["pm", "enable"]]
+    at = enables[-1] + 1 if enables else 0
+    steps = others[:at] + homes + others[at:]
     return steps + key_filter_off(state)
 
 
@@ -205,6 +220,8 @@ def plan_restore_without_journal(state: DeviceState, approved: Sequence[str]) ->
     for package in [STOCK_LAUNCHER, *sorted(set(approved) - {STOCK_LAUNCHER})]:
         if package in state.disabled:
             steps.append(Step(["pm", "enable", package], None, f"enable {package}"))
+    if state.home_activity == HOME_ACTIVITY:
+        steps.append(Step(["cmd", "package", "set-home-activity", STOCK_LAUNCHER_ACTIVITY], None, "make the Stock Launcher the preferred Home again"))
     if NOTIFICATION_LISTENER in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], None, "stop reading notifications"))
     if state.usage_appop_allowed:
@@ -239,9 +256,11 @@ def journal_path(serial: str) -> Path:
 
 
 def save_journal(serial: str, steps: Sequence[Step]) -> Path:
+    """Adds to the journal: running Setup again must not forget what an earlier Setup changed."""
     path = journal_path(serial)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps([asdict(s) for s in steps], indent=2))
+    journal = (load_journal(serial) or []) + [s for s in steps if s.undo is not None]
+    path.write_text(json.dumps([asdict(s) for s in journal], indent=2))
     return path
 
 
