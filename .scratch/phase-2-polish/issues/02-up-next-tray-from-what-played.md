@@ -12,8 +12,8 @@ Visual reference: `docs/design/home-input-tray.png` (the Tray between the App Tr
 
 **Status:** ready-for-agent
 
-- [ ] Playing something on the emulator or TV adds an entry with title, artwork and time left; a second play of the same title updates it
-- [ ] An untitled session becomes one "Continuar no <app>" entry per app
-- [ ] Selecting an entry resumes through a live session, or launches the app when the session is gone
-- [ ] Entries persist across a Home restart; the Tray is hidden when empty
-- [ ] Tests cover entry creation, de-duplication, untitled collapse, ordering and resume vs launch, through FakeTvPlatform
+- [x] Playing something on the emulator or TV adds an entry with title, artwork and time left; a second play of the same title updates it
+- [x] An untitled session becomes one "Continuar no <app>" entry per app
+- [x] Selecting an entry resumes through a live session, or launches the app when the session is gone
+- [x] Entries persist across a Home restart; the Tray is hidden when empty
+- [x] Tests cover entry creation, de-duplication, untitled collapse, ordering and resume vs launch, through FakeTvPlatform

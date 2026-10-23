@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!-- Debug builds only: a media session to try the Up Next Tray and the Top Shelf on an emulator. -->
+        <activity
+            android:name=".debug.FakePlayerActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.freemytv.home.fakeplayer" />
+    </application>
+</manifest>

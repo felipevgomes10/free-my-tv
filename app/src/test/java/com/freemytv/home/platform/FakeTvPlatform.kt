@@ -18,6 +18,8 @@ import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
 import com.freemytv.home.notifications.TvNotification
+import com.freemytv.home.upnext.PlayingMedia
+import com.freemytv.home.upnext.UpNextEntry
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.Instant
@@ -62,6 +64,20 @@ class FakeTvPlatform(
 ) : TvPlatform {
 
     val launched = mutableListOf<String>()
+
+    override val nowPlaying = MutableStateFlow<List<PlayingMedia>>(emptyList())
+    val resumed = mutableListOf<String>()
+    var upNext: List<UpNextEntry> = emptyList()
+
+    override fun resume(packageName: String) {
+        resumed += packageName
+    }
+
+    override suspend fun loadUpNext() = upNext
+
+    override suspend fun saveUpNext(entries: List<UpNextEntry>) {
+        upNext = entries
+    }
     val uninstallRequests = mutableListOf<String>()
     val appInfoOpened = mutableListOf<String>()
     var playStoreOpened = 0

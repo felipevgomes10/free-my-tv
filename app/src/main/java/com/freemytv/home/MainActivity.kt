@@ -137,6 +137,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val scope = rememberCoroutineScope()
             val homeState by home.state.collectAsStateWithLifecycle()
+            val upNextState by app.upNext.state.collectAsStateWithLifecycle()
             val inputState by inputs.state.collectAsStateWithLifecycle()
             val weatherState by weather.state.collectAsStateWithLifecycle()
             val monitorState by monitor.state.collectAsStateWithLifecycle()
@@ -156,6 +157,8 @@ class MainActivity : ComponentActivity() {
                 Screen.Home -> HomeScreen(
                     state = homeState,
                     inputs = inputState,
+                    upNext = upNextState,
+                    onUpNext = app.upNext::select,
                     inputTrayFocusRequest = inputTrayFocusRequest,
                     artwork = artwork,
                     actions = HomeActions(
