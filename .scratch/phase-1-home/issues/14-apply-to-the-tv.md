@@ -15,7 +15,7 @@
 
 **Status:** ready-for-human
 
-- [ ] Owner approved the bloatware list
+- [x] Owner approved the bloatware list
 - [ ] Restore dry run printed a plan that matches the Setup about to be applied
 - [ ] Pressing Home opens our Home; holding Home opens the Notification Panel; Home twice opens the App Switcher
 - [ ] Netflix, Globoplay, Prime Video, Disney+, YouTube and Input buttons all work
