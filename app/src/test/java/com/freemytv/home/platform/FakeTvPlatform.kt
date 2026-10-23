@@ -8,6 +8,7 @@ import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
 import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.settings.PackageState
+import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -40,6 +41,7 @@ class FakeTvPlatform(
     var refreshRate: Int = 60,
     var packageStates: Map<String, PackageState> = emptyMap(),
     var name: String? = "TCL Smart TV Pro",
+    var packages: List<InstalledPackage> = emptyList(),
     var device: DeviceInfo = DeviceInfo("TCL", "Smart TV Pro", "12", LocalDate.of(2025, 12, 5), "STT2.230203.001.AS24", "0.1.0"),
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
@@ -88,6 +90,18 @@ class FakeTvPlatform(
     override fun displayRefreshRate() = refreshRate
 
     var androidSettingsOpened = 0
+    var systemUpdaterOpened = 0
+    var playStoreAppsOpened = 0
+
+    override suspend fun installedPackages() = packages
+
+    override fun openSystemUpdater() {
+        systemUpdaterOpened++
+    }
+
+    override fun openPlayStoreApps() {
+        playStoreAppsOpened++
+    }
 
     override suspend fun packageState(packageName: String) = packageStates[packageName] ?: PackageState.NotInstalled
 

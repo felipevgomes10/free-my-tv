@@ -8,6 +8,7 @@ import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
 import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.settings.PackageState
+import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -95,6 +96,15 @@ interface TvPlatform {
     suspend fun deviceInfo(): DeviceInfo
 
     fun openAndroidSettings()
+
+    /** Every installed package, launchable or not, with who installed it. */
+    suspend fun installedPackages(): List<InstalledPackage>
+
+    /** Opens the system updater (on the owner's TV, Google's system update screen). */
+    fun openSystemUpdater()
+
+    /** Opens the Play Store's list of the owner's apps, where updates are managed. */
+    fun openPlayStoreApps()
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

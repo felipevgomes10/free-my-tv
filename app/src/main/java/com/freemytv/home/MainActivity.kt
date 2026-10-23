@@ -29,6 +29,9 @@ import com.freemytv.home.ui.InputActions
 import com.freemytv.home.ui.SettingsActions
 import com.freemytv.home.ui.SettingsScreen
 import com.freemytv.home.ui.StatusIconButton
+import com.freemytv.home.ui.UpdatesScreen
+import com.freemytv.home.ui.UpdatesStatusButton
+import com.freemytv.home.updates.UpdatesStateHolder
 import com.freemytv.home.ui.MonitorPill
 import com.freemytv.home.ui.MonitorScreen
 import com.freemytv.home.ui.WeatherPill
@@ -41,7 +44,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, AllApps, Weather, Monitor, Settings }
+    private enum class Screen { Home, AllApps, Weather, Monitor, Settings, Updates }
 
     private var screen by mutableStateOf(Screen.Home)
     private lateinit var home: HomeStateHolder
@@ -58,6 +61,7 @@ class MainActivity : ComponentActivity() {
         val weather = WeatherWidget(platform, widgetSettings)
         val monitor = SystemMonitor(platform, widgetSettings)
         val settings = SettingsStateHolder(platform, widgetSettings, lifecycleScope)
+        val updates = UpdatesStateHolder(platform)
         val artwork = AppArtworkLoader(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
@@ -86,6 +90,7 @@ class MainActivity : ComponentActivity() {
                 home.refresh()
                 inputs.load()
                 settings.load()
+                updates.load()
                 while (true) {
                     home.tick()
                     delay(CLOCK_TICK_MILLIS)
@@ -99,9 +104,11 @@ class MainActivity : ComponentActivity() {
             val inputState by inputs.state.collectAsStateWithLifecycle()
             val weatherState by weather.state.collectAsStateWithLifecycle()
             val monitorState by monitor.state.collectAsStateWithLifecycle()
+            val updatesState by updates.state.collectAsStateWithLifecycle()
             val statusWidgets: @Composable () -> Unit = {
                 WeatherPill(weatherState) { screen = Screen.Weather }
                 MonitorPill(monitorState) { screen = Screen.Monitor }
+                UpdatesStatusButton(updatesState.patchOutdated, getString(R.string.updates)) { screen = Screen.Updates }
                 StatusIconButton(R.drawable.ic_settings, getString(R.string.settings)) { screen = Screen.Settings }
             }
             when (screen) {
@@ -158,6 +165,13 @@ class MainActivity : ComponentActivity() {
                         ),
                     )
                 }
+                Screen.Updates -> UpdatesScreen(
+                    state = updatesState,
+                    clock = homeState.statusClock,
+                    statusWidgets = statusWidgets,
+                    onCheckSystemUpdate = updates::checkSystemUpdate,
+                    onOpenPlayStoreApps = updates::openPlayStoreApps,
+                )
                 Screen.Monitor -> MonitorScreen(
                     state = monitorState,
                     clock = homeState.statusClock,

@@ -14,8 +14,8 @@ Visual reference: `docs/design/updates.png`.
 
 **Status:** ready-for-agent
 
-- [ ] The Security Patch age is computed from the reported patch date; above 6 months the warning and Status Bar dot appear
-- [ ] "Procurar atualização do sistema" opens the system updater
-- [ ] The Play Store block reflects auto-update state and opens app management
-- [ ] Apps not installed by the Play Store are listed with their version
-- [ ] Tests cover the 6-month rule at its boundary and the installer-source split
+- [x] The Security Patch age is computed from the reported patch date; above 6 months the warning and Status Bar dot appear
+- [x] "Procurar atualização do sistema" opens the system updater
+- [ ] ~~The Play Store block reflects auto-update state~~ (not possible: the Play Store keeps that preference private; the block explains where to check it) and opens app management ✓
+- [x] Apps not installed by the Play Store are listed with their version
+- [x] Tests cover the 6-month rule at its boundary and the installer-source split

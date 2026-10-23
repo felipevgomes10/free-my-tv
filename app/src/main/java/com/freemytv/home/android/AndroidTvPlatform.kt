@@ -3,6 +3,7 @@ package com.freemytv.home.android
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -24,6 +25,7 @@ import com.freemytv.home.platform.PackageEvent
 import com.freemytv.home.platform.TvPlatform
 import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.settings.PackageState
+import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
 import kotlinx.coroutines.Dispatchers
@@ -153,6 +155,27 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override fun openAndroidSettings() = start(Intent(Settings.ACTION_SETTINGS))
 
+    override suspend fun installedPackages(): List<InstalledPackage> = withContext(Dispatchers.IO) {
+        packageManager.getInstalledPackages(0).map { info ->
+            val app = info.applicationInfo
+            InstalledPackage(
+                packageName = info.packageName,
+                label = app?.loadLabel(packageManager)?.toString() ?: info.packageName,
+                version = info.versionName.orEmpty(),
+                installer = runCatching { packageManager.getInstallSourceInfo(info.packageName).installingPackageName }.getOrNull(),
+                isSystem = app != null && app.flags and ApplicationInfo.FLAG_SYSTEM != 0,
+            )
+        }
+    }
+
+    override fun openSystemUpdater() {
+        if (!tryStart(Intent(SYSTEM_UPDATE_SETTINGS))) start(Intent(Settings.ACTION_SETTINGS))
+    }
+
+    override fun openPlayStoreApps() {
+        if (!tryStart(Intent(PLAY_STORE_MY_APPS).setPackage(PLAY_STORE))) launch(PLAY_STORE)
+    }
+
     private val tvInputManager: TvInputManager? = context.getSystemService(TvInputManager::class.java)
 
     override suspend fun tvInputs(): List<TvInputSource> = withContext(Dispatchers.IO) {
@@ -263,6 +286,13 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
+    private fun tryStart(intent: Intent): Boolean = try {
+        start(intent)
+        true
+    } catch (e: ActivityNotFoundException) {
+        false
+    }
+
     private companion object {
         const val TAG = "AndroidTvPlatform"
         const val PINNED_APPS = "pinned_apps"
@@ -272,5 +302,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val WEATHER_CITY = "weather_city"
         const val SEPARATOR = ","
         const val PLAY_STORE = "com.android.vending"
+        const val PLAY_STORE_MY_APPS = "com.google.android.finsky.VIEW_MY_DOWNLOADS"
+        const val SYSTEM_UPDATE_SETTINGS = "android.settings.SYSTEM_UPDATE_SETTINGS"
     }
 }

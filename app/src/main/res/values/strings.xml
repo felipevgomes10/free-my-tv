@@ -78,6 +78,23 @@
     <string name="security_patch">Patch de segurança</string>
     <string name="firmware">Firmware</string>
 
+    <string name="updates">Atualizações</string>
+    <string name="system">Sistema</string>
+    <string name="patch_of">Patch de segurança de %1$s</string>
+    <string name="no_patch">A TV não informa o patch de segurança.</string>
+    <string name="firmware_line">Android %1$s, firmware %2$s</string>
+    <string name="check_system_update">Procurar atualização do sistema</string>
+    <string name="play_store_apps">Apps da Play Store</string>
+    <string name="play_store_note">A Play Store atualiza esses apps. Veja o que está pendente e a atualização automática por lá.</string>
+    <string name="open_play_store_apps">Ver apps na Play Store</string>
+    <string name="apk_apps">Apps instalados por APK</string>
+    <string name="no_apk_apps">Nenhum app foi instalado fora da Play Store.</string>
+    <string name="installed_outside_play">Instalado fora da Play Store</string>
+    <plurals name="patch_outdated">
+        <item quantity="one">Faz %d mês que a TV não recebe atualização de segurança.</item>
+        <item quantity="other">Faz %d meses que a TV não recebe atualização de segurança.</item>
+    </plurals>
+
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
         <item quantity="other">%d apps instalados</item>
