@@ -166,6 +166,9 @@ interface TvPlatform {
     /** Posts an Android notification telling the owner a part of Setup was lost. */
     fun postSetupNotification(check: SetupCheck)
 
+    /** Withdraws that notification once the part of Setup holds again. */
+    fun cancelSetupNotification(check: SetupCheck)
+
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?
 

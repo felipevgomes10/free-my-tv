@@ -1,20 +1,37 @@
 package com.freemytv.home.android
 
 import android.accessibilityservice.AccessibilityService
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.Looper
+import android.os.Process
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import com.freemytv.home.HomeApplication
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.KeyDecision
+import java.util.concurrent.Executor
 
 /**
  * Sees remote keys before the system does (ADR 0005): keeps every Shortcut Button working
  * after Setup, applies the owner's reassignments, and turns long-press Home into the
  * Notification Panel. Every decision is ShortcutButtons'; this only relays.
+ *
+ * Every key on the TV waits for this filter's answer, so it answers on a thread of its own:
+ * on the Home's main thread a slow frame delayed the answer for a key's release past the
+ * system's 400 ms repeat timeout, and one press of an arrow moved the focus twice.
  */
 class KeyFilterService : AccessibilityService() {
 
+    private val keys = HandlerThread("KeyFilter", Process.THREAD_PRIORITY_DISPLAY).apply { start() }
+    private val keysExecutor = Handler(keys.looper).let { handler -> Executor { handler.post(it) } }
+
     private val home get() = application as HomeApplication
+
+    // AccessibilityService delivers its callbacks on the "main" looper (Android 12) or executor (later).
+    override fun getMainLooper(): Looper = keys.looper
+
+    override fun getMainExecutor(): Executor = keysExecutor
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
         val decision = home.shortcutButtons.onKey(
@@ -40,4 +57,9 @@ class KeyFilterService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
     override fun onInterrupt() = Unit
+
+    override fun onDestroy() {
+        super.onDestroy()
+        keys.quitSafely()
+    }
 }

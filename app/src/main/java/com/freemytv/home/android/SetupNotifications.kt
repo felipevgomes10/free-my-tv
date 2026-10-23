@@ -39,6 +39,10 @@ object SetupNotifications {
         manager.notify(NOTIFICATION_BASE + check.ordinal, notification)
     }
 
+    fun cancel(context: Context, check: SetupCheck) {
+        context.getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_BASE + check.ordinal)
+    }
+
     fun labelOf(check: SetupCheck): Int = when (check) {
         SetupCheck.StockLauncherDisabled -> R.string.check_stock_launcher
         SetupCheck.ProcessAccess -> R.string.check_process_access

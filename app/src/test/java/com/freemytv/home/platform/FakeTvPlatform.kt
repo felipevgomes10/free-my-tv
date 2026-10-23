@@ -81,7 +81,11 @@ class FakeTvPlatform(
         return memory
     }
 
+    /** How long ranking per-app storage takes; over a second on the owner's TV. */
+    var appStorageTakes: kotlin.time.Duration = kotlin.time.Duration.ZERO
+
     override suspend fun appStorage(): List<AppStorage>? {
+        kotlinx.coroutines.delay(appStorageTakes)
         measurements += "apps-storage"
         return storagePerApp
     }
@@ -148,6 +152,13 @@ class FakeTvPlatform(
 
     override fun postSetupNotification(check: SetupCheck) {
         setupNotifications += check
+    }
+
+    /** Setup notifications the Home withdrew. */
+    val withdrawnSetupNotifications = mutableListOf<SetupCheck>()
+
+    override fun cancelSetupNotification(check: SetupCheck) {
+        withdrawnSetupNotifications += check
     }
 
     override suspend fun loadButtonAssignments() = buttonAssignments

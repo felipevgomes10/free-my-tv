@@ -249,7 +249,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         fun granted(permission: String) = context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
         val notifications = context.getSystemService(NotificationManager::class.java)
         mapOf(
-            SetupCheck.StockLauncherDisabled to (packageState(STOCK_LAUNCHER) != PackageState.Enabled),
+            SetupCheck.StockLauncherDisabled to STOCK_HOME.all { packageState(it) != PackageState.Enabled },
             SetupCheck.ProcessAccess to (granted(android.Manifest.permission.DUMP) && granted(android.Manifest.permission.PACKAGE_USAGE_STATS)),
             SetupCheck.UsageAccess to system.hasUsageAccess(),
             SetupCheck.NotificationAccess to notifications.isNotificationListenerAccessGranted(ComponentName(context, HomeNotificationListener::class.java)),
@@ -266,6 +266,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     override suspend fun saveAnnouncedRegressions(lost: Set<SetupCheck>) = saveChecks(SETUP_ANNOUNCED, lost)
 
     override fun postSetupNotification(check: SetupCheck) = SetupNotifications.post(context, check)
+
+    override fun cancelSetupNotification(check: SetupCheck) = SetupNotifications.cancel(context, check)
 
     private suspend fun loadChecks(key: String): Set<SetupCheck> = withContext(Dispatchers.IO) {
         prefs.getString(key, null).orEmpty().split(SEPARATOR).mapNotNull { name -> SetupCheck.entries.firstOrNull { it.name == name } }.toSet()
@@ -432,7 +434,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val BUTTON_ASSIGNMENTS = "button_assignments"
         const val SETUP_HISTORY = "setup_history"
         const val SETUP_ANNOUNCED = "setup_announced"
-        const val STOCK_LAUNCHER = "com.google.android.apps.tv.launcherx"
+        /** The Stock Launcher and Google TV's setup app, whose recovery screen takes Home over without it. */
+        val STOCK_HOME = listOf("com.google.android.apps.tv.launcherx", "com.google.android.tungsten.setupwraith")
         const val SEPARATOR = ","
         const val PLAY_STORE = "com.android.vending"
         const val PLAY_STORE_MY_APPS = "com.google.android.finsky.VIEW_MY_DOWNLOADS"

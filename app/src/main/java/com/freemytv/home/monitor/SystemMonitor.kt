@@ -73,8 +73,17 @@ class SystemMonitor(private val platform: TvPlatform, private val settings: Widg
                         }
                     }
                     while (true) {
-                        _state.update { it.copy(storage = platform.storageUsage(), memory = platform.memoryUsage()) }
-                        if (open) _state.update { it.copy(detail = it.detail?.copy(topStorage = topStorage(), topMemory = topMemory())) }
+                        // Measure first, then write: the frame-rate readings update the state every second,
+                        // and a write that measures inside update() would keep being retried (the owner's TV
+                        // takes over a second to rank ~200 packages).
+                        val storage = platform.storageUsage()
+                        val memory = platform.memoryUsage()
+                        _state.update { it.copy(storage = storage, memory = memory) }
+                        if (open) {
+                            val topStorage = topStorage()
+                            val topMemory = topMemory()
+                            _state.update { it.copy(detail = it.detail?.copy(topStorage = topStorage, topMemory = topMemory)) }
+                        }
                         delay(if (open) DETAIL_EVERY else COMPACT_EVERY)
                     }
                 }
@@ -93,7 +102,8 @@ class SystemMonitor(private val platform: TvPlatform, private val settings: Widg
     suspend fun close(app: AppUsage) {
         if (!app.canClose) return
         platform.closeApp(app.packageName)
-        _state.update { it.copy(detail = it.detail?.copy(topMemory = topMemory())) }
+        val topMemory = topMemory()
+        _state.update { it.copy(detail = it.detail?.copy(topMemory = topMemory)) }
     }
 
     private suspend fun topStorage(): List<AppUsage>? = platform.appStorage()

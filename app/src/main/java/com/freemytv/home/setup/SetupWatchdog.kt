@@ -9,7 +9,7 @@ import kotlin.time.Duration.Companion.minutes
 
 /** What Setup puts in place on the TV; each can be lost, e.g. to a system update (ADR 0003). */
 enum class SetupCheck {
-    /** The Stock Launcher is disabled, so Home opens the Home. */
+    /** The Stock Launcher, and Google TV's setup app that would bring up its recovery screen, are disabled, so Home opens the Home. */
     StockLauncherDisabled,
 
     /** DUMP and PACKAGE_USAGE_STATS: the System Monitor rankings and the Open App Limit. */
@@ -50,6 +50,8 @@ class SetupWatchdog(private val platform: TvPlatform) {
         val announced = platform.loadAnnouncedRegressions()
         val lost = now.filter { (check, holds) -> !holds && check in heldBefore }.keys
         (lost - announced).forEach { platform.postSetupNotification(it) }
+        // Back in place: the warning no longer applies.
+        (announced - lost).forEach { platform.cancelSetupNotification(it) }
         // A check that holds again may be announced again if it's lost later.
         platform.saveAnnouncedRegressions(lost)
         val held = heldBefore + now.filterValues { it }.keys

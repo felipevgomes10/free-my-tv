@@ -1,3 +1,19 @@
 # Packages Setup disables (pm disable-user) besides the Stock Launcher, one per line.
 # Approved by the owner, package by package, from the candidate list (ticket 14).
 # Protected packages (Chromecast, AirPlay, Miracast, TV inputs, ...) are refused even if listed here.
+# Approved by the owner on 2026-10-23: every candidate in config/bloatware-candidates.md.
+com.tcl.channelplus
+com.tcl.esticker
+com.tcl.exhibit
+com.tcl.gamebar
+com.tcl.hotelmenu
+com.tcl.interactive
+com.tcl.logkit
+com.tcl.magiconnectfree
+com.tcl.messagebox
+com.tcl.ocean.instructions
+com.tcl.repairguide
+com.tcl.smartalexa
+com.tcl.tv.tclhome_passive
+com.tcl.usercenter
+com.tcl.waterfall.overseas

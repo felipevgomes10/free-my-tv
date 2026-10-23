@@ -76,6 +76,19 @@ class SetupWatchdogTest {
     }
 
     @Test
+    fun `when a lost part of Setup holds again its notification is withdrawn`() = runTest {
+        val platform = FakeTvPlatform(setup = all)
+        platform.check()
+        platform.setup = all + (SetupCheck.StockLauncherDisabled to false)
+        platform.check()
+
+        platform.setup = all
+        platform.check()
+
+        assertEquals(listOf(SetupCheck.StockLauncherDisabled), platform.withdrawnSetupNotifications)
+    }
+
+    @Test
     fun `on a TV where Setup never ran nothing is announced, and Preparação says so`() = runTest {
         val platform = FakeTvPlatform(setup = SetupCheck.entries.associateWith { false })
 

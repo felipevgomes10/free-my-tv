@@ -5,6 +5,7 @@ Run with: python3 -m unittest discover -s scripts
 
 import copy
 import io
+import json
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -12,7 +13,7 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 import tvsetup
-from tvsetup import HOME, KEY_FILTER, NOTIFICATION_LISTENER, STOCK_LAUNCHER, PlanError, Step
+from tvsetup import HOME, KEY_FILTER, NOTIFICATION_LISTENER, SETUP_WRAITH, STOCK_LAUNCHER, PlanError, Step
 
 BLOAT = ["com.tcl.waterfall.overseas", "com.tcl.smartalexa", "com.tcl.esticker"]
 
@@ -23,7 +24,7 @@ class FakeTv:
     def __init__(self, emulator=False):
         self.serial = "emulator-5554" if emulator else "192.168.100.18:5555"
         self.emulator = emulator
-        self.enabled = {HOME, STOCK_LAUNCHER, *BLOAT, "com.tcl.miracast", "com.google.android.apps.mediashell", "com.android.vending"}
+        self.enabled = {HOME, STOCK_LAUNCHER, SETUP_WRAITH, *BLOAT, "com.tcl.miracast", "com.google.android.apps.mediashell", "com.android.vending"}
         self.disabled = {"com.tcl.exhibit"}
         self.granted = set()
         self.appop = "default"
@@ -34,8 +35,17 @@ class FakeTv:
         }
         self.ran = []
 
+
     def snapshot(self):
         return (sorted(self.enabled), sorted(self.disabled), sorted(self.granted), self.appop, dict(self.secure))
+
+    def home(self):
+        """What Home opens, as on the owner's TV: setupwraith's RecoveryActivity outranks any third-party Home once the launcher is gone."""
+        if STOCK_LAUNCHER in self.enabled:
+            return "com.google.android.apps.tv.launcherx/.home.HomeActivity"
+        if SETUP_WRAITH in self.enabled:
+            return "com.google.android.tungsten.setupwraith/.RecoveryActivity"
+        return "com.freemytv.home/.MainActivity"
 
     def query(self, command):
         c = list(command)
@@ -106,6 +116,8 @@ class SetupTest(unittest.TestCase):
         self.assertIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertTrue({STOCK_LAUNCHER, *BLOAT} <= tv.disabled)
         self.assertEqual(KEY_FILTER, tv.secure["enabled_accessibility_services"])
+        self.assertEqual("com.freemytv.home/.MainActivity", tv.home())
+        self.assertIn(SETUP_WRAITH, tv.disabled)
 
     def test_every_package_change_is_disable_user_and_nothing_is_ever_uninstalled(self):
         tv = FakeTv()
@@ -147,6 +159,20 @@ class SetupTest(unittest.TestCase):
             setup_plan(tv)
 
 
+    def test_setup_disables_google_tvs_setup_app_before_the_stock_launcher(self):
+        commands = [s.command for s in setup_plan(FakeTv())]
+
+        wraith = commands.index(["pm", "disable-user", "--user", "0", SETUP_WRAITH])
+        launcher = commands.index(["pm", "disable-user", "--user", "0", STOCK_LAUNCHER])
+        self.assertLess(wraith, launcher)
+
+    def test_with_only_the_launcher_disabled_home_lands_on_the_recovery_screen(self):
+        tv = FakeTv()
+        tv.run(["pm", "disable-user", "--user", "0", STOCK_LAUNCHER])
+
+        self.assertEqual("com.google.android.tungsten.setupwraith/.RecoveryActivity", tv.home())
+
+
 class RestoreTest(unittest.TestCase):
 
     def test_restore_from_the_journal_puts_the_tv_back_exactly_as_it_was(self):
@@ -157,6 +183,7 @@ class RestoreTest(unittest.TestCase):
         tvsetup.apply(tv, tvsetup.plan_restore(done, tvsetup.read_state(tv)), out=lambda _: None)
 
         self.assertEqual(before[:4], tv.snapshot()[:4])
+        self.assertEqual("com.google.android.apps.tv.launcherx/.home.HomeActivity", tv.home())
         self.assertEqual(before[4]["enabled_notification_listeners"], tv.secure["enabled_notification_listeners"])
         self.assertEqual("", tv.secure["enabled_accessibility_services"])
         self.assertEqual("0", tv.secure["accessibility_enabled"])
@@ -179,6 +206,7 @@ class RestoreTest(unittest.TestCase):
 
         commands = [s.command for s in restore]
         self.assertEqual(["pm", "enable", STOCK_LAUNCHER], commands[0])
+        self.assertEqual(["pm", "enable", SETUP_WRAITH], commands[1])
         revoke = commands.index(["pm", "revoke", HOME, "android.permission.WRITE_SECURE_SETTINGS"])
         key_filter = commands.index(["settings", "delete", "secure", "enabled_accessibility_services"])
         self.assertLess(revoke, key_filter)
@@ -198,7 +226,7 @@ class RestoreTest(unittest.TestCase):
 
         tvsetup.apply(tv, tvsetup.plan_restore_without_journal(tvsetup.read_state(tv), BLOAT), out=lambda _: None)
 
-        self.assertTrue({STOCK_LAUNCHER, *BLOAT} <= tv.enabled)
+        self.assertTrue({STOCK_LAUNCHER, SETUP_WRAITH, *BLOAT} <= tv.enabled)
         self.assertEqual(set(), tv.granted)
         self.assertNotIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertEqual("", tv.secure["enabled_accessibility_services"])
@@ -255,6 +283,47 @@ class CommandLineTest(unittest.TestCase):
             self.assertEqual(0, code)
             self.assertFalse(journal.exists())
         self.assertIn(STOCK_LAUNCHER, tv.enabled)
+
+    def test_running_setup_again_adds_to_the_journal_and_restore_still_undoes_everything(self):
+        tv = FakeTv(emulator=True)
+        before = copy.deepcopy(tv.snapshot())
+        with TemporaryDirectory() as home:
+            self.run_main(tv, "setup", "--apply", home=home)
+            journal = Path(home) / ".freemytv" / "setup-emulator-5554.json"
+            # As if the first Setup came from the version that left Google TV's setup app enabled.
+            entries = [e for e in json.loads(journal.read_text()) if e["command"][-1] != SETUP_WRAITH]
+            journal.write_text(json.dumps(entries))
+            tv.run(["pm", "enable", SETUP_WRAITH])
+            self.run_main(tv, "setup", "--apply", home=home)
+            self.assertEqual(len(entries) + 1, len(json.loads(journal.read_text())))
+            code, _ = self.run_main(tv, "restore", "--apply", home=home)
+
+        self.assertEqual(0, code)
+        self.assertEqual(before[:4], tv.snapshot()[:4])
+        self.assertEqual("com.google.android.apps.tv.launcherx/.home.HomeActivity", tv.home())
+
+    def test_a_dropped_connection_mid_setup_keeps_the_journal_and_restore_still_undoes_everything(self):
+        tv = FakeTv(emulator=True)
+        before = copy.deepcopy(tv.snapshot())
+        run = tv.run
+
+        def drop_after_disabling_the_launcher(command):
+            run(command)
+            if command[-1] == STOCK_LAUNCHER and command[1] == "disable-user":
+                raise RuntimeError("adb: device offline")
+            return ""
+
+        with TemporaryDirectory() as home:
+            tv.run = drop_after_disabling_the_launcher
+            code, _ = self.run_main(tv, "setup", "--apply", home=home)
+            tv.run = run
+            journal = json.loads((Path(home) / ".freemytv" / "setup-emulator-5554.json").read_text())
+            restore_code, _ = self.run_main(tv, "restore", "--apply", home=home)
+
+        self.assertEqual(1, code)
+        self.assertIn(["pm", "disable-user", "--user", "0", STOCK_LAUNCHER], [e["command"] for e in journal])
+        self.assertEqual(0, restore_code)
+        self.assertEqual(before[:4], tv.snapshot()[:4])
 
     def test_restore_without_a_journal_asks_for_the_flag(self):
         tv = FakeTv()
