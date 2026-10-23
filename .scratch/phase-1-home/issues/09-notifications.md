@@ -10,9 +10,9 @@ Visual reference: `docs/design/notification-panel.png`.
 
 **Status:** ready-for-agent
 
-- [ ] New notifications show a 5-second Notification Banner
-- [ ] The bell appears only when notifications exist, with their count
-- [ ] Holding Home and selecting the bell both open the Notification Panel
-- [ ] OK on a notification opens it; "Limpar tudo" dismisses all clearable notifications
-- [ ] Without listener access the feature degrades gracefully with an explanation
-- [ ] Tests cover banner timing, bell visibility, clear-all and the missing-permission path
+- [x] New notifications show a 5-second Notification Banner
+- [x] The bell appears only when notifications exist, with their count
+- [x] Selecting the bell opens the Notification Panel (holding Home moved to 11: the system's long-press intent only reaches system apps, ADR 0005)
+- [x] OK on a notification opens it; "Limpar tudo" dismisses all clearable notifications
+- [x] Without listener access the feature degrades gracefully with an explanation
+- [x] Tests cover banner timing, bell visibility, clear-all and the missing-permission path

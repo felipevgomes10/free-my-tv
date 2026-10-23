@@ -4,6 +4,8 @@
 
 A new Settings section, "Botões do controle", lists each Shortcut Button (Netflix, Globoplay, Prime Video, Disney+, YouTube, Input) plus "Home segurado" (fixed to Notificações), showing its current assignment and marking changed ones. Each button can be assigned any installed app, any Input, or the App Switcher.
 
+The filter also handles long-press Home and opens the Notification Panel (from 09): the system's long-press intent can only reach system apps (see ADR 0005).
+
 If the system turns the accessibility service off, the Home turns it back on using the secure-settings permission granted by Setup.
 
 Key codes observed on the owner's remote: Netflix 472, Prime Video 473, YouTube 569, Globoplay 586, Disney+ 762, Input 471 (scan codes, mapped to TCL key codes by the system key layout).
@@ -17,6 +19,7 @@ Visual reference: `docs/design/settings-remote-buttons.png`.
 - [ ] With default assignments, each Shortcut Button opens its own app even when the Stock Launcher is disabled
 - [ ] Input opens the Home focused on the Input Tray
 - [ ] Each button can be reassigned to an app, an Input or the App Switcher, and the change persists
+- [ ] Long-press Home opens the Notification Panel; a short Home press is untouched
 - [ ] Keys not assigned through this feature pass through untouched
 - [ ] The Home re-enables its accessibility service when it finds it disabled and holds the permission to do so
 - [ ] Tests cover assignment resolution for every target kind and the pass-through rule

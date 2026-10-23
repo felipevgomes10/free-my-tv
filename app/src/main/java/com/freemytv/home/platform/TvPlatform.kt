@@ -6,6 +6,7 @@ import com.freemytv.home.monitor.AppStorage
 import com.freemytv.home.monitor.MemoryUsage
 import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
+import com.freemytv.home.notifications.TvNotification
 import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.updates.InstalledPackage
@@ -105,6 +106,18 @@ interface TvPlatform {
 
     /** Opens the Play Store's list of the owner's apps, where updates are managed. */
     fun openPlayStoreApps()
+
+    /** Whether the Home may read notifications (granted by Setup). */
+    val notificationAccess: Flow<Boolean>
+
+    /** Every current notification, re-sent whenever one is posted, updated or removed. Empty without access. */
+    val activeNotifications: Flow<List<TvNotification>>
+
+    /** Opens what the notification points to. */
+    fun openNotification(key: String)
+
+    /** Dismisses every clearable notification. */
+    fun clearNotifications()
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

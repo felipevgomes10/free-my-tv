@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +26,11 @@ import com.freemytv.home.ui.AllAppsScreen
 import com.freemytv.home.ui.HomeActions
 import com.freemytv.home.monitor.SystemMonitor
 import com.freemytv.home.settings.SettingsStateHolder
+import com.freemytv.home.notifications.NotificationCenter
 import com.freemytv.home.ui.InputActions
+import com.freemytv.home.ui.NotificationBanner
+import com.freemytv.home.ui.NotificationPanel
+import com.freemytv.home.ui.NotificationsBell
 import com.freemytv.home.ui.SettingsActions
 import com.freemytv.home.ui.SettingsScreen
 import com.freemytv.home.ui.StatusIconButton
@@ -47,6 +52,7 @@ class MainActivity : ComponentActivity() {
     private enum class Screen { Home, AllApps, Weather, Monitor, Settings, Updates }
 
     private var screen by mutableStateOf(Screen.Home)
+    private var notificationsOpen by mutableStateOf(false)
     private lateinit var home: HomeStateHolder
     private lateinit var inputs: InputTray
 
@@ -62,12 +68,14 @@ class MainActivity : ComponentActivity() {
         val monitor = SystemMonitor(platform, widgetSettings)
         val settings = SettingsStateHolder(platform, widgetSettings, lifecycleScope)
         val updates = UpdatesStateHolder(platform)
+        val notifications = NotificationCenter(platform)
         val artwork = AppArtworkLoader(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 when {
+                    notificationsOpen -> notificationsOpen = false
                     home.state.value.lifted != null -> home.cancelEdit()
                     inputs.state.value.lifted != null -> inputs.cancelEdit()
                     else -> screen = Screen.Home
@@ -77,6 +85,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch { library.followPackageEvents() }
         lifecycleScope.launch { inputs.followInputChanges() }
+        lifecycleScope.launch { notifications.follow() }
         lifecycleScope.launch {
             widgetSettings.load()
             // Widgets only work while the Home is visible; a TV app in front never pays for them.
@@ -105,12 +114,15 @@ class MainActivity : ComponentActivity() {
             val weatherState by weather.state.collectAsStateWithLifecycle()
             val monitorState by monitor.state.collectAsStateWithLifecycle()
             val updatesState by updates.state.collectAsStateWithLifecycle()
+            val notificationsState by notifications.state.collectAsStateWithLifecycle()
             val statusWidgets: @Composable () -> Unit = {
+                NotificationsBell(notificationsState) { notificationsOpen = true }
                 WeatherPill(weatherState) { screen = Screen.Weather }
                 MonitorPill(monitorState) { screen = Screen.Monitor }
                 UpdatesStatusButton(updatesState.patchOutdated, getString(R.string.updates)) { screen = Screen.Updates }
                 StatusIconButton(R.drawable.ic_settings, getString(R.string.settings)) { screen = Screen.Settings }
             }
+            Box {
             when (screen) {
                 Screen.Home -> HomeScreen(
                     state = homeState,
@@ -182,6 +194,19 @@ class MainActivity : ComponentActivity() {
                     onCloseApp = { scope.launch { monitor.close(it) } },
                 )
             }
+            val now = platform.now().toInstant()
+            if (notificationsOpen) {
+                NotificationPanel(
+                    state = notificationsState,
+                    artwork = artwork,
+                    now = now,
+                    onOpen = { notificationsOpen = false; notifications.open(it) },
+                    onClearAll = notifications::clearAll,
+                )
+            } else {
+                notificationsState.banner?.let { NotificationBanner(it, artwork, now) }
+            }
+            }
         }
     }
 
@@ -190,6 +215,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         home.cancelEdit()
         inputs.cancelEdit()
+        notificationsOpen = false
         screen = Screen.Home
     }
 

@@ -20,6 +20,7 @@ import com.freemytv.home.inputs.InputKind
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.Signal
 import com.freemytv.home.inputs.TvInputSource
+import com.freemytv.home.notifications.TvNotification
 import com.freemytv.home.platform.InstalledApp
 import com.freemytv.home.platform.PackageEvent
 import com.freemytv.home.platform.TvPlatform
@@ -154,6 +155,14 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     }
 
     override fun openAndroidSettings() = start(Intent(Settings.ACTION_SETTINGS))
+
+    override val notificationAccess: Flow<Boolean> = HomeNotificationListener.isConnected
+
+    override val activeNotifications: Flow<List<TvNotification>> = HomeNotificationListener.notifications
+
+    override fun openNotification(key: String) = HomeNotificationListener.open(key)
+
+    override fun clearNotifications() = HomeNotificationListener.clearAll()
 
     override suspend fun installedPackages(): List<InstalledPackage> = withContext(Dispatchers.IO) {
         packageManager.getInstalledPackages(0).map { info ->

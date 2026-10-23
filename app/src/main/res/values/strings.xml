@@ -95,6 +95,15 @@
         <item quantity="other">Faz %d meses que a TV não recebe atualização de segurança.</item>
     </plurals>
 
+    <string name="notifications">Notificações</string>
+    <string name="clear_all">Limpar tudo</string>
+    <string name="no_notifications">Nenhuma notificação.</string>
+    <string name="notifications_need_setup">Para ver notificações aqui, rode a Preparação no computador.</string>
+    <string name="just_now">agora</string>
+    <string name="minutes_ago">há %1$d min</string>
+    <string name="hours_ago">há %1$d h</string>
+    <string name="yesterday">ontem</string>
+
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
         <item quantity="other">%d apps instalados</item>

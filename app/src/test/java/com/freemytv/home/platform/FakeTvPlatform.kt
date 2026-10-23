@@ -13,7 +13,9 @@ import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
+import com.freemytv.home.notifications.TvNotification
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -88,6 +90,23 @@ class FakeTvPlatform(
     override val homeFrameRate = MutableSharedFlow<Int>()
 
     override fun displayRefreshRate() = refreshRate
+
+    override val notificationAccess = MutableStateFlow(true)
+    override val activeNotifications = MutableStateFlow<List<TvNotification>>(emptyList())
+    val openedNotifications = mutableListOf<String>()
+
+    override fun openNotification(key: String) {
+        openedNotifications += key
+    }
+
+    override fun clearNotifications() {
+        activeNotifications.value = activeNotifications.value.filterNot { it.clearable }
+    }
+
+    /** An app posts (or updates) a notification. */
+    fun post(notification: TvNotification) {
+        activeNotifications.value = activeNotifications.value.filterNot { it.key == notification.key } + notification
+    }
 
     var androidSettingsOpened = 0
     var systemUpdaterOpened = 0

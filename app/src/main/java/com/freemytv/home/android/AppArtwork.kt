@@ -45,6 +45,15 @@ class AppArtworkLoader(context: Context) {
         artwork.also { cache[packageName] = it }
     }
 
+    private val icons = ConcurrentHashMap<String, Bitmap>()
+
+    fun cachedIcon(packageName: String): Bitmap? = icons[packageName]
+
+    /** The app's launcher icon, small, for notification badges. */
+    suspend fun icon(packageName: String): Bitmap? = icons[packageName] ?: withContext(Dispatchers.IO) {
+        runCatching { packageManager.getApplicationIcon(packageName).toBitmap(ICON_SIZE, ICON_SIZE) }.getOrNull()?.also { icons[packageName] = it }
+    }
+
     private companion object {
         // Decoded at banner size, never at panel resolution (ADR 0004).
         const val BANNER_WIDTH = 320

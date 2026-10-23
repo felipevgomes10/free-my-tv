@@ -6,6 +6,8 @@ Grants discovered while building the Home (all verified on the emulator):
 
 - `pm grant com.freemytv.home android.permission.DUMP` and `pm grant com.freemytv.home android.permission.PACKAGE_USAGE_STATS`, plus `appops set com.freemytv.home GET_USAGE_STATS allow` — System Monitor rankings and Open Apps (ADR 0006).
 
+- `cmd notification allow_listener com.freemytv.home/com.freemytv.home.android.HomeNotificationListener` — Notification Panel and Banner.
+
 A protected-package list is hard-wired and can never appear in a plan: Chromecast (`com.google.android.apps.mediashell`), AirPlay (`com.tcl.airplay2`, `com.amlogic.airplay`), Miracast (`com.tcl.miracast`), TV inputs and player (`com.tcl.tvinput`, `com.tcl.tv`), `com.tcl.systemserver`, `com.tcl.guard`, the screensaver (`com.google.android.apps.tv.dreamx`), Assistant (`com.google.android.katniss`), the system updater and Play Store.
 
 The ticket also produces the candidate bloatware list for the owner to approve package by package in 14; the approved list is an input to Setup, not hard-coded.
