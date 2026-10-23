@@ -46,6 +46,7 @@ import com.freemytv.home.android.AppArtworkLoader
 import com.freemytv.home.home.AppTrayItem
 import com.freemytv.home.home.HomeState
 import com.freemytv.home.home.StatusClock
+import com.freemytv.home.topshelf.TopShelfState
 import com.freemytv.home.inputs.InputTrayState
 import com.freemytv.home.ui.theme.Tokens
 import com.freemytv.home.upnext.UpNextEntry
@@ -54,6 +55,8 @@ import com.freemytv.home.upnext.UpNextState
 /** Everything the owner can do from the Home. */
 class HomeActions(
     val onSelect: (AppTrayItem) -> Unit,
+    /** Focus landed on an App Tray item, for the Top Shelf. */
+    val onFocus: (AppTrayItem) -> Unit,
     val onStartEdit: (AppTrayItem) -> Unit,
     val onMove: (Int) -> Unit,
     val onDrop: () -> Unit,
@@ -66,6 +69,7 @@ fun HomeScreen(
     state: HomeState,
     inputs: InputTrayState,
     upNext: UpNextState,
+    topShelf: TopShelfState,
     onUpNext: (UpNextEntry) -> Unit,
     onRemoveUpNext: (UpNextEntry) -> Unit,
     inputTrayFocusRequest: Int,
@@ -77,7 +81,8 @@ fun HomeScreen(
     var inputsFocused by remember { mutableStateOf(false) }
     var upNextFocused by remember { mutableStateOf(false) }
     // The top of the Home recedes when focus moves down to the lower Trays, so every tray fits.
-    val topArea by animateDpAsState(if (inputsFocused || upNextFocused) 24.dp else 236.dp, label = "top area")
+    val lowered = inputsFocused || upNextFocused
+    val topArea by animateDpAsState(if (lowered) 24.dp else 236.dp, label = "top area")
 
     Box(
         Modifier
@@ -85,13 +90,17 @@ fun HomeScreen(
             .background(Tokens.Background)
             .background(Brush.verticalGradient(0f to Color(0xFF14161C), 0.6f to Tokens.Background)),
     ) {
+        TopShelfBackdrop(topShelf, artwork, lowered, Modifier.fillMaxWidth().height(TOP_SHELF_HEIGHT))
         // Laid out at full height and clipped by the screen: trays below the fold peek in, nothing scrolls.
         Column(Modifier.fillMaxSize().wrapContentHeight(Alignment.Top, unbounded = true)) {
             StatusBar(state.statusClock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
-            Box(Modifier.height(topArea)) {
+            Box(Modifier.fillMaxWidth().height(topArea)) {
                 val hint = state.lifted?.let { stringResource(R.string.app_tray) to it.label }
                     ?: inputs.lifted?.let { stringResource(R.string.inputs) to it.displayName() }
-                hint?.let { (tray, item) -> EditModeHint(tray, item, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 40.dp)) }
+                when {
+                    hint != null -> EditModeHint(hint.first, hint.second, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 40.dp))
+                    !lowered -> TopShelfText(topShelf, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, bottom = 20.dp))
+                }
             }
             AppTray(state, artwork, actions, dimmed = inputs.lifted != null)
             UpNextTrayRow(
@@ -180,7 +189,14 @@ private fun AppTray(
                     focusedScale = FOCUSED_SCALE,
                     modifier = Modifier
                         .then(trayFocus.itemModifier(item.key(), index))
-                        .onFocusChanged { if (it.isFocused) focused = item else if (focused == item) focused = null }
+                        .onFocusChanged {
+                            if (it.isFocused) {
+                                focused = item
+                                actions.onFocus(item)
+                            } else if (focused == item) {
+                                focused = null
+                            }
+                        }
                         .onPreviewKeyEvent { event -> lifted != null && editKey(event.key, event.type, actions.onMove) { menuOpen = true } },
                 ) {
                     when (item) {
@@ -255,6 +271,7 @@ private fun GridGlyph() {
     }
 }
 
+private val TOP_SHELF_HEIGHT = 400.dp
 private val TILE_WIDTH = 124.dp
 private val TILE_HEIGHT = 75.dp
 private const val FOCUSED_SCALE = 1.11f

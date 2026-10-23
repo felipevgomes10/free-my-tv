@@ -52,6 +52,8 @@ import com.freemytv.home.ui.WeatherScreen
 import com.freemytv.home.weather.WeatherWidget
 import com.freemytv.home.widgets.WidgetSettings
 import com.freemytv.home.ui.HomeScreen
+import com.freemytv.home.topshelf.ShelfApp
+import com.freemytv.home.topshelf.TopShelf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -84,6 +86,7 @@ class MainActivity : ComponentActivity() {
         val notifications = NotificationCenter(platform)
         multitasking = Multitasking(platform)
         val artwork = AppArtworkLoader(applicationContext)
+        val topShelf = TopShelf(app.upNext.state)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -113,6 +116,7 @@ class MainActivity : ComponentActivity() {
             widgetSettings.load()
             // Widgets only work while the Home is visible; a TV app in front never pays for them.
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { topShelf.run() }
                 launch { weather.follow() }
                 launch { monitor.follow() }
             }
@@ -139,6 +143,7 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             val homeState by home.state.collectAsStateWithLifecycle()
             val upNextState by app.upNext.state.collectAsStateWithLifecycle()
+            val topShelfState by topShelf.state.collectAsStateWithLifecycle()
             val inputState by inputs.state.collectAsStateWithLifecycle()
             val weatherState by weather.state.collectAsStateWithLifecycle()
             val monitorState by monitor.state.collectAsStateWithLifecycle()
@@ -159,12 +164,14 @@ class MainActivity : ComponentActivity() {
                     state = homeState,
                     inputs = inputState,
                     upNext = upNextState,
+                    topShelf = topShelfState,
                     onUpNext = app.upNext::select,
                     onRemoveUpNext = { scope.launch { app.upNext.remove(it) } },
                     inputTrayFocusRequest = inputTrayFocusRequest,
                     artwork = artwork,
                     actions = HomeActions(
                         onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
+                        onFocus = { item -> topShelf.focus((item as? AppTrayItem.App)?.let { ShelfApp(it.packageName, it.label) }) },
                         onStartEdit = home::startEdit,
                         onMove = home::move,
                         onDrop = { scope.launch { home.drop() } },
