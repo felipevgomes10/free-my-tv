@@ -48,6 +48,8 @@ import com.freemytv.home.home.HomeState
 import com.freemytv.home.home.StatusClock
 import com.freemytv.home.inputs.InputTrayState
 import com.freemytv.home.ui.theme.Tokens
+import com.freemytv.home.upnext.UpNextEntry
+import com.freemytv.home.upnext.UpNextState
 
 /** Everything the owner can do from the Home. */
 class HomeActions(
@@ -63,6 +65,8 @@ class HomeActions(
 fun HomeScreen(
     state: HomeState,
     inputs: InputTrayState,
+    upNext: UpNextState,
+    onUpNext: (UpNextEntry) -> Unit,
     inputTrayFocusRequest: Int,
     artwork: AppArtworkLoader,
     actions: HomeActions,
@@ -70,8 +74,9 @@ fun HomeScreen(
     statusWidgets: @Composable () -> Unit,
 ) {
     var inputsFocused by remember { mutableStateOf(false) }
-    // The top of the Home recedes when focus moves down to the Input Tray, so every tray fits.
-    val topArea by animateDpAsState(if (inputsFocused) 24.dp else 236.dp, label = "top area")
+    var upNextFocused by remember { mutableStateOf(false) }
+    // The top of the Home recedes when focus moves down to the lower Trays, so every tray fits.
+    val topArea by animateDpAsState(if (inputsFocused || upNextFocused) 24.dp else 236.dp, label = "top area")
 
     Box(
         Modifier
@@ -88,6 +93,15 @@ fun HomeScreen(
                 hint?.let { (tray, item) -> EditModeHint(tray, item, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 40.dp)) }
             }
             AppTray(state, artwork, actions, dimmed = inputs.lifted != null)
+            UpNextTrayRow(
+                upNext,
+                artwork,
+                onSelect = onUpNext,
+                dimmed = state.lifted != null || inputs.lifted != null,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .onFocusChanged { upNextFocused = it.hasFocus },
+            )
             InputTrayRow(
                 inputs,
                 inputActions,

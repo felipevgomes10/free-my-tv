@@ -14,6 +14,8 @@ import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.updates.InstalledPackage
+import com.freemytv.home.upnext.PlayingMedia
+import com.freemytv.home.upnext.UpNextEntry
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -168,6 +170,19 @@ interface TvPlatform {
 
     /** Withdraws that notification once the part of Setup holds again. */
     fun cancelSetupNotification(check: SetupCheck)
+
+    /**
+     * The TV's media sessions, re-sent whenever one starts, stops or changes, and every few
+     * seconds while something plays. Empty without notification access.
+     */
+    val nowPlaying: Flow<List<PlayingMedia>>
+
+    /** Reopens what [packageName] is playing through its live media session, or else opens the app. */
+    fun resume(packageName: String)
+
+    suspend fun loadUpNext(): List<UpNextEntry>
+
+    suspend fun saveUpNext(entries: List<UpNextEntry>)
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

@@ -138,6 +138,10 @@
     <string name="check_notification_access">Notificações</string>
     <string name="check_key_filter">Botões do controle</string>
     <string name="check_install_apps">Instalação de apps</string>
+    <string name="up_next">Continuar assistindo</string>
+    <string name="up_next_app">Continuar no %1$s</string>
+    <string name="left_minutes">faltam %1$d min</string>
+    <string name="left_hours">faltam %1$dh%2$02d</string>
     <string name="check_ok">Ativo</string>
     <string name="check_missing">Falta</string>
     <string name="setup_lost_launcher_title">O launcher original voltou</string>

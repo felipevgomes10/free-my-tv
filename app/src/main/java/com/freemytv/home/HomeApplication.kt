@@ -4,6 +4,7 @@ import android.app.Application
 import com.freemytv.home.android.AndroidTvPlatform
 import com.freemytv.home.buttons.ShortcutButtons
 import com.freemytv.home.setup.SetupWatchdog
+import com.freemytv.home.upnext.UpNextTray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,10 +21,17 @@ class HomeApplication : Application() {
 
     val setupWatchdog by lazy { SetupWatchdog(platform) }
 
+    val upNext by lazy { UpNextTray(platform) }
+
     override fun onCreate() {
         super.onCreate()
         scope.launch { shortcutButtons.load() }
         // Checked from boot (the Home starts with the TV) and every 15 minutes, whichever app is in front.
         scope.launch { setupWatchdog.keepWatching() }
+        // What plays is recorded whichever app is in front, for as long as the Home's process lives.
+        scope.launch {
+            upNext.load()
+            upNext.follow()
+        }
     }
 }

@@ -37,6 +37,7 @@ import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.updates.InstalledPackage
+import com.freemytv.home.upnext.UpNextEntry
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +55,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     private val packageManager = context.packageManager
     private val prefs = context.getSharedPreferences("home", Context.MODE_PRIVATE)
+    private val mediaSessions = MediaSessions(context)
 
     override suspend fun installedApps(): List<InstalledApp> = withContext(Dispatchers.IO) {
         val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
@@ -401,6 +403,49 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override fun openPlayStore() = launch(PLAY_STORE)
 
+    override val nowPlaying = mediaSessions.nowPlaying
+
+    override fun resume(packageName: String) {
+        if (!mediaSessions.resume(packageName)) launch(packageName)
+    }
+
+    override suspend fun loadUpNext(): List<UpNextEntry> = withContext(Dispatchers.IO) {
+        val json = prefs.getString(UP_NEXT, null)?.let(::JSONArray) ?: return@withContext emptyList()
+        List(json.length()) { json.getJSONObject(it) }.map { o ->
+            UpNextEntry(
+                key = o.getString("key"),
+                packageName = o.getString("package"),
+                appLabel = o.getString("label"),
+                title = o.optStringOrNull("title"),
+                subtitle = o.optStringOrNull("subtitle"),
+                positionMillis = o.optLongOrNull("position"),
+                durationMillis = o.optLongOrNull("duration"),
+                artwork = o.optStringOrNull("artwork"),
+                lastWatched = Instant.ofEpochMilli(o.getLong("watched")),
+            )
+        }
+    }
+
+    override suspend fun saveUpNext(entries: List<UpNextEntry>) = withContext(Dispatchers.IO) {
+        val json = JSONArray(entries.map { e ->
+            JSONObject()
+                .put("key", e.key)
+                .put("package", e.packageName)
+                .put("label", e.appLabel)
+                .put("title", e.title)
+                .put("subtitle", e.subtitle)
+                .put("position", e.positionMillis)
+                .put("duration", e.durationMillis)
+                .put("artwork", e.artwork)
+                .put("watched", e.lastWatched.toEpochMilli())
+        })
+        prefs.edit().putString(UP_NEXT, json.toString()).apply()
+    }
+
+    private fun JSONObject.optStringOrNull(name: String): String? = if (isNull(name)) null else optString(name)
+
+    private fun JSONObject.optLongOrNull(name: String): Long? = if (isNull(name)) null else optLong(name)
+
     override suspend fun loadPinnedApps(): List<String>? = withContext(Dispatchers.IO) {
         prefs.getString(PINNED_APPS, null)?.let { saved -> saved.split(SEPARATOR).filter { it.isNotEmpty() } }
     }
@@ -435,6 +480,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val BUTTON_ASSIGNMENTS = "button_assignments"
         const val SETUP_HISTORY = "setup_history"
         const val SETUP_ANNOUNCED = "setup_announced"
+        const val UP_NEXT = "up_next"
         /** The Stock Launcher and Google TV's setup app, whose recovery screen takes Home over without it. */
         val STOCK_HOME = listOf("com.google.android.apps.tv.launcherx", "com.google.android.tungsten.setupwraith")
         const val SEPARATOR = ","
