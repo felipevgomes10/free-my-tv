@@ -6,7 +6,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] Detects the Stock Launcher re-enabled and each missing permission individually
-- [ ] Raises one notification per regression, not one per check
-- [ ] Settings → Preparação lists what is missing and the re-run instruction, or confirms Setup is active
-- [ ] Tests cover each regression kind and notification de-duplication
+- [x] Detects the Stock Launcher re-enabled and each missing permission individually
+- [x] Raises one notification per regression, not one per check
+- [x] Settings → Preparação lists what is missing and the re-run instruction, or confirms Setup is active
+- [x] Tests cover each regression kind and notification de-duplication

@@ -120,6 +120,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 app.shortcutButtons.ensureKeyFilter()
+                app.setupWatchdog.check()
                 home.refresh()
                 inputs.load()
                 settings.load()
@@ -195,6 +196,7 @@ class MainActivity : ComponentActivity() {
                 Screen.Settings -> {
                     val settingsState by settings.state.collectAsStateWithLifecycle()
                     val assignments by app.shortcutButtons.assignments.collectAsStateWithLifecycle()
+                    val setupState by app.setupWatchdog.state.collectAsStateWithLifecycle()
                     val allAppsState by allApps.state.collectAsStateWithLifecycle()
                     SettingsScreen(
                         state = settingsState,
@@ -205,6 +207,7 @@ class MainActivity : ComponentActivity() {
                             apps = allAppsState.apps.map { InstalledApp(it.packageName, it.label, it.art == TileArt.Banner) },
                             inputs = inputState.inputs,
                         ),
+                        setup = setupState,
                         clock = homeState.statusClock,
                         statusWidgets = statusWidgets,
                         actions = SettingsActions(

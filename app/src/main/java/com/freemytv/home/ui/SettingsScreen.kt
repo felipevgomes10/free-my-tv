@@ -41,9 +41,12 @@ import com.freemytv.home.home.StatusClock
 import com.freemytv.home.buttons.ButtonTarget
 import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.multitasking.OpenAppLimit
+import com.freemytv.home.android.SetupNotifications
 import com.freemytv.home.settings.CastReceiver
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.settings.SettingsState
+import com.freemytv.home.setup.SetupCheck
+import com.freemytv.home.setup.SetupState
 import com.freemytv.home.ui.theme.Tokens
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -73,6 +76,7 @@ fun SettingsScreen(
     state: SettingsState,
     openAppLimit: Int,
     buttons: ButtonsPanelState,
+    setup: SetupState,
     clock: StatusClock,
     statusWidgets: @Composable () -> Unit,
     actions: SettingsActions,
@@ -114,7 +118,7 @@ fun SettingsScreen(
                     }
                     SettingsSection.Buttons -> ButtonsPanel(buttons, actions.onAssignButton)
                     SettingsSection.Cast -> CastPanel(state)
-                    SettingsSection.Setup -> Note(stringResource(R.string.setup_pending))
+                    SettingsSection.Setup -> SetupPanel(setup)
                     SettingsSection.About -> AboutPanel(state)
                     SettingsSection.AndroidSettings -> Note(stringResource(R.string.android_settings_note))
                 }
@@ -185,6 +189,32 @@ private fun CastPanel(state: SettingsState) {
         )
     }
     Note(stringResource(R.string.cast_note, state.tvName ?: stringResource(R.string.this_tv)))
+}
+
+@Composable
+private fun SetupPanel(setup: SetupState) {
+    Note(
+        stringResource(
+            when {
+                setup.active -> R.string.setup_active
+                !setup.everSetUp -> R.string.setup_never
+                else -> R.string.setup_missing
+            },
+        ),
+    )
+    SetupCheck.entries.forEach { check ->
+        val holds = setup.checks[check] == true
+        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(SetupNotifications.labelOf(check)), color = Tokens.TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            Text(
+                stringResource(if (holds) R.string.check_ok else R.string.check_missing),
+                color = if (holds) Color(0xFF30D158) else Tokens.Attention,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+        Divider()
+    }
 }
 
 @Composable

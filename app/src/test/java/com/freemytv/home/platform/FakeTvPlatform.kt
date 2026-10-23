@@ -10,6 +10,7 @@ import com.freemytv.home.monitor.MemoryUsage
 import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
 import com.freemytv.home.settings.DeviceInfo
+import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.weather.CachedForecast
@@ -53,6 +54,9 @@ class FakeTvPlatform(
     var buttonAssignments: Map<ShortcutButton, ButtonTarget> = emptyMap(),
     var keyFilterEnabled: Boolean = true,
     var canWriteSecureSettings: Boolean = true,
+    var setup: Map<SetupCheck, Boolean> = SetupCheck.entries.associateWith { true },
+    var setupHistory: Set<SetupCheck> = emptySet(),
+    var announcedRegressions: Set<SetupCheck> = emptySet(),
     var device: DeviceInfo = DeviceInfo("TCL", "Smart TV Pro", "12", LocalDate.of(2025, 12, 5), "STT2.230203.001.AS24", "0.1.0"),
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
@@ -126,6 +130,25 @@ class FakeTvPlatform(
     }
 
     val homeOpenedAt = mutableListOf<HomeDestination>()
+    val setupNotifications = mutableListOf<SetupCheck>()
+
+    override suspend fun setupStatus() = setup
+
+    override suspend fun loadSetupHistory() = setupHistory
+
+    override suspend fun saveSetupHistory(held: Set<SetupCheck>) {
+        setupHistory = held
+    }
+
+    override suspend fun loadAnnouncedRegressions() = announcedRegressions
+
+    override suspend fun saveAnnouncedRegressions(lost: Set<SetupCheck>) {
+        announcedRegressions = lost
+    }
+
+    override fun postSetupNotification(check: SetupCheck) {
+        setupNotifications += check
+    }
 
     override suspend fun loadButtonAssignments() = buttonAssignments
 

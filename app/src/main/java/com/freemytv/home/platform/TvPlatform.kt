@@ -11,6 +11,7 @@ import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
 import com.freemytv.home.notifications.TvNotification
 import com.freemytv.home.settings.DeviceInfo
+import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.weather.CachedForecast
@@ -148,6 +149,22 @@ interface TvPlatform {
 
     /** Turns the key filter on; needs WRITE_SECURE_SETTINGS (granted by Setup). Returns whether it worked. */
     fun enableKeyFilter(): Boolean
+
+    /** Whether each part of Setup holds right now. */
+    suspend fun setupStatus(): Map<SetupCheck, Boolean>
+
+    /** Checks that have held at some point on this TV. */
+    suspend fun loadSetupHistory(): Set<SetupCheck>
+
+    suspend fun saveSetupHistory(held: Set<SetupCheck>)
+
+    /** Lost checks the owner was already told about. */
+    suspend fun loadAnnouncedRegressions(): Set<SetupCheck>
+
+    suspend fun saveAnnouncedRegressions(lost: Set<SetupCheck>)
+
+    /** Posts an Android notification telling the owner a part of Setup was lost. */
+    fun postSetupNotification(check: SetupCheck)
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

@@ -110,7 +110,7 @@ class SystemReader(private val context: Context) {
     fun displayRefreshRate(): Int =
         context.getSystemService(DisplayManager::class.java).getDisplay(Display.DEFAULT_DISPLAY)?.refreshRate?.roundToInt() ?: 60
 
-    private fun hasUsageAccess(): Boolean {
+    fun hasUsageAccess(): Boolean {
         val appOps = context.getSystemService(AppOpsManager::class.java)
         return appOps.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName) == AppOpsManager.MODE_ALLOWED
     }

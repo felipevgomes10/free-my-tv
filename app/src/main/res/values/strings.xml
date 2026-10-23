@@ -71,7 +71,6 @@
     <string name="receiver_off">Desativado</string>
     <string name="receiver_missing">Não disponível</string>
     <string name="cast_note">No celular ou no computador, escolha %1$s na lista de transmissão.</string>
-    <string name="setup_pending">A situação da Preparação desta TV aparece aqui.</string>
     <string name="android_settings_note">Rede, imagem, som e contas ficam nas configurações do Android. Pressione OK para abrir.</string>
     <string name="tv">TV</string>
     <string name="android">Android</string>
@@ -129,6 +128,21 @@
     <string name="input_named">Entrada: %1$s</string>
     <string name="button_opens">O botão %1$s abre</string>
     <string name="input_button">Input</string>
+
+    <string name="setup_active">A Preparação está ativa nesta TV.</string>
+    <string name="setup_never">A Preparação ainda não foi feita nesta TV. No computador, rode scripts/setup.sh.</string>
+    <string name="setup_missing">Parte da Preparação se perdeu, talvez numa atualização do sistema. No computador, rode scripts/setup.sh de novo.</string>
+    <string name="check_stock_launcher">Launcher original desativado</string>
+    <string name="check_process_access">Memória dos apps e apps abertos</string>
+    <string name="check_usage_access">Histórico de uso dos apps</string>
+    <string name="check_notification_access">Notificações</string>
+    <string name="check_key_filter">Botões do controle</string>
+    <string name="check_ok">Ativo</string>
+    <string name="check_missing">Falta</string>
+    <string name="setup_lost_launcher_title">O launcher original voltou</string>
+    <string name="setup_lost_launcher_text">Uma atualização do sistema reativou o launcher do Google TV. Rode a Preparação de novo no computador.</string>
+    <string name="setup_lost_title">A Preparação perdeu um ajuste</string>
+    <string name="setup_lost_text">%1$s parou de funcionar. Rode a Preparação de novo no computador.</string>
 
     <plurals name="apps_installed">
         <item quantity="one">%d app instalado</item>
