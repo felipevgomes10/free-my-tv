@@ -24,7 +24,8 @@ if [[ "$serial" != emulator-* ]] || [[ "$(adb -s "$serial" shell getprop ro.kern
   exit 1
 fi
 
-if [[ -z "${JAVA_HOME:-}" ]] && command -v brew >/dev/null && [[ -d "$(brew --prefix openjdk@17 2>/dev/null)" ]]; then
+# The build needs JDK 17 (Gradle 8.11 can't run on newer ones), whatever JAVA_HOME the shell has.
+if command -v brew >/dev/null && [[ -d "$(brew --prefix openjdk@17 2>/dev/null)" ]]; then
   export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
 fi
 
