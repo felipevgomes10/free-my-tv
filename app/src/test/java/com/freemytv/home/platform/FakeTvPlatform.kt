@@ -4,6 +4,9 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.TrendWindow
+import com.freemytv.home.explorar.TrendingLookup
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputPreferences
@@ -143,6 +146,15 @@ class FakeTvPlatform(
 
     override suspend fun saveUpdateSources(sources: Map<String, String>) {
         updateSources = sources
+    }
+
+    /** Trending per window and filter; a missing pair is offline. */
+    var trending: Map<Pair<TrendWindow, KindFilter>, TrendingLookup> = emptyMap()
+    val trendingCalls = mutableListOf<Pair<TrendWindow, KindFilter>>()
+
+    override suspend fun trending(window: TrendWindow, filter: KindFilter): TrendingLookup {
+        trendingCalls += window to filter
+        return trending[window to filter] ?: TrendingLookup.Offline
     }
 
     val deletedArtwork = mutableListOf<String>()

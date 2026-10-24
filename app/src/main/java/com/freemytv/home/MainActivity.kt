@@ -54,6 +54,9 @@ import com.freemytv.home.weather.WeatherWidget
 import com.freemytv.home.widgets.WidgetSettings
 import com.freemytv.home.ui.HomeScreen
 import com.freemytv.home.ui.ExplorarScreen
+import com.freemytv.home.ui.ExplorarActions
+import com.freemytv.home.android.TmdbImages
+import com.freemytv.home.explorar.Explorar
 import com.freemytv.home.ui.HomeSection
 import com.freemytv.home.apkdrop.ApkDrop
 import com.freemytv.home.ui.ApkDropScreen
@@ -93,6 +96,8 @@ class MainActivity : ComponentActivity() {
         val artwork = AppArtworkLoader(applicationContext)
         val topShelf = TopShelf(app.upNext.state)
         val apkDrop = ApkDrop(platform)
+        val explorar = Explorar(platform)
+        val tmdbImages = TmdbImages(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -218,7 +223,24 @@ class MainActivity : ComponentActivity() {
                         statusWidgets = statusWidgets,
                     )
                 }
-                Screen.Explorar -> ExplorarScreen(clock = homeState.statusClock, onSection = ::openSection, statusWidgets = statusWidgets)
+                Screen.Explorar -> {
+                    val explorarState by explorar.state.collectAsStateWithLifecycle()
+                    // Highlights load while Explorar is on screen; the hour's cache outlives it.
+                    LaunchedEffect(Unit) { explorar.run() }
+                    ExplorarScreen(
+                        state = explorarState,
+                        clock = homeState.statusClock,
+                        images = tmdbImages,
+                        actions = ExplorarActions(
+                            onWindow = explorar::choose,
+                            onFilter = explorar::choose,
+                            onFocus = explorar::focus,
+                            onDetails = {},
+                        ),
+                        onSection = ::openSection,
+                        statusWidgets = statusWidgets,
+                    )
+                }
                 Screen.ApkDrop -> {
                     val apkDropState by apkDrop.state.collectAsStateWithLifecycle()
                     // The page is served only while this screen is on.

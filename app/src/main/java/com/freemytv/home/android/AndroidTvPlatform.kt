@@ -25,6 +25,9 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.TrendWindow
+import com.freemytv.home.explorar.TrendingLookup
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputKind
@@ -63,6 +66,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     private val mediaSessions = MediaSessions(context)
     private val apkDropServer = ApkDropServer(java.io.File(context.cacheDir, "apkdrop"))
     private val apkInstaller = ApkInstaller(context)
+    private val tmdb = Tmdb(context)
     private val gitHub = GitHubReleases({ GitHubEndpoint.api(context) }, java.io.File(context.cacheDir, "updates"))
 
     override suspend fun installedApps(): List<InstalledApp> = withContext(Dispatchers.IO) {
@@ -431,6 +435,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     override suspend fun deleteFile(path: String) {
         withContext(Dispatchers.IO) { java.io.File(path).delete() }
     }
+
+    override suspend fun trending(window: TrendWindow, filter: KindFilter): TrendingLookup = tmdb.trending(window, filter)
 
     override suspend fun latestRelease(repository: String): ReleaseLookup = gitHub.latest(repository)
 

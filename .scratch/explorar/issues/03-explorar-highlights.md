@@ -12,9 +12,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] Hoje/Semana and Todos/Filmes/Séries change the highlights and the row's headings as in the designs
-- [ ] The hero follows the focused card after the settle, without loading the cards passed
-- [ ] Highlights are reused within the hour and fetched again after it
-- [ ] Offline and missing-token states show their messages
-- [ ] Settings → Sobre credits TMDB
-- [ ] Tests cover the choices and headings, the settle, the cache, offline with and without earlier highlights, the missing token and empty synopses
+- [x] Hoje/Semana and Todos/Filmes/Séries change the highlights and the row's headings as in the designs
+- [x] The hero follows the focused card after the settle, without loading the cards passed
+- [x] Highlights are reused within the hour and fetched again after it
+- [x] Offline and missing-token states show their messages
+- [x] Settings → Sobre credits TMDB
+- [x] Tests cover the choices and headings, the settle, the cache, offline with and without earlier highlights, the missing token and empty synopses
