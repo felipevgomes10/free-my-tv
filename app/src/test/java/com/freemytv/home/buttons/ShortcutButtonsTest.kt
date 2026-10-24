@@ -66,13 +66,13 @@ class ShortcutButtonsTest {
     }
 
     @Test
-    fun `the remote's settings button opens the Android settings once`() = runTest {
+    fun `the remote's settings button opens the Home's Settings once`() = runTest {
         val platform = FakeTvPlatform(apps = factoryApps)
 
         val decisions = buttons(platform).press(scanCode = 561, keyCode = 83)
 
-        assertEquals(listOf(KeyDecision.Consume(ButtonTarget.AndroidSettings), KeyDecision.Consume(null)), decisions)
-        assertEquals(1, platform.androidSettingsOpened)
+        assertEquals(listOf(KeyDecision.Consume(ButtonTarget.HomeSettings), KeyDecision.Consume(null)), decisions)
+        assertEquals(listOf(HomeDestination.Settings), platform.homeOpenedAt)
     }
 
     @Test

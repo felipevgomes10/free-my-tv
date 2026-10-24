@@ -208,7 +208,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
             val target = when {
                 value == "switcher" -> ButtonTarget.AppSwitcher
                 value == "inputs" -> ButtonTarget.InputTray
-                value == "settings" -> ButtonTarget.AndroidSettings
+                value == "settings" -> ButtonTarget.HomeSettings
                 value.startsWith("app:") -> ButtonTarget.App(value.removePrefix("app:"))
                 value.startsWith("input:") -> ButtonTarget.TvInput(value.removePrefix("input:"))
                 else -> return@mapNotNull null
@@ -225,7 +225,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
                 when (target) {
                     ButtonTarget.AppSwitcher -> "switcher"
                     ButtonTarget.InputTray -> "inputs"
-                    ButtonTarget.AndroidSettings -> "settings"
+                    ButtonTarget.HomeSettings -> "settings"
                     is ButtonTarget.App -> "app:${target.packageName}"
                     is ButtonTarget.TvInput -> "input:${target.inputId}"
                 },
