@@ -18,7 +18,7 @@ _Avoid_: App drawer, library
 The strip at the top of the Home showing time, connectivity and notifications.
 
 **Top Shelf**:
-The large area at the top of the Home that shows content from the app currently focused in the App Tray, as on Apple TV: what the owner last watched in that app, or the app's banner enlarged when there is nothing.
+The large area at the top of the Home that shows content from the app currently focused in the App Tray, as on Apple TV: what the owner last watched in that app; it stays dark when there is nothing.
 _Avoid_: Hero, banner, featured
 
 **Settings** (Configurações):

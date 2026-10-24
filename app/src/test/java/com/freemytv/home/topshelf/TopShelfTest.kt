@@ -43,7 +43,7 @@ class TopShelfTest {
     }
 
     @Test
-    fun `an app with nothing watched falls back to its banner`() = runTest {
+    fun `an app with nothing watched shows nothing`() = runTest {
         val (shelf, _) = running()
 
         shelf.focus(ShelfApp(YOUTUBE, "YouTube"))

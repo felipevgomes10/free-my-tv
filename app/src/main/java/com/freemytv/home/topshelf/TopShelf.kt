@@ -27,7 +27,7 @@ data class TopShelfState(
     val entries: List<UpNextEntry> = emptyList(),
     val index: Int = 0,
 ) {
-    /** What is shown; null means the app's banner, enlarged and blurred. */
+    /** What is shown; null means nothing was watched in the app and the Top Shelf stays dark. */
     val current: UpNextEntry? get() = entries.getOrNull(index)
 }
 
