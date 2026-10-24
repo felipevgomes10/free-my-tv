@@ -119,9 +119,9 @@ internal class ForceStopper(private val service: AccessibilityService) {
      */
     private fun returnHome() {
         service.startActivity(
-            Intent(service, MainActivity::class.java)
+            MainActivity.homeIntent(service)
                 .putExtra(MainActivity.EXTRA_RETURN, true)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION),
+                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION),
         )
         waitUntil { service.windows.none { it.type == AccessibilityWindowInfo.TYPE_APPLICATION && it.root?.packageName == SETTINGS } }
         SystemClock.sleep(FRAMES_MILLIS)

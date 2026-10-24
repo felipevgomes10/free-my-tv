@@ -256,7 +256,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     }
 
     override fun openHome(destination: HomeDestination) {
-        start(Intent(context, MainActivity::class.java).putExtra(MainActivity.EXTRA_DESTINATION, destination.name))
+        start(MainActivity.homeIntent(context).putExtra(MainActivity.EXTRA_DESTINATION, destination.name))
     }
 
     override fun isKeyFilterEnabled(): Boolean {

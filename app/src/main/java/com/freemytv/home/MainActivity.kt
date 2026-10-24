@@ -1,5 +1,6 @@
 package com.freemytv.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -101,6 +102,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Started by name rather than as Home, Android opens a second copy of the Home in a task of
+        // its own, which lingers with all its screens and pictures: hand over to the real one.
+        if (!intent.isHome()) {
+            startActivity(homeIntent(this).putExtras(intent))
+            finish()
+            return
+        }
         val app = application as HomeApplication
         platform = app.platform
         val library = AppLibrary(platform)
@@ -501,6 +509,17 @@ class MainActivity : ComponentActivity() {
 
         /** Brings the Home back in front exactly as it was left. */
         const val EXTRA_RETURN = "com.freemytv.home.RETURN"
+
+        /**
+         * The one way to bring the Home to the front: as Home (MAIN and HOME alone), which Android
+         * sends to the Home already running. By name alone it would open a second copy.
+         */
+        fun homeIntent(context: Context): Intent = Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_HOME)
+            .setClass(context, MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        private fun Intent?.isHome() = this != null && action == Intent.ACTION_MAIN && hasCategory(Intent.CATEGORY_HOME)
 
         private const val ENTER_MILLIS = 260
         private const val EXIT_MILLIS = 200
