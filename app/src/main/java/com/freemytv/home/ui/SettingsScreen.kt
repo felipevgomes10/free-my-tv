@@ -225,6 +225,9 @@ private fun AboutPanel(state: SettingsState) {
     InfoRow(stringResource(R.string.android), device.androidVersion)
     InfoRow(stringResource(R.string.security_patch), device.securityPatch?.format(LONG_DATE) ?: "—")
     InfoRow(stringResource(R.string.firmware), device.build)
+    // TMDB's terms ask for this credit wherever its data shows.
+    InfoRow(stringResource(R.string.tmdb_credit), "TMDB")
+    Note(stringResource(R.string.tmdb_notice))
 }
 
 /** A setting the owner turns on and off. */

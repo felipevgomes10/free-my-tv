@@ -4,6 +4,9 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.TrendWindow
+import com.freemytv.home.explorar.TrendingLookup
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputPreferences
@@ -223,6 +226,9 @@ interface TvPlatform {
     suspend fun loadUpdateSources(): Map<String, String>
 
     suspend fun saveUpdateSources(sources: Map<String, String>)
+
+    /** TMDB's trending Titles, in Portuguese, with genre names. */
+    suspend fun trending(window: TrendWindow, filter: KindFilter): TrendingLookup
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?
