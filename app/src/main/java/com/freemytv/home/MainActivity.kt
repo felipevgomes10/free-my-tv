@@ -257,6 +257,7 @@ class MainActivity : ComponentActivity() {
                             clock = homeState.statusClock,
                             images = tmdbImages,
                             onBack = ::closeDetails,
+                            onWatch = explorar::watch,
                             statusWidgets = statusWidgets,
                         )
                     }

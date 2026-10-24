@@ -58,6 +58,9 @@ interface TvPlatform {
 
     fun openPlayStore()
 
+    /** Opens an app's page in the Play Store, to install it. */
+    fun openPlayStorePage(packageName: String)
+
     /** Every TV input Android publishes, physical or not; the Input Tray decides which are Inputs. */
     suspend fun tvInputs(): List<TvInputSource>
 

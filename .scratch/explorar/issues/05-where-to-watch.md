@@ -11,7 +11,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] Services are ordered subscription first, merged by variant, each shown once
-- [ ] Selecting an installed service opens its app; a missing one opens its Play Store page; an unmapped one isn't selectable
-- [ ] The section is hidden when there are no offers in Brazil
-- [ ] Tests cover ordering, merging, the mapping, and what selecting each kind of service does
+- [x] Services are ordered subscription first, merged by variant, each shown once
+- [x] Selecting an installed service opens its app; a missing one opens its Play Store page; an unmapped one isn't selectable
+- [x] The section is hidden when there are no offers in Brazil
+- [x] Tests cover ordering, merging, the mapping, and what selecting each kind of service does

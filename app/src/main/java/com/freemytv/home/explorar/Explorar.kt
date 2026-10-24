@@ -52,6 +52,8 @@ data class DetailsState(
     val details: TitleDetails? = null,
     val loading: Boolean = true,
     val problem: ExplorarProblem? = null,
+    /** "Onde assistir"; empty hides the section. */
+    val whereToWatch: List<WatchOption> = emptyList(),
 )
 
 data class ExplorarState(
@@ -111,12 +113,18 @@ class Explorar(
     suspend fun openDetails(summary: TitleSummary) {
         _state.update { it.copy(hero = summary, details = DetailsState(summary)) }
         val details = when (val lookup = platform.titleDetails(summary.kind, summary.id)) {
-            is DetailsLookup.Found -> DetailsState(summary, lookup.details, loading = false)
+            is DetailsLookup.Found -> DetailsState(summary, lookup.details, loading = false, whereToWatch = whereToWatch(lookup.details.offers, platform::isLaunchable))
             DetailsLookup.Offline -> DetailsState(summary, loading = false, problem = ExplorarProblem.Offline)
             DetailsLookup.MissingToken -> DetailsState(summary, loading = false, problem = ExplorarProblem.MissingToken)
         }
         // The owner may have left the details while they loaded.
         _state.update { if (it.details?.summary == summary) it.copy(details = details) else it }
+    }
+
+    /** Opens the service's app, or its Play Store page when the app isn't installed. */
+    fun watch(option: WatchOption) {
+        val packageName = option.packageName ?: return
+        if (platform.isLaunchable(packageName)) platform.launch(packageName) else platform.openPlayStorePage(packageName)
     }
 
     fun closeDetails() {

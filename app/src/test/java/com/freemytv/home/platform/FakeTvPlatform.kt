@@ -164,6 +164,12 @@ class FakeTvPlatform(
 
     override suspend fun titleDetails(kind: TitleKind, id: Int) = details[id] ?: DetailsLookup.Offline
 
+    val playStorePages = mutableListOf<String>()
+
+    override fun openPlayStorePage(packageName: String) {
+        playStorePages += packageName
+    }
+
     val deletedArtwork = mutableListOf<String>()
 
     override suspend fun deleteArtwork(path: String) {
