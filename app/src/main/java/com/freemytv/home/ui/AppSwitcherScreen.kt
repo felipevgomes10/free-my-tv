@@ -80,7 +80,7 @@ fun AppSwitcherScreen(
                 var focused by remember { mutableStateOf(false) }
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(9.dp)) {
                     Row(Modifier.height(14.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        if (focused) {
+                        if (focused && !app.playing) {
                             Icon(painterResource(R.drawable.ic_chevron_up), contentDescription = null, tint = Tokens.TextSecondary, modifier = Modifier.size(13.dp))
                             Text(stringResource(R.string.close_app), color = Tokens.TextSecondary, fontSize = 10.sp)
                         }

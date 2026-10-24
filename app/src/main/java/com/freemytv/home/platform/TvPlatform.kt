@@ -104,8 +104,14 @@ interface TvPlatform {
     /** An app's name, or its package name if it has none. */
     suspend fun appLabel(packageName: String): String
 
-    /** Ends a background app's processes. */
+    /** Ends a background app's processes, quietly; Android won't end protected ones (playing media, foreground services) this way. */
     fun closeApp(packageName: String)
+
+    /**
+     * Ends all of an app's processes, protected or not, the way Settings' Force stop does,
+     * and keeps them from restarting by themselves; Settings shows for a moment.
+     */
+    fun forceStop(packageName: String)
 
     /** The Home's frames per second, one reading each second, for as long as it is collected. */
     val homeFrameRate: Flow<Int>

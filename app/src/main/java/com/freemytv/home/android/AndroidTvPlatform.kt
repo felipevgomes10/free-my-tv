@@ -129,6 +129,10 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override fun closeApp(packageName: String) = system.closeApp(packageName)
 
+    override fun forceStop(packageName: String) {
+        if (!KeyFilterService.forceStop(packageName)) system.closeApp(packageName)
+    }
+
     override val homeFrameRate = system.homeFrameRate
 
     override fun displayRefreshRate() = system.displayRefreshRate()

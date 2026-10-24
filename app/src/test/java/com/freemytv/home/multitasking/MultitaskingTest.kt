@@ -25,12 +25,13 @@ class MultitaskingTest {
     private val appleTv = app("com.apple.atve.androidtv.appletv", "Apple TV")
     private val spotify = app("com.spotify.tv.android", "Spotify")
     private val plex = app("com.plexapp.android", "Plex")
+    private val settings = app("com.android.tv.settings", "Configurações")
 
     private fun process(pkg: String, importance: Importance = Importance.Background) = ProcessMemory(pkg, 100 * mb, importance)
 
     /** Plenty of memory unless a test says otherwise. */
     private fun platform(processes: List<ProcessMemory>?, lastUsed: Map<String, Instant>, limit: Int = 3) = FakeTvPlatform(
-        apps = listOf(netflix, youtube, globoplay, appleTv, spotify, plex),
+        apps = listOf(netflix, youtube, globoplay, appleTv, spotify, plex, settings),
         processes = processes,
         lastUsed = lastUsed,
         openAppLimit = limit,
@@ -85,7 +86,7 @@ class MultitaskingTest {
     }
 
     @Test
-    fun `closing an app in the App Switcher ends it and takes it off the row`() = runTest {
+    fun `closing an app in the App Switcher force stops it and takes it off the row`() = runTest {
         val platform = platform(
             processes = listOf(process(globoplay.packageName), process(youtube.packageName)),
             lastUsed = mapOf(globoplay.packageName to minutesAgo(1), youtube.packageName to minutesAgo(5)),
@@ -95,8 +96,33 @@ class MultitaskingTest {
 
         multitasking.close(multitasking.switcher.value.apps!!.last())
 
-        assertEquals(listOf(youtube.packageName), platform.closed)
+        assertEquals(listOf(youtube.packageName), platform.forceStopped)
         assertEquals(listOf(globoplay.packageName), multitasking.switcher.value.apps!!.map { it.packageName })
+    }
+
+    @Test
+    fun `Settings, which force stops apps and runs the TV's Bluetooth, isn't an Open App`() = runTest {
+        val platform = platform(
+            processes = listOf(process(globoplay.packageName), process(settings.packageName)),
+            lastUsed = mapOf(settings.packageName to minutesAgo(0), globoplay.packageName to minutesAgo(1)),
+        )
+
+        assertEquals(listOf(globoplay.packageName), multitasking(platform).openApps().map { it.packageName })
+    }
+
+    @Test
+    fun `an app playing media can't be closed from the App Switcher`() = runTest {
+        val platform = platform(
+            processes = listOf(process(globoplay.packageName), process(spotify.packageName, Importance.Perceptible)),
+            lastUsed = mapOf(globoplay.packageName to minutesAgo(1), spotify.packageName to minutesAgo(5)),
+        )
+        val multitasking = multitasking(platform)
+        multitasking.openSwitcher()
+
+        multitasking.close(multitasking.switcher.value.apps!!.first { it.playing })
+
+        assertEquals(emptyList<String>(), platform.forceStopped)
+        assertEquals(listOf(globoplay.packageName, spotify.packageName), multitasking.switcher.value.apps!!.map { it.packageName })
     }
 
     @Test

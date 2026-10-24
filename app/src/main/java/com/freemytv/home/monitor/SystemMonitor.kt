@@ -98,10 +98,10 @@ class SystemMonitor(private val platform: TvPlatform, private val settings: Widg
         detailOpen.value = false
     }
 
-    /** Ends a background app's processes; Android won't touch the foreground app this way. */
+    /** Force stops a background app, so it can't restart by itself; apps Android protects stay open. */
     suspend fun close(app: AppUsage) {
         if (!app.canClose) return
-        platform.closeApp(app.packageName)
+        platform.forceStop(app.packageName)
         val topMemory = topMemory()
         _state.update { it.copy(detail = it.detail?.copy(topMemory = topMemory)) }
     }
@@ -137,9 +137,13 @@ class SystemMonitor(private val platform: TvPlatform, private val settings: Widg
         val COMPACT_EVERY = 5.seconds
         val DETAIL_EVERY = 3.seconds
 
-        /** Cast Receivers and the Home itself are never closed. */
+        /**
+         * Cast Receivers, the Home itself and Settings are never closed. Settings runs the TV's
+         * Bluetooth services, comes right back when ended, and is where closing happens.
+         */
         val NEVER_CLOSE = setOf(
             "com.freemytv.home",
+            "com.android.tv.settings",
             "com.google.android.apps.mediashell",
             "com.tcl.airplay2",
             "com.amlogic.airplay",
