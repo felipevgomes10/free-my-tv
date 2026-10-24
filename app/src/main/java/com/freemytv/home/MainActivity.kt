@@ -390,6 +390,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        // Back from closing an app through Settings: the owner stays where they were.
+        if (intent.getBooleanExtra(EXTRA_RETURN, false)) return
         home.cancelEdit()
         inputs.cancelEdit()
         notificationsOpen = false
@@ -427,6 +429,9 @@ class MainActivity : ComponentActivity() {
     companion object {
         /** A [HomeDestination] name; the Home opens there. */
         const val EXTRA_DESTINATION = "com.freemytv.home.DESTINATION"
+
+        /** Brings the Home back in front exactly as it was left. */
+        const val EXTRA_RETURN = "com.freemytv.home.RETURN"
 
         private const val CLOCK_TICK_MILLIS = 1_000L
     }

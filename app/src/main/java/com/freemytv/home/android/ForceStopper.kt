@@ -1,6 +1,7 @@
 package com.freemytv.home.android
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -19,8 +20,10 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
 import android.widget.ImageView
 import android.widget.TextView
+import com.freemytv.home.MainActivity
 import com.freemytv.home.R
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -30,7 +33,7 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * Force stops apps by pressing Settings' own buttons (ADR 0010). Android keeps force stop to
  * itself, so the key filter, which already holds accessibility access, opens the app's page in
- * Settings, presses Force stop, confirms with OK and leaves Settings again. One app at a time,
+ * Settings, presses Force stop, confirms with OK and brings the Home back. One app at a time,
  * on a thread of its own so remote keys never wait for it. A still of the screen covers Settings
  * meanwhile, so the owner never sees it, and [busy] tells the key filter to hold keys back.
  */
@@ -68,14 +71,25 @@ internal class ForceStopper(private val service: AccessibilityService) {
         }.getOrNull() ?: return
         // Lets the Home take the closed app off its screen first, so the still already shows it gone.
         SystemClock.sleep(SETTLE_MILLIS)
-        cover.show(packageName)
         try {
+            cover.show(packageName)
+            trackWindows(true)
             pressForceStop(packageName, forceStop)
-            leaveSettings()
-            SystemClock.sleep(SETTLE_MILLIS)
+            returnHome()
         } finally {
             cover.hide()
+            trackWindows(false)
         }
+    }
+
+    /**
+     * Android follows the windows on screen for the key filter only while a close needs it, to
+     * see Settings gone: following them costs every window change on the TV. (It leaves the
+     * cover out of that list, as it does every window that takes no touches.)
+     */
+    private fun trackWindows(on: Boolean) {
+        val flag = AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
+        service.serviceInfo = service.serviceInfo.apply { flags = if (on) flags or flag else flags and flag.inv() }
     }
 
     private fun pressForceStop(packageName: String, forceStop: String) {
@@ -98,14 +112,24 @@ internal class ForceStopper(private val service: AccessibilityService) {
         }
     }
 
-    /** Back out of Settings to whatever the owner was on, never pressing Back anywhere else. */
-    private fun leaveSettings() {
-        repeat(MAX_BACKS) {
-            if (service.rootInActiveWindow?.packageName != SETTINGS) return
-            service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)
-            waitFor { root -> root.takeIf { it.packageName != SETTINGS } } ?: return@repeat
-            return
-        }
+    /**
+     * Brings the Home back in front as the owner left it, without the closing animation Back
+     * would play: Settings fading out was what still showed once the cover came off. The cover
+     * stays until Settings is off the screen and the Home has had a few frames to draw.
+     */
+    private fun returnHome() {
+        service.startActivity(
+            Intent(service, MainActivity::class.java)
+                .putExtra(MainActivity.EXTRA_RETURN, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION),
+        )
+        waitUntil { service.windows.none { it.type == AccessibilityWindowInfo.TYPE_APPLICATION && it.root?.packageName == SETTINGS } }
+        SystemClock.sleep(FRAMES_MILLIS)
+    }
+
+    private fun waitUntil(done: () -> Boolean) {
+        val deadline = SystemClock.uptimeMillis() + TIMEOUT_MILLIS
+        while (!done() && SystemClock.uptimeMillis() < deadline) SystemClock.sleep(POLL_MILLIS)
     }
 
     /** Polls Settings' window until [find] finds something, or gives up after [TIMEOUT_MILLIS]. */
@@ -157,14 +181,19 @@ internal class ForceStopper(private val service: AccessibilityService) {
                         setBackgroundColor(Color.BLACK)
                     }
                 }
-                view.viewTreeObserver.addOnDrawListener(ViewTreeObserver.OnDrawListener { drawn.countDown() })
+                // Committed is when the cover's first frame goes to the screen; before Android 10, drawn is the best there is.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    view.viewTreeObserver.registerFrameCommitCallback { drawn.countDown() }
+                } else {
+                    view.viewTreeObserver.addOnDrawListener(ViewTreeObserver.OnDrawListener { drawn.countDown() })
+                }
                 runCatching { windows.addView(view, layout()) }.onFailure { drawn.countDown() }.onSuccess {
                     this.view = view
                     still = shot?.second
                 }
             }
             drawn.await(COVER_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
-            // Drawn is not yet on screen: give it a couple of frames before Settings opens.
+            // A new window shows a few frames after its first one is committed, more on a slow TV.
             SystemClock.sleep(FRAMES_MILLIS)
         }
 
@@ -224,9 +253,8 @@ internal class ForceStopper(private val service: AccessibilityService) {
         const val ACTION_TITLE = "$SETTINGS:id/guidedactions_item_title"
         const val TIMEOUT_MILLIS = 4_000L
         const val POLL_MILLIS = 100L
-        const val MAX_BACKS = 3
         const val SETTLE_MILLIS = 150L
-        const val FRAMES_MILLIS = 50L
+        const val FRAMES_MILLIS = 100L
         const val COVER_TIMEOUT_MILLIS = 500L
     }
 }
