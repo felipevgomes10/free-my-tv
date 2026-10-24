@@ -58,6 +58,9 @@ interface TvPlatform {
 
     fun openPlayStore()
 
+    /** Plays a YouTube video in the YouTube app, or opens its Play Store page when it isn't installed. */
+    fun openYouTubeVideo(key: String)
+
     /** Opens an app's page in the Play Store, to install it. */
     fun openPlayStorePage(packageName: String)
 

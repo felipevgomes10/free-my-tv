@@ -56,6 +56,7 @@ import com.freemytv.home.ui.HomeScreen
 import com.freemytv.home.ui.ExplorarScreen
 import com.freemytv.home.ui.ExplorarActions
 import com.freemytv.home.ui.TitleDetailsScreen
+import com.freemytv.home.ui.TrailerScreen
 import com.freemytv.home.android.TmdbImages
 import com.freemytv.home.explorar.Explorar
 import com.freemytv.home.ui.HomeSection
@@ -68,7 +69,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, Explorar, TitleDetails, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
+    private enum class Screen { Home, Explorar, TitleDetails, Trailer, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
 
     private var screen by mutableStateOf(Screen.Home)
     private var notificationsOpen by mutableStateOf(false)
@@ -115,6 +116,7 @@ class MainActivity : ComponentActivity() {
                     inputs.state.value.lifted != null -> inputs.cancelEdit()
                     screen == Screen.ApkDrop -> screen = Screen.AllApps
                     screen == Screen.TitleDetails -> closeDetails()
+                    screen == Screen.Trailer -> screen = Screen.TitleDetails
                     else -> screen = Screen.Home
                 }
             }
@@ -258,7 +260,24 @@ class MainActivity : ComponentActivity() {
                             images = tmdbImages,
                             onBack = ::closeDetails,
                             onWatch = explorar::watch,
+                            onTrailer = { screen = Screen.Trailer },
                             statusWidgets = statusWidgets,
+                        )
+                    }
+                }
+                Screen.Trailer -> {
+                    val explorarState by explorar.state.collectAsStateWithLifecycle()
+                    val details = explorarState.details
+                    val video = details?.trailer
+                    if (details != null && video != null) {
+                        TrailerScreen(
+                            title = details.details?.name ?: details.summary.name,
+                            video = video,
+                            onBack = { screen = Screen.TitleDetails },
+                            onFailed = {
+                                screen = Screen.TitleDetails
+                                explorar.trailerFailed(video)
+                            },
                         )
                     }
                 }

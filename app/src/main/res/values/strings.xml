@@ -152,6 +152,10 @@
     <string name="audience_rating">Avaliação do público</string>
     <string name="cast">Elenco</string>
     <string name="where_to_watch">Onde assistir</string>
+    <string name="watch_trailer">Assistir trailer</string>
+    <string name="back_to_details">Voltar aos detalhes</string>
+    <string name="official_trailer">Trailer oficial</string>
+    <string name="trailer">Trailer</string>
     <string name="offer_subscription">Incluído na assinatura</string>
     <string name="offer_rent_or_buy">Alugar ou comprar</string>
     <string name="where_to_watch_note">Abre a obra no app do streaming. Pode exigir assinatura ou pagamento.</string>

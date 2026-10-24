@@ -11,8 +11,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] The trailer chosen follows the order above; no trailer hides the button
-- [ ] On the emulator a trailer plays with the design's controls, and seek, pause and the progress bar work
-- [ ] A video that refuses embedding opens in the YouTube app
-- [ ] Leaving the screen stops playback and frees the player
-- [ ] Tests cover the trailer choice and the fallback decision
+- [x] The trailer chosen follows the order above; no trailer hides the button
+- [x] On the emulator a trailer plays (the picture itself is checked on the TV in 07: the emulator's WebView 91 shows video black in screenshots) with the design's controls, and seek, pause and the progress bar work
+- [x] A video that refuses embedding opens in the YouTube app (seen with error 152 before the page had its own origin; without the app, its Play Store page)
+- [x] Leaving the screen stops playback and frees the player
+- [x] Tests cover the trailer choice and the fallback decision
