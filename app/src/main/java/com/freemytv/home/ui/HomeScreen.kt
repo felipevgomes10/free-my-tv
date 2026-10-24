@@ -73,6 +73,7 @@ fun HomeScreen(
     onUpNext: (UpNextEntry) -> Unit,
     onRemoveUpNext: (UpNextEntry) -> Unit,
     inputTrayFocusRequest: Int,
+    onSection: (HomeSection) -> Unit,
     artwork: AppArtworkLoader,
     actions: HomeActions,
     inputActions: InputActions,
@@ -82,7 +83,8 @@ fun HomeScreen(
     var upNextFocused by remember { mutableStateOf(false) }
     // The top of the Home recedes when focus moves down to the lower Trays, so every tray fits.
     val lowered = inputsFocused || upNextFocused
-    val topArea by animateDpAsState(if (lowered) 24.dp else 236.dp, label = "top area")
+    // The Home Navigation takes the top of what used to be this space, so the Trays stay put.
+    val topArea by animateDpAsState(if (lowered) 24.dp else 184.dp, label = "top area")
 
     Box(
         Modifier
@@ -94,6 +96,7 @@ fun HomeScreen(
         // Laid out at full height and clipped by the screen: trays below the fold peek in, nothing scrolls.
         Column(Modifier.fillMaxSize().wrapContentHeight(Alignment.Top, unbounded = true)) {
             StatusBar(state.statusClock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
+            HomeNavigation(HomeSection.Inicio, onSection, Modifier.padding(top = NAVIGATION_TOP))
             Box(Modifier.fillMaxWidth().height(topArea)) {
                 val hint = state.lifted?.let { stringResource(R.string.app_tray) to it.label }
                     ?: inputs.lifted?.let { stringResource(R.string.inputs) to it.displayName() }

@@ -11,7 +11,7 @@
 
 **Status:** ready-for-agent
 
-- [ ] The row matches the design on Início and Explorar, with the current section highlighted
-- [ ] Up from the App Tray reaches the row; left and right move along it; OK switches sections
-- [ ] Todos os apps opens All Apps; Back from Explorar returns to Início; Home lands on Início
-- [ ] Nothing on Início moves into the row's space (Top Shelf, Edit Mode hint)
+- [x] The row matches the design on Início and Explorar, with the current section highlighted
+- [x] Up from the App Tray reaches the row; left and right move along it; OK switches sections
+- [x] Todos os apps opens All Apps; Back from Explorar returns to Início; Home lands on Início
+- [x] Nothing on Início moves into the row's space (Top Shelf, Edit Mode hint)
