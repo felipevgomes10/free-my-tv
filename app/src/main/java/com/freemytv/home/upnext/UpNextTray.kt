@@ -57,7 +57,13 @@ data class UpNextEntry(
 data class UpNextState(
     /** Most recently watched first; the Tray is hidden while this is empty. */
     val entries: List<UpNextEntry> = emptyList(),
-)
+) {
+    /** The apps on the Tray, package and name, the most recently watched first: what it filters by. */
+    val apps: List<Pair<String, String>> get() = entries.distinctBy { it.packageName }.map { it.packageName to it.appLabel }
+
+    /** One app's entries, or all of them for null. */
+    fun entriesOf(packageName: String?): List<UpNextEntry> = if (packageName == null) entries else entries.filter { it.packageName == packageName }
+}
 
 /**
  * The Up Next Tray (ADR 0012). Apps that list what the owner is watching in Android TV's Watch

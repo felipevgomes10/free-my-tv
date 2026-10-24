@@ -315,22 +315,6 @@ private fun <T : Any> Segmented(options: List<Pair<T, String>>, selected: T, onS
     }
 }
 
-@Composable
-private fun FilterPill(label: String, selected: Boolean, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        modifier = Modifier.slidingHighlightItem(),
-        shape = ClickableSurfaceDefaults.shape(CircleShape),
-        scale = highlightScale(1.1f),
-        colors = highlightColors(
-            content = if (selected) Tokens.TextPrimary else Tokens.TextSecondary,
-            container = if (selected) Color(0x33FFFFFF) else Color.Transparent,
-        ),
-    ) {
-        Text(label, fontSize = 12.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp))
-    }
-}
-
 private fun TitleSummary.key() = "$kind-$id"
 
 /** Where the Home Navigation sits under the Status Bar, on every section. */
