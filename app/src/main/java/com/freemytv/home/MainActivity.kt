@@ -55,6 +55,7 @@ import com.freemytv.home.widgets.WidgetSettings
 import com.freemytv.home.ui.HomeScreen
 import com.freemytv.home.ui.ExplorarScreen
 import com.freemytv.home.ui.ExplorarActions
+import com.freemytv.home.ui.TitleDetailsScreen
 import com.freemytv.home.android.TmdbImages
 import com.freemytv.home.explorar.Explorar
 import com.freemytv.home.ui.HomeSection
@@ -67,10 +68,12 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, Explorar, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
+    private enum class Screen { Home, Explorar, TitleDetails, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
 
     private var screen by mutableStateOf(Screen.Home)
     private var notificationsOpen by mutableStateOf(false)
+    private var explorarReturnsToCard = false
+    private lateinit var explorar: Explorar
     private var inputTrayFocusRequest by mutableIntStateOf(0)
     private val homePresses = HomePresses()
     private lateinit var multitasking: Multitasking
@@ -96,7 +99,7 @@ class MainActivity : ComponentActivity() {
         val artwork = AppArtworkLoader(applicationContext)
         val topShelf = TopShelf(app.upNext.state)
         val apkDrop = ApkDrop(platform)
-        val explorar = Explorar(platform)
+        explorar = Explorar(platform)
         val tmdbImages = TmdbImages(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
@@ -111,6 +114,7 @@ class MainActivity : ComponentActivity() {
                     home.state.value.lifted != null -> home.cancelEdit()
                     inputs.state.value.lifted != null -> inputs.cancelEdit()
                     screen == Screen.ApkDrop -> screen = Screen.AllApps
+                    screen == Screen.TitleDetails -> closeDetails()
                     else -> screen = Screen.Home
                 }
             }
@@ -235,11 +239,27 @@ class MainActivity : ComponentActivity() {
                             onWindow = explorar::choose,
                             onFilter = explorar::choose,
                             onFocus = explorar::focus,
-                            onDetails = {},
+                            onDetails = { title ->
+                                screen = Screen.TitleDetails
+                                scope.launch { explorar.openDetails(title) }
+                            },
                         ),
                         onSection = ::openSection,
                         statusWidgets = statusWidgets,
+                        returnToCard = explorarReturnsToCard.also { explorarReturnsToCard = false },
                     )
+                }
+                Screen.TitleDetails -> {
+                    val explorarState by explorar.state.collectAsStateWithLifecycle()
+                    explorarState.details?.let { details ->
+                        TitleDetailsScreen(
+                            state = details,
+                            clock = homeState.statusClock,
+                            images = tmdbImages,
+                            onBack = ::closeDetails,
+                            statusWidgets = statusWidgets,
+                        )
+                    }
                 }
                 Screen.ApkDrop -> {
                     val apkDropState by apkDrop.state.collectAsStateWithLifecycle()
@@ -334,6 +354,12 @@ class MainActivity : ComponentActivity() {
     }
 
     /** Pressing Home while the Home is already in front always returns to the Home screen. */
+    private fun closeDetails() {
+        explorar.closeDetails()
+        explorarReturnsToCard = true
+        screen = Screen.Explorar
+    }
+
     private fun openSection(section: HomeSection) {
         screen = when (section) {
             HomeSection.Inicio -> Screen.Home

@@ -149,6 +149,9 @@
     <string name="kind_movie">Filme</string>
     <string name="kind_series">Série</string>
     <string name="see_details">Ver detalhes</string>
+    <string name="audience_rating">Avaliação do público</string>
+    <string name="cast">Elenco</string>
+    <string name="details_offline">Sem internet: não deu para trazer os detalhes desta obra.</string>
     <string name="highlights_today">Destaques de hoje</string>
     <string name="highlights_today_note">Filmes e séries para descobrir</string>
     <string name="highlights_week">Destaques da semana</string>

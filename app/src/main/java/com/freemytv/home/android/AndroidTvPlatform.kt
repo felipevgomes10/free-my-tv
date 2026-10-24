@@ -25,7 +25,9 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
 import com.freemytv.home.buttons.HomeDestination
@@ -437,6 +439,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     }
 
     override suspend fun trending(window: TrendWindow, filter: KindFilter): TrendingLookup = tmdb.trending(window, filter)
+
+    override suspend fun titleDetails(kind: TitleKind, id: Int): DetailsLookup = tmdb.details(kind, id)
 
     override suspend fun latestRelease(repository: String): ReleaseLookup = gitHub.latest(repository)
 

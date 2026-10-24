@@ -46,6 +46,14 @@ sealed interface TrendingLookup {
 
 enum class ExplorarProblem { Offline, MissingToken }
 
+/** The details screen of one Title: what the highlights knew at once, then the rest. */
+data class DetailsState(
+    val summary: TitleSummary,
+    val details: TitleDetails? = null,
+    val loading: Boolean = true,
+    val problem: ExplorarProblem? = null,
+)
+
 data class ExplorarState(
     val window: TrendWindow = TrendWindow.Today,
     val filter: KindFilter = KindFilter.All,
@@ -55,6 +63,8 @@ data class ExplorarState(
     val loading: Boolean = false,
     /** Why the highlights may be missing or old; the titles shown, if any, are the last ones fetched. */
     val problem: ExplorarProblem? = null,
+    /** The Title whose details are open, if any; the hero keeps the card to come back to. */
+    val details: DetailsState? = null,
 )
 
 /**
@@ -97,6 +107,22 @@ class Explorar(
         choice.collectLatest { (window, filter) -> load(window, filter) }
     }
 
+    /** Opens a Title's details: one TMDB request for everything the screen shows. */
+    suspend fun openDetails(summary: TitleSummary) {
+        _state.update { it.copy(hero = summary, details = DetailsState(summary)) }
+        val details = when (val lookup = platform.titleDetails(summary.kind, summary.id)) {
+            is DetailsLookup.Found -> DetailsState(summary, lookup.details, loading = false)
+            DetailsLookup.Offline -> DetailsState(summary, loading = false, problem = ExplorarProblem.Offline)
+            DetailsLookup.MissingToken -> DetailsState(summary, loading = false, problem = ExplorarProblem.MissingToken)
+        }
+        // The owner may have left the details while they loaded.
+        _state.update { if (it.details?.summary == summary) it.copy(details = details) else it }
+    }
+
+    fun closeDetails() {
+        _state.update { it.copy(details = null) }
+    }
+
     /** Fetches again, ignoring the cache: after Setup, or when the network comes back. */
     suspend fun retry() {
         val (window, filter) = choice.value
@@ -124,6 +150,8 @@ class Explorar(
 
     private fun show(window: TrendWindow, filter: KindFilter, titles: List<TitleSummary>, problem: ExplorarProblem?) {
         focused.value = null
-        _state.value = ExplorarState(window, filter, titles, hero = titles.firstOrNull(), loading = false, problem = problem)
+        // Coming back from a Title's details reloads the highlights: the card left keeps the hero.
+        val hero = _state.value.hero?.takeIf { it in titles } ?: titles.firstOrNull()
+        _state.update { ExplorarState(window, filter, titles, hero = hero, loading = false, problem = problem, details = it.details) }
     }
 }

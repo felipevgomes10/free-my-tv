@@ -16,7 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -66,9 +68,21 @@ fun ExplorarScreen(
     actions: ExplorarActions,
     onSection: (HomeSection) -> Unit,
     statusWidgets: @Composable () -> Unit,
+    /** Coming back from a Title's details: focus returns to its card instead of the navigation. */
+    returnToCard: Boolean = false,
 ) {
     val navigation = remember { FocusRequester() }
-    LaunchedEffect(Unit) { runCatching { navigation.requestFocus() } }
+    val cards = remember { HashMap<String, FocusRequester>() }
+    val row = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        val index = state.titles.indexOf(state.hero)
+        if (returnToCard && index >= 0) {
+            row.scrollToItem(index)
+            runCatching { cards.getOrPut(state.hero!!.key()) { FocusRequester() }.requestFocus() }
+        } else {
+            runCatching { navigation.requestFocus() }
+        }
+    }
     Box(Modifier.fillMaxSize().background(Tokens.Background)) {
         state.hero?.backdrop?.let { HeroBackdrop(it, images) }
         Column(Modifier.fillMaxSize()) {
@@ -115,11 +129,18 @@ fun ExplorarScreen(
                     )
                 }
                 LazyRow(
+                    state = row,
                     contentPadding = PaddingValues(horizontal = Tokens.SafeAreaHorizontal, vertical = 10.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(state.titles, key = { "${it.kind}-${it.id}" }) { title ->
-                        TitleCard(title, images, onFocus = { actions.onFocus(title) }, onClick = { actions.onDetails(title) })
+                    itemsIndexed(state.titles, key = { _, title -> title.key() }) { _, title ->
+                        TitleCard(
+                            title,
+                            images,
+                            onFocus = { actions.onFocus(title) },
+                            onClick = { actions.onDetails(title) },
+                            modifier = Modifier.focusRequester(cards.getOrPut(title.key()) { FocusRequester() }),
+                        )
                     }
                 }
                 Text(
@@ -152,12 +173,12 @@ private fun Hero(title: TitleSummary, modifier: Modifier, onDetails: () -> Unit)
 }
 
 @Composable
-private fun TitleCard(title: TitleSummary, images: TmdbImages, onFocus: () -> Unit, onClick: () -> Unit) {
+private fun TitleCard(title: TitleSummary, images: TmdbImages, onFocus: () -> Unit, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val picture by produceState<Bitmap?>(null, title.backdrop) {
         value = title.backdrop?.let { images.file(it, "w780") }?.let { decodeNear(it, CARD_DECODE_WIDTH) }
     }
     Column(Modifier.width(CARD_WIDTH), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        TvTile(onClick = onClick, width = CARD_WIDTH, height = CARD_HEIGHT, focusedScale = 1.05f, modifier = Modifier.onFocusChanged { if (it.isFocused) onFocus() }) {
+        TvTile(onClick = onClick, width = CARD_WIDTH, height = CARD_HEIGHT, focusedScale = 1.05f, modifier = modifier.onFocusChanged { if (it.isFocused) onFocus() }) {
             picture?.let { Image(it.asImageBitmap(), contentDescription = title.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
         }
         Text(title.name, color = Tokens.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
@@ -220,6 +241,8 @@ private fun FilterPill(label: String, selected: Boolean, onClick: () -> Unit) {
         Text(label, fontSize = 12.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp))
     }
 }
+
+private fun TitleSummary.key() = "$kind-$id"
 
 /** Where the Home Navigation sits under the Status Bar, on every section. */
 internal val NAVIGATION_TOP = 16.dp
