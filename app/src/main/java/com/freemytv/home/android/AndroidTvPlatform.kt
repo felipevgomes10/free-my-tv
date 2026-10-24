@@ -265,6 +265,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
             SetupCheck.NotificationAccess to notifications.isNotificationListenerAccessGranted(ComponentName(context, HomeNotificationListener::class.java)),
             SetupCheck.KeyFilter to (granted(android.Manifest.permission.WRITE_SECURE_SETTINGS) && isKeyFilterEnabled()),
             SetupCheck.InstallApps to context.packageManager.canRequestPackageInstalls(),
+            SetupCheck.Explorar to (TmdbToken.read(context) != null),
         )
     }
 

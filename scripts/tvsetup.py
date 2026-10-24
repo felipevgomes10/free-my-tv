@@ -14,7 +14,10 @@ on a real TV, --apply also asks the owner to confirm at the terminal.
 """
 
 import argparse
+import hashlib
 import json
+import os
+import re
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
@@ -30,6 +33,12 @@ SETUP_WRAITH = "com.google.android.tungsten.setupwraith"
 STOCK_HOME = [SETUP_WRAITH, STOCK_LAUNCHER]
 NOTIFICATION_LISTENER = f"{HOME}/{HOME}.android.HomeNotificationListener"
 KEY_FILTER = f"{HOME}/{HOME}.android.KeyFilterService"
+# Explorar's TMDB token goes to this receiver, which only the shell (or the Home) may reach (ADR 0008).
+TMDB_RECEIVER = f"{HOME}/.android.TmdbTokenReceiver"
+TMDB_SET = "com.freemytv.home.action.SET_TMDB_TOKEN"
+TMDB_FORGET = "com.freemytv.home.action.FORGET_TMDB_TOKEN"
+TMDB_STATE = "com.freemytv.home.action.TMDB_TOKEN_STATE"
+TOKEN_FILE = Path(__file__).resolve().parent.parent / "config" / "tmdb-token.local"
 GRANTED_PERMISSIONS = [
     "android.permission.DUMP",
     "android.permission.PACKAGE_USAGE_STATS",
@@ -90,11 +99,29 @@ class PlanError(Exception):
 
 @dataclass(frozen=True)
 class Step:
-    """One ADB shell command and how to undo it; `undo` is None for steps with nothing to undo."""
+    """One ADB shell command and how to undo it; `undo` is None for steps with nothing to undo.
+
+    `secret` is a value inside `command` that is never printed or written to the journal.
+    """
 
     command: List[str]
     undo: Optional[List[str]]
     why: str
+    secret: Optional[str] = None
+
+    def shown(self) -> str:
+        """The command as it may be printed: the secret, if any, redacted."""
+        return redact(" ".join(self.command), self.secret)
+
+    def public(self) -> "Step":
+        """This step as the journal keeps it, without the secret."""
+        if self.secret is None:
+            return self
+        return Step([redact(part, self.secret) for part in self.command], self.undo, self.why)
+
+
+def redact(text: str, secret: Optional[str]) -> str:
+    return text.replace(secret, "[token]") if secret else text
 
 
 class Adb:
@@ -127,6 +154,8 @@ class DeviceState:
     notification_listeners: List[str]
     accessibility_services: List[str]
     is_emulator: bool
+    # SHA-256 of the TMDB token the Home holds, or None when it holds none.
+    tmdb_token_hash: Optional[str] = None
 
 
 def read_state(adb: Adb) -> DeviceState:
@@ -155,7 +184,26 @@ def read_state(adb: Adb) -> DeviceState:
         notification_listeners=secure_list("enabled_notification_listeners"),
         accessibility_services=secure_list("enabled_accessibility_services"),
         is_emulator=adb.query(["getprop", "ro.kernel.qemu"]).strip() == "1",
+        tmdb_token_hash=token_hash_on_tv(tolerant(["am", "broadcast", "-n", TMDB_RECEIVER, "-a", TMDB_STATE])),
     )
+
+
+def token_hash_on_tv(broadcast_output: str) -> Optional[str]:
+    """The Home answers the state broadcast with the token's SHA-256, never the token."""
+    match = re.search(r'data="([0-9a-f]{64})"', broadcast_output)
+    return match.group(1) if match else None
+
+
+def sha256(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+def read_token(path: Path = TOKEN_FILE) -> Optional[str]:
+    """Explorar's TMDB token, from the environment or the git-ignored file on this computer."""
+    token = os.environ.get("TMDB_TOKEN", "").strip()
+    if not token and path.exists():
+        token = path.read_text().strip()
+    return token or None
 
 
 def check_approved(approved: Sequence[str]) -> None:
@@ -165,7 +213,7 @@ def check_approved(approved: Sequence[str]) -> None:
         raise PlanError(f"These packages are protected and are never disabled: {names}. Remove them from the approved list.")
 
 
-def plan_setup(state: DeviceState, approved: Sequence[str]) -> List[Step]:
+def plan_setup(state: DeviceState, approved: Sequence[str], token: Optional[str] = None) -> List[Step]:
     """Only what isn't in place yet, so the journal records exactly what Setup changed."""
     check_approved(approved)
     if HOME not in state.enabled:
@@ -177,6 +225,13 @@ def plan_setup(state: DeviceState, approved: Sequence[str]) -> List[Step]:
     for op, what in ALLOWED_APP_OPS.items():
         if op not in state.allowed_app_ops:
             steps.append(Step(["appops", "set", HOME, op, "allow"], ["appops", "set", HOME, op, "default"], f"allow {what}"))
+    if token and state.tmdb_token_hash != sha256(token):
+        steps.append(Step(
+            ["am", "broadcast", "-n", TMDB_RECEIVER, "-a", TMDB_SET, "--es", "token", token],
+            ["am", "broadcast", "-n", TMDB_RECEIVER, "-a", TMDB_FORGET],
+            "give Explorar its TMDB token",
+            secret=token,
+        ))
     if NOTIFICATION_LISTENER not in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "allow_listener", NOTIFICATION_LISTENER], ["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], "allow reading notifications"))
     for package in [*sorted(set(approved) - set(STOCK_HOME)), *STOCK_HOME]:
@@ -221,6 +276,8 @@ def plan_restore_without_journal(state: DeviceState, approved: Sequence[str]) ->
             steps.append(Step(["pm", "enable", package], None, f"enable {package}"))
     if NOTIFICATION_LISTENER in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], None, "stop reading notifications"))
+    if state.tmdb_token_hash:
+        steps.append(Step(["am", "broadcast", "-n", TMDB_RECEIVER, "-a", TMDB_FORGET], None, "make Explorar forget its TMDB token"))
     for op, what in reversed(list(ALLOWED_APP_OPS.items())):
         if op in state.allowed_app_ops:
             steps.append(Step(["appops", "set", HOME, op, "default"], None, f"reset access to {what}"))
@@ -257,7 +314,7 @@ def save_journal(serial: str, steps: Sequence[Step]) -> Path:
     """Adds to the journal: running Setup again must not forget what an earlier Setup changed."""
     path = journal_path(serial)
     path.parent.mkdir(parents=True, exist_ok=True)
-    journal = (load_journal(serial) or []) + [s for s in steps if s.undo is not None]
+    journal = (load_journal(serial) or []) + [s.public() for s in steps if s.undo is not None]
     path.write_text(json.dumps([asdict(s) for s in journal], indent=2))
     return path
 
@@ -278,7 +335,7 @@ def read_approved(path: Path) -> List[str]:
 def print_plan(title: str, steps: Sequence[Step], out: Callable[[str], None] = print) -> None:
     out(f"{title}: {len(steps)} step(s)")
     for i, step in enumerate(steps, 1):
-        out(f"  {i:2}. adb shell {' '.join(step.command)}")
+        out(f"  {i:2}. adb shell {step.shown()}")
         out(f"      ({step.why})")
 
 
@@ -295,7 +352,7 @@ class StepFailed(Exception):
     """A step failed; everything before it ran, and the step itself may or may not have."""
 
     def __init__(self, step: Step, cause: Exception):
-        super().__init__(f"{' '.join(step.command)}: {cause}")
+        super().__init__(f"{step.shown()}: {redact(str(cause), step.secret)}")
         self.step = step
 
 
@@ -308,7 +365,7 @@ def apply(adb: Adb, steps: Sequence[Step], out: Callable[[str], None] = print, r
     check_plan(steps)
     done: List[Step] = []
     for step in steps:
-        out(f"  running: adb shell {' '.join(step.command)}")
+        out(f"  running: adb shell {step.shown()}")
         try:
             adb.run(step.command)
         except RuntimeError as e:
@@ -337,7 +394,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print("\n".join(candidates(state)))
             return 0
         if args.action == "setup":
-            steps = plan_setup(state, approved)
+            token = read_token()
+            if token is None:
+                print(f"No TMDB token in {TOKEN_FILE} or TMDB_TOKEN: Explorar will wait for it (ADR 0008).")
+            steps = plan_setup(state, approved, token)
         else:
             journal = load_journal(args.serial)
             if journal is None and not args.without_journal:

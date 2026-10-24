@@ -11,8 +11,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] With the token file present, Setup delivers the token and Preparação shows "Explorar" Ativo; without it, Setup says so and skips only that step
-- [ ] The token appears in no printed plan, no journal and no file under version control (the token file is git-ignored)
-- [ ] An app other than the shell or the Home can't hand the Home a token
-- [ ] Restore makes the Home forget the token
-- [ ] Python tests cover the redacted step, the journal without the token, the missing file and Restore's forget; Kotlin tests cover the new check
+- [x] With the token file present, Setup delivers the token and Preparação shows "Explorar" Ativo; without it, Setup says so and skips only that step
+- [x] The token appears in no printed plan, no journal and no file under version control (the token file is git-ignored)
+- [x] An app other than the shell or the Home can't hand the Home a token (the receiver requires WRITE_SECURE_SETTINGS, which only the shell and the Home hold)
+- [x] Restore makes the Home forget the token
+- [x] Python tests cover the redacted step, the journal without the token, the missing file and Restore's forget; Kotlin tests cover the new check

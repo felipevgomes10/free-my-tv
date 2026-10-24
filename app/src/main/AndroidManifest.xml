@@ -74,6 +74,18 @@
         </activity>
 
         <!-- Remote keys: Shortcut Buttons and long-press Home (ADR 0005); Setup turns it on. -->
+        <!-- Setup hands Explorar its TMDB token here; only the ADB shell (or the Home) may send it (ADR 0008). -->
+        <receiver
+            android:name=".android.TmdbTokenReceiver"
+            android:exported="true"
+            android:permission="android.permission.WRITE_SECURE_SETTINGS">
+            <intent-filter>
+                <action android:name="com.freemytv.home.action.SET_TMDB_TOKEN" />
+                <action android:name="com.freemytv.home.action.FORGET_TMDB_TOKEN" />
+                <action android:name="com.freemytv.home.action.TMDB_TOKEN_STATE" />
+            </intent-filter>
+        </receiver>
+
         <!-- Puts the Home back in front after it updates itself. -->
         <receiver
             android:name=".android.SelfUpdateReceiver"

@@ -7,3 +7,6 @@ local.properties
 captures/
 .kotlin/
 __pycache__/
+
+# Secrets that stay on this Mac: Setup hands them to the TV (ADR 0008).
+config/*.local
