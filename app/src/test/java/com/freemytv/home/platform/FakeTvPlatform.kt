@@ -365,8 +365,12 @@ class FakeTvPlatform(
         return cities[city]
     }
 
+    /** How long a forecast takes to arrive. */
+    var forecastTakes: kotlin.time.Duration = kotlin.time.Duration.ZERO
+
     override suspend fun forecast(place: Place): Forecast? {
         networkRequests += "forecast:${place.name}"
+        kotlinx.coroutines.delay(forecastTakes)
         return forecasts[place.name]?.also { cached = CachedForecast(place, it) }
     }
 

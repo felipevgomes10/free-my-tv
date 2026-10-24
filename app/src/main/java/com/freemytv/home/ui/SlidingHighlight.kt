@@ -53,10 +53,11 @@ import kotlinx.coroutines.launch
  * item to item instead of jumping. It follows focus, or the chosen option for a segmented
  * control. Items keep their own look otherwise, and whatever of them the pill passes under is
  * drawn black, exactly where it is. Everything happens at draw time: sliding recomposes nothing.
- * Tiles don't use it: a focused tile grows in place.
+ * Tiles don't use it: a focused tile grows in place. A highlight that [inks] nothing, such as a
+ * glass focus pill under a segmented control's white choice, only slides.
  */
 @Stable
-class SlidingHighlight internal constructor(private val followsSelection: Boolean) {
+class SlidingHighlight internal constructor(private val followsSelection: Boolean, private val inks: Boolean) {
     private var origin by mutableStateOf(Offset.Zero)
     private var shape: Shape = RectangleShape
     private val bounds = mutableStateMapOf<Any, Rect>()
@@ -97,6 +98,9 @@ class SlidingHighlight internal constructor(private val followsSelection: Boolea
         .onFocusChanged {
             if (it.isFocused) focused = key else if (focused == key) focused = null
         }
+        .then(if (inks) ink(key) else Modifier)
+
+    private fun ink(key: Any): Modifier = Modifier
         // Its own layer, so the black below lands on its pixels only. (Switching to a layer only
         // while the pill is over it didn't take on the emulator.)
         .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
@@ -201,8 +205,8 @@ fun highlightScale(focusedScale: Float) =
 
 /** A [SlidingHighlight] following focus; with [selected], one following that option instead. */
 @Composable
-fun rememberSlidingHighlight(selected: Any? = null, followsSelection: Boolean = selected != null): SlidingHighlight {
-    val highlight = remember { SlidingHighlight(followsSelection) }
+fun rememberSlidingHighlight(selected: Any? = null, followsSelection: Boolean = selected != null, inks: Boolean = true): SlidingHighlight {
+    val highlight = remember { SlidingHighlight(followsSelection, inks) }
     highlight.selected = selected
     LaunchedEffect(highlight) {
         launch {

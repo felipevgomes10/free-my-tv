@@ -19,6 +19,8 @@ data class WeatherState(
     val visible: Boolean,
     /** Null until a forecast has ever been fetched. */
     val report: WeatherReport?,
+    /** True while the very first forecast is on its way, with none kept from before. */
+    val loading: Boolean = false,
 )
 
 data class WeatherReport(
@@ -61,8 +63,10 @@ class WeatherWidget(private val platform: TvPlatform, private val settings: Widg
                 }
                 _state.value = _state.value.copy(visible = true)
                 if (_state.value.report == null) platform.lastForecast()?.let { show(it) }
+                _state.value = _state.value.copy(loading = _state.value.report == null)
                 while (true) {
                     refresh(city)
+                    _state.value = _state.value.copy(loading = false)
                     delay(REFRESH_EVERY)
                 }
             }
