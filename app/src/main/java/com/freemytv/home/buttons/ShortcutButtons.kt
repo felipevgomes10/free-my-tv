@@ -26,6 +26,7 @@ sealed interface ButtonTarget {
     data class TvInput(val inputId: String) : ButtonTarget
     data object AppSwitcher : ButtonTarget
     data object InputTray : ButtonTarget
+    data object AndroidSettings : ButtonTarget
 }
 
 /** Where the Home should open when a button asks for it. */
@@ -71,6 +72,8 @@ class ShortcutButtons(private val platform: TvPlatform) {
      * doesn't), by being released after [LONG_PRESS_MILLIS].
      */
     fun onKey(scanCode: Int, keyCode: Int, down: Boolean, repeatCount: Int, heldMillis: Long = 0): KeyDecision {
+        // The remote's settings button sends KEYCODE_NOTIFICATION, which only the Stock Launcher answered.
+        if (keyCode == KEYCODE_NOTIFICATION || scanCode == SETTINGS_SCAN_CODE) return KeyDecision.Consume(ButtonTarget.AndroidSettings.takeIf { down && repeatCount == 0 })
         if (keyCode == KEYCODE_HOME) {
             val held = if (down) repeatCount == 1 else heldMillis >= LONG_PRESS_MILLIS
             if (down && repeatCount == 0) homeHoldHandled = false
@@ -90,6 +93,7 @@ class ShortcutButtons(private val platform: TvPlatform) {
         is ButtonTarget.TvInput -> platform.switchToInputById(target.inputId)
         ButtonTarget.AppSwitcher -> platform.openHome(HomeDestination.AppSwitcher)
         ButtonTarget.InputTray -> platform.openHome(HomeDestination.InputTray)
+        ButtonTarget.AndroidSettings -> platform.openAndroidSettings()
     }
 
     /** Turns the key filter back on if the system turned it off; false if the Home lacks the permission Setup grants. */
@@ -103,6 +107,8 @@ class ShortcutButtons(private val platform: TvPlatform) {
 
     private companion object {
         const val KEYCODE_HOME = 3
+        const val KEYCODE_NOTIFICATION = 83
+        const val SETTINGS_SCAN_CODE = 561
         const val LONG_PRESS_MILLIS = 500L
     }
 }
