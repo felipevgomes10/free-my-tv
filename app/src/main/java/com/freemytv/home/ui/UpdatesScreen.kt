@@ -133,9 +133,11 @@ private fun SideloadedRow(app: SideloadedApp, onEditSource: () -> Unit, onUpdate
             when {
                 app.updating -> Text(stringResource(R.string.updating), color = Tokens.TextSecondary, fontSize = 11.sp)
                 update != null -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    TextAction(stringResource(R.string.change_source), onEditSource)
+                    if (!app.fixedSource) TextAction(stringResource(R.string.change_source), onEditSource)
                     PillAction(stringResource(R.string.update_to, update.version), R.drawable.ic_download, onUpdate)
                 }
+                // The Home's own source is this project's repository, always.
+                app.fixedSource -> Unit
                 else -> TextAction(stringResource(if (app.source == null) R.string.set_source else R.string.change_source), onEditSource)
             }
         }

@@ -13,10 +13,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /** Public GitHub releases, read without a token (60 requests an hour is plenty for a daily check). */
-class GitHubReleases(private val downloads: File) {
+class GitHubReleases(private val api: () -> String, private val downloads: File) {
 
     suspend fun latest(repository: String): ReleaseLookup = withContext(Dispatchers.IO) {
-        val connection = URL("https://api.github.com/repos/$repository/releases/latest").openConnection() as HttpURLConnection
+        val connection = URL("${api()}/repos/$repository/releases/latest").openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = TIMEOUT_MILLIS
             connection.readTimeout = TIMEOUT_MILLIS

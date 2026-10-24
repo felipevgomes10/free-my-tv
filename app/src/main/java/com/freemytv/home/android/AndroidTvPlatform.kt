@@ -63,7 +63,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     private val mediaSessions = MediaSessions(context)
     private val apkDropServer = ApkDropServer(java.io.File(context.cacheDir, "apkdrop"))
     private val apkInstaller = ApkInstaller(context)
-    private val gitHub = GitHubReleases(java.io.File(context.cacheDir, "updates"))
+    private val gitHub = GitHubReleases({ GitHubEndpoint.api(context) }, java.io.File(context.cacheDir, "updates"))
 
     override suspend fun installedApps(): List<InstalledApp> = withContext(Dispatchers.IO) {
         val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)

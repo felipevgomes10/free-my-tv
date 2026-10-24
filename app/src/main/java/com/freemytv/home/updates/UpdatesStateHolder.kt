@@ -33,6 +33,8 @@ data class SideloadedApp(
     /** Downloading or installing an update right now. */
     val updating: Boolean = false,
     val problem: UpdateProblem? = null,
+    /** The Home itself: its Update Source is this project's repository and can't be changed. */
+    val fixedSource: Boolean = false,
 )
 
 data class AvailableUpdate(val version: String, val asset: ReleaseAsset)
@@ -86,13 +88,21 @@ class UpdatesStateHolder(private val platform: TvPlatform) {
         val sources = platform.loadUpdateSources()
         val known = _state.value.sideloaded.associateBy { it.packageName }
         return platform.installedPackages()
-            .filter { !it.isSystem && it.installer != PLAY_STORE && it.packageName != HOME }
+            .filter { !it.isSystem && it.installer != PLAY_STORE }
             .sortedBy { it.label.lowercase(PT_BR) }
             .map { pkg ->
-                val source = sources[pkg.packageName]
+                val source = if (pkg.packageName == HOME) HOME_SOURCE else sources[pkg.packageName]
                 // What the last check found still holds, unless the app got there meanwhile.
                 val update = known[pkg.packageName]?.update?.takeIf { source != null && isNewer(it.version, pkg.version) }
-                SideloadedApp(pkg.packageName, pkg.label, pkg.version, source, update, problem = known[pkg.packageName]?.problem?.takeIf { source != null })
+                SideloadedApp(
+                    pkg.packageName,
+                    pkg.label,
+                    pkg.version,
+                    source,
+                    update,
+                    problem = known[pkg.packageName]?.problem?.takeIf { source != null },
+                    fixedSource = pkg.packageName == HOME,
+                )
             }
     }
 
@@ -114,6 +124,7 @@ class UpdatesStateHolder(private val platform: TvPlatform) {
      * repository's latest release has an APK for this TV. A blank entry removes the source.
      */
     suspend fun setSource(packageName: String, input: String) {
+        if (packageName == HOME) return
         if (input.isBlank()) return removeSource(packageName)
         val repository = parseRepository(input) ?: return setProblem(packageName, UpdateProblem.NotFound)
         val problem = when (val lookup = platform.latestRelease(repository)) {
@@ -128,11 +139,15 @@ class UpdatesStateHolder(private val platform: TvPlatform) {
     }
 
     suspend fun removeSource(packageName: String) {
+        if (packageName == HOME) return
         platform.saveUpdateSources(platform.loadUpdateSources() - packageName)
         _state.update { it.copy(sideloaded = sideloadedApps()) }
     }
 
-    /** Downloads the update and hands it to Android's installer, which asks the owner. */
+    /**
+     * Downloads the update and hands it to Android's installer, which asks the owner. The Home's
+     * own update asks Android to skip that, which it does once the Home installed itself before.
+     */
     suspend fun update(packageName: String) {
         val app = _state.value.sideloaded.firstOrNull { it.packageName == packageName } ?: return
         val update = app.update ?: return
@@ -142,7 +157,8 @@ class UpdatesStateHolder(private val platform: TvPlatform) {
             change(packageName) { it.copy(updating = false, problem = UpdateProblem.DownloadFailed) }
             return
         }
-        val result = platform.installApk(path)
+        // A successful update of the Home ends this process; Android brings the new Home back.
+        val result = platform.installApk(path, silent = packageName == HOME)
         platform.deleteFile(path)
         _state.update { it.copy(sideloaded = sideloadedApps()) }
         change(packageName) { it.copy(updating = false, problem = if (result is InstallResult.Failed) UpdateProblem.InstallFailed else null) }
@@ -183,6 +199,7 @@ class UpdatesStateHolder(private val platform: TvPlatform) {
         val CHECK_EVERY = 24.hours
         const val PLAY_STORE = "com.android.vending"
         const val HOME = "com.freemytv.home"
+        const val HOME_SOURCE = "felipevgomes10/free-my-tv"
         val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
     }
 }
