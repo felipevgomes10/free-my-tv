@@ -144,14 +144,16 @@ private fun ReceivedCard(received: ReceivedApk, installing: Boolean, onInstall: 
                 Text("${info.packageName} · ${megabytes(info.sizeBytes)}", color = Tokens.TextSecondary, fontSize = 10.sp)
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PillButton(
-                stringResource(if (installing) R.string.installing else R.string.install),
-                R.drawable.ic_download,
-                onClick = { if (!installing) onInstall() },
-                modifier = Modifier.focusRequester(install),
-            )
-            if (!installing) PillButton(stringResource(R.string.cancel), null, onCancel)
+        SlidingHighlightGroup(rememberSlidingHighlight(), CircleShape) { group ->
+            Row(group, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PillButton(
+                    stringResource(if (installing) R.string.installing else R.string.install),
+                    R.drawable.ic_download,
+                    onClick = { if (!installing) onInstall() },
+                    modifier = Modifier.focusRequester(install),
+                )
+                if (!installing) PillButton(stringResource(R.string.cancel), null, onCancel)
+            }
         }
     }
 }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -143,15 +142,16 @@ fun TitleDetailsScreen(
             }
             if (state.whereToWatch.isNotEmpty()) {
                 Text(stringResource(R.string.where_to_watch), color = Tokens.TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 18.dp))
-                // Room on the sides for a focused card to grow into, shifted back so the cards line up with the text.
-                LazyRow(
-                    modifier = Modifier.offset(x = -GROW_ROOM),
-                    contentPadding = PaddingValues(horizontal = GROW_ROOM, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    itemsIndexed(state.whereToWatch, key = { _, option -> option.name }) { index, option ->
-                        val toTop = Modifier.focusProperties { up = if (hasTrailer) trailer else back }
-                        WatchCard(option, if (index == 0) toTop.focusRequester(firstOffer) else toTop) { onWatch(option) }
+                SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(12.dp)) { group ->
+                    LazyRow(
+                        modifier = group,
+                        contentPadding = PaddingValues(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        itemsIndexed(state.whereToWatch, key = { _, option -> option.name }) { index, option ->
+                            val toTop = Modifier.focusProperties { up = if (hasTrailer) trailer else back }
+                            WatchCard(option, if (index == 0) toTop.focusRequester(firstOffer) else toTop) { onWatch(option) }
+                        }
                     }
                 }
                 Text(stringResource(R.string.where_to_watch_note), color = Tokens.TextSecondary, fontSize = 10.sp)
@@ -179,16 +179,13 @@ private fun WatchCard(option: WatchOption, modifier: Modifier, onClick: () -> Un
     Surface(
         onClick = onClick,
         enabled = option.packageName != null,
-        modifier = modifier.width(190.dp),
+        modifier = Modifier.slidingHighlightItem().then(modifier).width(190.dp),
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(12.dp)),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.03f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color(0x2EFFFFFF),
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-            disabledContainerColor = Color(0x14FFFFFF),
-            disabledContentColor = Tokens.TextSecondary,
+        scale = highlightScale(1.03f),
+        colors = highlightColors(
+            container = Color(0x2EFFFFFF),
+            disabledContainer = Color(0x14FFFFFF),
+            disabledContent = Tokens.TextSecondary,
         ),
     ) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -231,5 +228,4 @@ private fun Problem(text: String) {
     Text(text, color = Tokens.Attention, fontSize = 12.sp, modifier = Modifier.width(520.dp).padding(top = 16.dp))
 }
 
-private val GROW_ROOM = 10.dp
 private val PT_BR: Locale = Locale.forLanguageTag("pt-BR")

@@ -62,15 +62,10 @@ fun ButtonsPanel(state: ButtonsPanelState, onAssign: (ShortcutButton, ButtonTarg
         val changed = button in state.assignments
         Surface(
             onClick = { picking = button },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.slidingHighlightItem().fillMaxWidth(),
             shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(9.dp)),
             scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
-            colors = ClickableSurfaceDefaults.colors(
-                containerColor = Color.Transparent,
-                contentColor = Tokens.TextPrimary,
-                focusedContainerColor = Tokens.TextPrimary,
-                focusedContentColor = Color.Black,
-            ),
+            colors = highlightColors(),
         ) {
             Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Keycap(buttonLabel(button))
@@ -133,21 +128,18 @@ private fun TargetPicker(button: ShortcutButton, state: ButtonsPanelState, onPic
     Dialog(onDismissRequest = onDismiss) {
         Column(Modifier.width(300.dp).background(Tokens.Menu, RoundedCornerShape(16.dp)).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.button_opens, buttonLabel(button)), color = Tokens.TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 6.dp))
-            LazyColumn(Modifier.heightIn(max = 320.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                items(choices) { (label, target) ->
-                    Surface(
-                        onClick = { onPick(target) },
-                        modifier = Modifier.fillMaxWidth().then(if (target == null) Modifier.focusRequester(first) else Modifier),
-                        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(8.dp)),
-                        scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
-                        colors = ClickableSurfaceDefaults.colors(
-                            containerColor = Color.Transparent,
-                            contentColor = Tokens.TextPrimary,
-                            focusedContainerColor = Tokens.TextPrimary,
-                            focusedContentColor = Color.Black,
-                        ),
-                    ) {
-                        Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp))
+            SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(8.dp)) { group ->
+                LazyColumn(Modifier.heightIn(max = 320.dp).then(group), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    items(choices) { (label, target) ->
+                        Surface(
+                            onClick = { onPick(target) },
+                            modifier = Modifier.slidingHighlightItem().fillMaxWidth().then(if (target == null) Modifier.focusRequester(first) else Modifier),
+                            shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(8.dp)),
+                            scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
+                            colors = highlightColors(),
+                        ) {
+                            Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp))
+                        }
                     }
                 }
             }

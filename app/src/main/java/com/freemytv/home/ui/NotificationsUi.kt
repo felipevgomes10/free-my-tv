@@ -55,14 +55,10 @@ fun NotificationsBell(state: NotificationsState, onClick: () -> Unit) {
     if (state.notifications.isEmpty()) return
     Surface(
         onClick = onClick,
+        modifier = Modifier.slidingHighlightItem(),
         shape = ClickableSurfaceDefaults.shape(CircleShape),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.1f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color.Transparent,
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        scale = highlightScale(1.1f),
+        colors = highlightColors(),
     ) {
         Row(Modifier.padding(horizontal = 8.dp, vertical = 7.dp), horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(R.drawable.ic_notifications), contentDescription = stringResource(R.string.notifications), modifier = Modifier.size(14.dp))
@@ -102,15 +98,17 @@ fun NotificationPanel(
             when {
                 !state.hasAccess -> PanelNote(stringResource(R.string.notifications_need_setup), Modifier.focusRequester(first))
                 state.notifications.isEmpty() -> PanelNote(stringResource(R.string.no_notifications), Modifier.focusRequester(first))
-                else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    items(state.notifications, key = { it.key }) { notification ->
-                        NotificationCard(
-                            notification,
-                            artwork,
-                            now,
-                            onClick = { onOpen(notification) },
-                            modifier = if (notification == state.notifications.first()) Modifier.focusRequester(first) else Modifier,
-                        )
+                else -> SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(10.dp)) { group ->
+                    LazyColumn(group, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(state.notifications, key = { it.key }) { notification ->
+                            NotificationCard(
+                                notification,
+                                artwork,
+                                now,
+                                onClick = { onOpen(notification) },
+                                modifier = if (notification == state.notifications.first()) Modifier.focusRequester(first) else Modifier,
+                            )
+                        }
                     }
                 }
             }
@@ -132,15 +130,10 @@ fun NotificationBanner(notification: TvNotification, artwork: AppArtworkLoader, 
 private fun NotificationCard(notification: TvNotification, artwork: AppArtworkLoader, now: Instant, onClick: () -> Unit, modifier: Modifier) {
     Surface(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.slidingHighlightItem().then(modifier).fillMaxWidth(),
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(10.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color(0x0FFFFFFF),
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        colors = highlightColors(container = Color(0x0FFFFFFF)),
     ) {
         NotificationContent(notification, artwork, now, LocalContentColor.current)
     }
@@ -151,7 +144,7 @@ private fun NotificationContent(notification: TvNotification, artwork: AppArtwor
     val icon by produceState(artwork.cachedIcon(notification.packageName), notification.packageName) { value = artwork.icon(notification.packageName) }
     Row(Modifier.padding(10.dp), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
         Box(Modifier.size(24.dp).background(Color(0x14FFFFFF), RoundedCornerShape(7.dp)), contentAlignment = Alignment.Center) {
-            icon?.let { Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(18.dp)) }
+            icon?.let { Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(18.dp).keepColorsUnderHighlight()) }
         }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

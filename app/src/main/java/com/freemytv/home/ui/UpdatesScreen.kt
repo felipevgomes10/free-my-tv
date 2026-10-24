@@ -55,55 +55,59 @@ fun UpdatesScreen(
     var editingSource by remember { mutableStateOf<SideloadedApp?>(null) }
     val first = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(Tokens.Background)
-            .padding(horizontal = Tokens.SafeAreaHorizontal)
-            .padding(top = Tokens.SafeAreaTop),
-    ) {
-        StatusBar(clock, trailing = statusWidgets)
-        Text(
-            stringResource(R.string.updates),
-            color = Tokens.TextPrimary,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.5).sp,
-            modifier = Modifier.padding(top = 20.dp, bottom = 14.dp),
-        )
-        Section(stringResource(R.string.system)) {
-            val device = state.device
+    // One pill for every action on the page, sliding from row to row.
+    SlidingHighlightGroup(rememberSlidingHighlight(), CircleShape) { group ->
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(Tokens.Background)
+                .padding(horizontal = Tokens.SafeAreaHorizontal)
+                .padding(top = Tokens.SafeAreaTop)
+                .then(group),
+        ) {
+            StatusBar(clock, trailing = statusWidgets)
             Text(
-                device?.securityPatch?.let { stringResource(R.string.patch_of, it.format(LONG_DATE)) } ?: stringResource(R.string.no_patch),
+                stringResource(R.string.updates),
                 color = Tokens.TextPrimary,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.5).sp,
+                modifier = Modifier.padding(top = 20.dp, bottom = 14.dp),
             )
-            if (device != null) {
-                Text(stringResource(R.string.firmware_line, device.androidVersion, device.build), color = Tokens.TextSecondary, fontSize = 10.sp)
-            }
-            if (state.patchOutdated && state.patchAgeMonths != null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painterResource(R.drawable.ic_warning), contentDescription = null, tint = Tokens.Attention, modifier = Modifier.size(12.dp))
-                    Text(
-                        pluralStringResource(R.plurals.patch_outdated, state.patchAgeMonths.toInt(), state.patchAgeMonths.toInt()),
-                        color = Tokens.Attention,
-                        fontSize = 11.sp,
-                    )
+            Section(stringResource(R.string.system)) {
+                val device = state.device
+                Text(
+                    device?.securityPatch?.let { stringResource(R.string.patch_of, it.format(LONG_DATE)) } ?: stringResource(R.string.no_patch),
+                    color = Tokens.TextPrimary,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                if (device != null) {
+                    Text(stringResource(R.string.firmware_line, device.androidVersion, device.build), color = Tokens.TextSecondary, fontSize = 10.sp)
                 }
+                if (state.patchOutdated && state.patchAgeMonths != null) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(painterResource(R.drawable.ic_warning), contentDescription = null, tint = Tokens.Attention, modifier = Modifier.size(12.dp))
+                        Text(
+                            pluralStringResource(R.plurals.patch_outdated, state.patchAgeMonths.toInt(), state.patchAgeMonths.toInt()),
+                            color = Tokens.Attention,
+                            fontSize = 11.sp,
+                        )
+                    }
+                }
+                PillAction(stringResource(R.string.check_system_update), R.drawable.ic_refresh, onCheckSystemUpdate, Modifier.focusRequester(first))
             }
-            PillAction(stringResource(R.string.check_system_update), R.drawable.ic_refresh, onCheckSystemUpdate, Modifier.focusRequester(first))
-        }
-        Section(stringResource(R.string.play_store_apps)) {
-            Text(stringResource(R.string.play_store_note), color = Tokens.TextSecondary, fontSize = 11.sp, lineHeight = 15.sp)
-            PillAction(stringResource(R.string.open_play_store_apps), R.drawable.ic_open_in_new, onOpenPlayStoreApps)
-        }
-        Section(stringResource(R.string.apk_apps)) {
-            if (state.sideloaded.isEmpty()) {
-                Text(stringResource(R.string.no_apk_apps), color = Tokens.TextSecondary, fontSize = 11.sp)
+            Section(stringResource(R.string.play_store_apps)) {
+                Text(stringResource(R.string.play_store_note), color = Tokens.TextSecondary, fontSize = 11.sp, lineHeight = 15.sp)
+                PillAction(stringResource(R.string.open_play_store_apps), R.drawable.ic_open_in_new, onOpenPlayStoreApps)
             }
-            state.sideloaded.forEach { app ->
-                SideloadedRow(app, onEditSource = { editingSource = app }, onUpdate = { onUpdate(app.packageName) })
+            Section(stringResource(R.string.apk_apps)) {
+                if (state.sideloaded.isEmpty()) {
+                    Text(stringResource(R.string.no_apk_apps), color = Tokens.TextSecondary, fontSize = 11.sp)
+                }
+                state.sideloaded.forEach { app ->
+                    SideloadedRow(app, onEditSource = { editingSource = app }, onUpdate = { onUpdate(app.packageName) })
+                }
             }
         }
     }
@@ -161,13 +165,10 @@ private fun problemText(problem: UpdateProblem) = stringResource(
 private fun TextAction(label: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
+        modifier = Modifier.slidingHighlightItem(),
         shape = ClickableSurfaceDefaults.shape(CircleShape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color.Transparent,
-            contentColor = Tokens.TextSecondary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        scale = highlightScale(1.1f),
+        colors = highlightColors(content = Tokens.TextSecondary),
     ) {
         Text(label, fontSize = 11.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp))
     }
@@ -189,14 +190,10 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 private fun PillAction(label: String, icon: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
         onClick = onClick,
-        modifier = modifier.padding(top = 4.dp),
+        modifier = modifier.padding(top = 4.dp).slidingHighlightItem(),
         shape = ClickableSurfaceDefaults.shape(CircleShape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Tokens.Glass,
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        scale = highlightScale(1.1f),
+        colors = highlightColors(container = Tokens.Glass),
     ) {
         Row(Modifier.padding(horizontal = 13.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(12.dp))
