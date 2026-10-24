@@ -147,13 +147,35 @@ class UpNextTrayTest {
     }
 
     @Test
-    fun `selecting an entry goes back to it through its app`() = runTest {
+    fun `selecting an entry resumes it through its live session`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana"))
+        platform.liveSessions = setOf(DISNEY)
+
+        tray.select(tray.state.value.entries.single())
+
+        assertEquals(listOf(DISNEY), platform.resumed)
+        assertEquals(emptyList<String>(), platform.launched)
+    }
+
+    @Test
+    fun `with its session gone, an entry opens its app`() = runTest {
         val tray = following()
         play(PlayingMedia(DISNEY, playing = true, title = "Moana"))
 
         tray.select(tray.state.value.entries.single())
 
-        assertEquals(listOf(DISNEY), platform.resumed)
+        assertEquals(listOf(DISNEY), platform.launched)
+    }
+
+    @Test
+    fun `a YouTube video with its session gone and no id is searched for by title and channel`() = runTest {
+        val tray = following()
+        play(PlayingMedia(YOUTUBE, playing = true, title = "VOLTEI A PROGRAMAR EM 2026!", subtitle = "Nerds de Negócios"))
+
+        tray.select(tray.state.value.entries.single())
+
+        assertEquals(listOf("VOLTEI A PROGRAMAR EM 2026! Nerds de Negócios"), platform.youTubeSearches)
     }
 
     @Test
@@ -281,13 +303,14 @@ class UpNextTrayTest {
     }
 
     @Test
-    fun `an id that isn't a YouTube video's resumes through the app`() = runTest {
+    fun `an id that isn't a YouTube video's is ignored`() = runTest {
         val tray = following()
         play(PlayingMedia(YOUTUBE, playing = true, title = "Algo", mediaId = "not-a-video-id/123"))
 
         tray.select(tray.state.value.entries.single())
 
-        assertEquals(listOf(YOUTUBE), platform.resumed)
+        assertEquals(emptyList<String>(), platform.youTubeVideos)
+        assertEquals(listOf("Algo"), platform.youTubeSearches)
     }
 
     @Test

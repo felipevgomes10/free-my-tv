@@ -194,10 +194,13 @@ interface TvPlatform {
     val nowPlaying: Flow<List<PlayingMedia>>
 
     /**
-     * Reopens what [packageName] played: through its live media session when that session is
-     * still on [title] (or any, for an app that names nothing), or else by opening the app.
+     * Resumes what [packageName] played through its live media session, when that session is
+     * still on [title] (or any, for an app that names nothing); false when there is none.
      */
-    fun resume(packageName: String, title: String?)
+    fun resumeSession(packageName: String, title: String?): Boolean
+
+    /** Opens YouTube's search for [query]. */
+    fun openYouTubeSearch(query: String)
 
     suspend fun loadUpNext(): List<UpNextEntry>
 

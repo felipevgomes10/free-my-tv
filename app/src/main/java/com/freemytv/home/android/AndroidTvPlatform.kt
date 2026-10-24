@@ -469,8 +469,13 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         withContext(Dispatchers.IO) { mediaSessions.deleteArtwork(path) }
     }
 
-    override fun resume(packageName: String, title: String?) {
-        if (!mediaSessions.resume(packageName, title)) launch(packageName)
+    override fun resumeSession(packageName: String, title: String?): Boolean = mediaSessions.resume(packageName, title)
+
+    override fun openYouTubeSearch(query: String) {
+        // Spaces as %20: YouTube's TV app shows a "+" literally.
+        val encoded = java.net.URLEncoder.encode(query, "UTF-8").replace("+", "%20")
+        val search = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/results?search_query=$encoded")).setPackage(YOUTUBE)
+        if (!tryStart(search)) openPlayStorePage(YOUTUBE)
     }
 
     override suspend fun loadUpNext(): List<UpNextEntry> = withContext(Dispatchers.IO) {

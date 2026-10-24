@@ -90,15 +90,18 @@ class UpNextTray(private val platform: TvPlatform) {
     suspend fun remove(entry: UpNextEntry) = change { entries -> entries.filterNot { it.key == entry.key } }
 
     /**
-     * Back to the entry where the owner stopped when the app allows it: a YouTube video reopens
-     * at its position from its id; others resume through their live session, or else open the app.
+     * Back to the entry where the owner stopped, as close as the app allows: a YouTube video with
+     * an id reopens at its position; an app whose session is still on the title resumes it; a
+     * YouTube video otherwise is searched for (YouTube's on-TV app names no id, and the video comes
+     * up first, at the owner's position); anything else opens its app.
      */
     fun select(entry: UpNextEntry) {
         val videoId = entry.mediaId?.takeIf { entry.packageName == YOUTUBE && YOUTUBE_ID.matches(it) }
-        if (videoId != null) {
-            platform.openYouTubeVideo(videoId, startSeconds = ((entry.positionMillis ?: 0) / 1000).toInt())
-        } else {
-            platform.resume(entry.packageName, entry.title)
+        when {
+            videoId != null -> platform.openYouTubeVideo(videoId, startSeconds = ((entry.positionMillis ?: 0) / 1000).toInt())
+            platform.resumeSession(entry.packageName, entry.title) -> Unit
+            entry.packageName == YOUTUBE && entry.title != null -> platform.openYouTubeSearch(listOfNotNull(entry.title, entry.subtitle).joinToString(" "))
+            else -> platform.launch(entry.packageName)
         }
     }
 
