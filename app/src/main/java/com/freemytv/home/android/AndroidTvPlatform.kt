@@ -458,7 +458,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override suspend fun inspectApk(path: String): ApkInfo? = apkInstaller.inspect(path)
 
-    override suspend fun installApk(path: String, silent: Boolean): InstallResult = apkInstaller.install(path, silent)
+    override suspend fun installApk(path: String, silent: Boolean, dexMetadata: String?): InstallResult = apkInstaller.install(path, silent, dexMetadata)
 
     override suspend fun deleteFile(path: String) {
         withContext(Dispatchers.IO) { java.io.File(path).delete() }

@@ -137,7 +137,15 @@ class FakeTvPlatform(
 
     override suspend fun inspectApk(path: String) = apkInfos[path]
 
-    override suspend fun installApk(path: String, silent: Boolean): InstallResult {
+    /** The dex metadata each install came with, null for none. */
+    val installedDexMetadata = mutableListOf<String?>()
+
+    /** Android refuses installs that come with dex metadata. */
+    var dexMetadataRefused = false
+
+    override suspend fun installApk(path: String, silent: Boolean, dexMetadata: String?): InstallResult {
+        installedDexMetadata += dexMetadata
+        if (dexMetadata != null && dexMetadataRefused) return InstallResult.Failed("INSTALL_FAILED_BAD_DEX_METADATA")
         installed += path to silent
         return installResult
     }

@@ -39,6 +39,15 @@ fun isNewer(candidate: String, installed: String): Boolean {
 private fun numbers(version: String): List<Long> =
     Regex("""\d+""").findAll(version.trimStart('v', 'V')).map { it.value.toLongOrNull() ?: 0 }.toList()
 
+/**
+ * The dex metadata that goes with [apk], named like it with ".dm": with it, Android compiles the
+ * app as it installs instead of running it slowly until its next compilation (ADR 0013).
+ */
+fun Release.dexMetadataFor(apk: ReleaseAsset): ReleaseAsset? {
+    val name = apk.name.substringBeforeLast('.') + ".dm"
+    return assets.firstOrNull { it.name.equals(name, ignoreCase = true) }
+}
+
 /** The release's version: its tag without a leading "v". */
 val Release.version: String get() = tag.trim().removePrefix("v").removePrefix("V")
 

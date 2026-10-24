@@ -194,7 +194,7 @@ scripts/release.sh 0.4.1 --dry-run   # build only
 scripts/release.sh 0.4.1             # build, then type "sim" to publish
 ```
 
-From a clean `main`, it bumps `homeVersionName` and `homeVersionCode` in `gradle.properties` and builds the release APK. It names it `free-my-tv-<version>-tv.apk`: the Home looks for `tv` in a release's files. After you type `sim`, it commits, tags `v<version>`, pushes `main` and the tag, and creates the GitHub release with `gh`. On the TV: *Atualizações → Free My TV → Atualizar*.
+From a clean `main`, it bumps `homeVersionName` and `homeVersionCode` in `gradle.properties` and builds the release APK. It names it `free-my-tv-<version>-tv.apk`: the Home looks for `tv` in a release's files. Next to it go `free-my-tv-<version>-tv.dm`, the APK's dex metadata, with which the TV compiles the update as it installs it ([ADR 0013](docs/adr/0013-updates-install-compiled.md)), and, kept on your computer only, the build's `mapping.txt`, to read the TV's stack traces. After you type `sim`, it commits, tags `v<version>`, pushes `main` and the tag, and creates the GitHub release with `gh`. On the TV: *Atualizações → Free My TV → Atualizar*.
 
 It must run on the computer that first installed the Home, because updates have to be signed with the same debug key. It also needs JDK 17, which the script picks from Homebrew when available, and a signed-in `gh`.
 

@@ -156,6 +156,42 @@ class UpdateSourcesTest {
     }
 
     @Test
+    fun `the Home's update installs with its dex metadata, so Android compiles it as it installs`() = runTest {
+        platform.packages = platform.packages + InstalledPackage(HOME, "Free My TV", "0.1.0", installer = null, isSystem = false)
+        platform.releases = mapOf(HOME_REPO to ReleaseLookup.Found(release("v0.2.0", "free-my-tv-0.2.0-tv.apk", "free-my-tv-0.2.0-tv.dm")))
+        val updates = updates()
+        updates.checkSources()
+
+        updates.update(HOME)
+
+        assertEquals(listOf("/cache/updates/free-my-tv-0.2.0-tv.apk" to true), platform.installed)
+        assertEquals(listOf("/cache/updates/free-my-tv-0.2.0-tv.dm"), platform.installedDexMetadata)
+        assertTrue(platform.deletedFiles.containsAll(listOf("/cache/updates/free-my-tv-0.2.0-tv.apk", "/cache/updates/free-my-tv-0.2.0-tv.dm")))
+    }
+
+    @Test
+    fun `when Android refuses the dex metadata, the update installs without it`() = runTest {
+        platform.packages = platform.packages + InstalledPackage(HOME, "Free My TV", "0.1.0", installer = null, isSystem = false)
+        platform.releases = mapOf(HOME_REPO to ReleaseLookup.Found(release("v0.2.0", "free-my-tv-0.2.0-tv.apk", "free-my-tv-0.2.0-tv.dm")))
+        platform.dexMetadataRefused = true
+        val updates = updates()
+        updates.checkSources()
+
+        updates.update(HOME)
+
+        assertEquals(listOf("/cache/updates/free-my-tv-0.2.0-tv.dm", null), platform.installedDexMetadata)
+        assertNull(updates.state.value.sideloaded.first { it.packageName == HOME }.problem)
+    }
+
+    @Test
+    fun `dex metadata goes with the APK of the same name only`() {
+        val release = release("v1.0", "app-tv.apk", "app-tv.dm", "other.dm")
+
+        assertEquals("app-tv.dm", release.dexMetadataFor(release.apkForTv()!!)?.name)
+        assertNull(release("v1.0", "app-tv.apk", "other.dm").let { it.dexMetadataFor(it.apkForTv()!!) })
+    }
+
+    @Test
     fun `the Home's Update Source can't be changed or removed`() = runTest {
         platform.packages = platform.packages + InstalledPackage(HOME, "Free My TV", "0.1.0", installer = null, isSystem = false)
         val updates = updates()
