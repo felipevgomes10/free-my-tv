@@ -25,7 +25,7 @@ object SetupNotifications {
         val open = PendingIntent.getActivity(
             context,
             check.ordinal,
-            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            MainActivity.homeIntent(context),
             PendingIntent.FLAG_IMMUTABLE,
         )
         val notification = Notification.Builder(context, CHANNEL)
