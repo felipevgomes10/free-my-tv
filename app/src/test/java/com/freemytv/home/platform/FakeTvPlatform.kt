@@ -79,8 +79,18 @@ class FakeTvPlatform(
     val resumed = mutableListOf<String>()
     var upNext: List<UpNextEntry> = emptyList()
 
-    override fun resume(packageName: String, title: String?) {
+    /** Packages whose media session is still alive on what they played. */
+    var liveSessions: Set<String> = emptySet()
+    val youTubeSearches = mutableListOf<String>()
+
+    override fun resumeSession(packageName: String, title: String?): Boolean {
+        if (packageName !in liveSessions) return false
         resumed += packageName
+        return true
+    }
+
+    override fun openYouTubeSearch(query: String) {
+        youTubeSearches += query
     }
 
     override suspend fun loadUpNext() = upNext
