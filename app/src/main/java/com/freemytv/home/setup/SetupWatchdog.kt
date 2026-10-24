@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.time.Duration.Companion.minutes
 
 /** What Setup puts in place on the TV; each can be lost, e.g. to a system update (ADR 0003). */
-enum class SetupCheck {
+enum class SetupCheck(
+    /** Whether losing it is announced; a token only the owner removes, with Restore, isn't. */
+    val announcedWhenLost: Boolean = true,
+) {
     /** The Stock Launcher, and Google TV's setup app that would bring up its recovery screen, are disabled, so Home opens the Home. */
     StockLauncherDisabled,
 
@@ -26,6 +29,9 @@ enum class SetupCheck {
 
     /** The "install unknown apps" app-op: APK Drop, Update Sources and the Home's own updates. */
     InstallApps,
+
+    /** Explorar's TMDB token, handed over by Setup (ADR 0008). */
+    Explorar(announcedWhenLost = false),
 }
 
 data class SetupState(
@@ -51,7 +57,7 @@ class SetupWatchdog(private val platform: TvPlatform) {
         val now = platform.setupStatus()
         val heldBefore = platform.loadSetupHistory()
         val announced = platform.loadAnnouncedRegressions()
-        val lost = now.filter { (check, holds) -> !holds && check in heldBefore }.keys
+        val lost = now.filter { (check, holds) -> !holds && check in heldBefore && check.announcedWhenLost }.keys
         (lost - announced).forEach { platform.postSetupNotification(it) }
         // Back in place: the warning no longer applies.
         (announced - lost).forEach { platform.cancelSetupNotification(it) }

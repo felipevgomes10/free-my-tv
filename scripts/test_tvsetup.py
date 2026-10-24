@@ -13,9 +13,10 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 import tvsetup
-from tvsetup import HOME, KEY_FILTER, NOTIFICATION_LISTENER, SETUP_WRAITH, STOCK_LAUNCHER, PlanError, Step
+from tvsetup import HOME, KEY_FILTER, NOTIFICATION_LISTENER, SETUP_WRAITH, STOCK_LAUNCHER, TMDB_FORGET, TMDB_SET, TMDB_STATE, PlanError, Step
 
 BLOAT = ["com.tcl.waterfall.overseas", "com.tcl.smartalexa", "com.tcl.esticker"]
+TOKEN = "eyFAKE.tmdb-read-token.for-tests"
 
 
 class FakeTv:
@@ -34,6 +35,7 @@ class FakeTv:
             "accessibility_enabled": "0",
         }
         self.ran = []
+        self.tmdb_token = None
 
 
     def snapshot(self):
@@ -59,6 +61,9 @@ class FakeTv:
             return f"{c[3]}: {self.appops[c[3]]}\n"
         if c[:3] == ["settings", "get", "secure"]:
             return self.secure.get(c[3]) or "null"
+        if c[:2] == ["am", "broadcast"] and TMDB_STATE in c:
+            data = f' data="{tvsetup.sha256(self.tmdb_token)}"' if self.tmdb_token else ""
+            return f"Broadcasting: Intent {{ act={TMDB_STATE} }}\nBroadcast completed: result=0{data}\n"
         if c == ["getprop", "ro.kernel.qemu"]:
             return "1\n" if self.emulator else "\n"
         raise AssertionError(f"unexpected query {command}")
@@ -87,6 +92,10 @@ class FakeTv:
             if "android.permission.WRITE_SECURE_SETTINGS" in self.granted:
                 self.secure["enabled_accessibility_services"] = KEY_FILTER
                 self.secure["accessibility_enabled"] = "1"
+        elif c[:2] == ["am", "broadcast"] and TMDB_SET in c:
+            self.tmdb_token = c[c.index("token") + 1]
+        elif c[:2] == ["am", "broadcast"] and TMDB_FORGET in c:
+            self.tmdb_token = None
         elif c[:3] == ["settings", "put", "secure"]:
             self.secure[c[3]] = c[4]
         elif c[:3] == ["settings", "delete", "secure"]:
@@ -233,6 +242,42 @@ class RestoreTest(unittest.TestCase):
         tvsetup.apply(tv, tvsetup.plan_restore(first + second, tvsetup.read_state(tv)), out=lambda _: None)
         self.assertEqual("default", tv.appops["REQUEST_INSTALL_PACKAGES"])
 
+    def test_setup_gives_explorar_its_token_and_restore_takes_it_back(self):
+        tv = FakeTv()
+        setup = tvsetup.plan_setup(tvsetup.read_state(tv), BLOAT, TOKEN)
+        tvsetup.apply(tv, setup, out=lambda _: None)
+        self.assertEqual(TOKEN, tv.tmdb_token)
+
+        tvsetup.apply(tv, tvsetup.plan_restore([s.public() for s in setup if s.undo], tvsetup.read_state(tv)), out=lambda _: None)
+
+        self.assertIsNone(tv.tmdb_token)
+
+    def test_the_token_is_sent_again_only_when_the_tv_holds_another_one(self):
+        tv = FakeTv()
+        tvsetup.apply(tv, tvsetup.plan_setup(tvsetup.read_state(tv), BLOAT, TOKEN), out=lambda _: None)
+
+        again = tvsetup.plan_setup(tvsetup.read_state(tv), BLOAT, TOKEN)
+        renewed = tvsetup.plan_setup(tvsetup.read_state(tv), BLOAT, TOKEN + "-new")
+
+        self.assertFalse(any(TMDB_SET in s.command for s in again))
+        self.assertTrue(any(TMDB_SET in s.command for s in renewed))
+
+    def test_without_a_token_setup_does_everything_else(self):
+        tv = FakeTv()
+
+        steps = tvsetup.plan_setup(tvsetup.read_state(tv), BLOAT, None)
+
+        self.assertFalse(any(TMDB_SET in s.command for s in steps))
+        self.assertTrue(steps)
+
+    def test_without_the_journal_restore_also_makes_explorar_forget_its_token(self):
+        tv = FakeTv()
+        tvsetup.apply(tv, tvsetup.plan_setup(tvsetup.read_state(tv), BLOAT, TOKEN), out=lambda _: None)
+
+        tvsetup.apply(tv, tvsetup.plan_restore_without_journal(tvsetup.read_state(tv), BLOAT), out=lambda _: None)
+
+        self.assertIsNone(tv.tmdb_token)
+
     def test_without_the_journal_restore_still_brings_back_the_stock_launcher_and_revokes_everything(self):
         tv = FakeTv()
         tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
@@ -338,6 +383,19 @@ class CommandLineTest(unittest.TestCase):
         self.assertIn(["pm", "disable-user", "--user", "0", STOCK_LAUNCHER], [e["command"] for e in journal])
         self.assertEqual(0, restore_code)
         self.assertEqual(before[:4], tv.snapshot()[:4])
+
+    def test_the_token_is_never_printed_nor_written_to_the_journal(self):
+        tv = FakeTv(emulator=True)
+        with TemporaryDirectory() as home, mock.patch.dict("os.environ", {"TMDB_TOKEN": TOKEN}):
+            dry, dry_out = self.run_main(tv, "setup", home=home)
+            code, out = self.run_main(tv, "setup", "--apply", home=home)
+            journal = (Path(home) / ".freemytv" / f"setup-{tv.serial.replace(':', '_')}.json").read_text()
+
+        self.assertEqual((0, 0), (dry, code))
+        self.assertEqual(TOKEN, tv.tmdb_token)
+        self.assertIn("[token]", dry_out)
+        for text in (dry_out, out, journal):
+            self.assertNotIn(TOKEN, text)
 
     def test_restore_without_a_journal_asks_for_the_flag(self):
         tv = FakeTv()

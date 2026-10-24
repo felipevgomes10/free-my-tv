@@ -38,7 +38,7 @@ class SetupWatchdogTest {
 
     @Test
     fun `each lost permission is detected on its own`() = runTest {
-        SetupCheck.entries.forEach { lost ->
+        SetupCheck.entries.filter { it.announcedWhenLost }.forEach { lost ->
             val platform = FakeTvPlatform(setup = all)
             platform.check()
 
@@ -96,6 +96,18 @@ class SetupWatchdogTest {
 
         assertFalse(state.everSetUp)
         assertFalse(state.active)
+        assertEquals(emptyList<SetupCheck>(), platform.setupNotifications)
+    }
+
+    @Test
+    fun `losing Explorar's token shows in Preparação without an alarm`() = runTest {
+        val platform = FakeTvPlatform(setup = all)
+        platform.check()
+        platform.setup = all + (SetupCheck.Explorar to false)
+
+        val state = platform.check().state.value
+
+        assertEquals(setOf(SetupCheck.Explorar), state.missing)
         assertEquals(emptyList<SetupCheck>(), platform.setupNotifications)
     }
 

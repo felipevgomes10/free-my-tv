@@ -138,6 +138,7 @@
     <string name="check_notification_access">Notificações e Continuar assistindo</string>
     <string name="check_key_filter">Botões do controle</string>
     <string name="check_install_apps">Instalação de apps</string>
+    <string name="check_explorar">Explorar (chave do TMDB)</string>
     <string name="up_next">Continuar assistindo</string>
     <string name="send_apk">Enviar APK</string>
     <string name="no_update_source">Sem origem associada</string>
