@@ -58,8 +58,8 @@ interface TvPlatform {
 
     fun openPlayStore()
 
-    /** Plays a YouTube video in the YouTube app, or opens its Play Store page when it isn't installed. */
-    fun openYouTubeVideo(key: String)
+    /** Plays a YouTube video in the YouTube app from [startSeconds], or opens its Play Store page when it isn't installed. */
+    fun openYouTubeVideo(key: String, startSeconds: Int = 0)
 
     /** Opens an app's page in the Play Store, to install it. */
     fun openPlayStorePage(packageName: String)
@@ -193,8 +193,11 @@ interface TvPlatform {
      */
     val nowPlaying: Flow<List<PlayingMedia>>
 
-    /** Reopens what [packageName] is playing through its live media session, or else opens the app. */
-    fun resume(packageName: String)
+    /**
+     * Reopens what [packageName] played: through its live media session when that session is
+     * still on [title] (or any, for an app that names nothing), or else by opening the app.
+     */
+    fun resume(packageName: String, title: String?)
 
     suspend fun loadUpNext(): List<UpNextEntry>
 

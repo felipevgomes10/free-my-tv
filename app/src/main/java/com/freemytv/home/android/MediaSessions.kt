@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
@@ -26,6 +27,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
 import java.security.MessageDigest
 import kotlin.math.min
 
@@ -40,7 +43,11 @@ class MediaSessions(private val context: Context) {
     private val artworkDir = File(context.filesDir, "upnext")
 
     /** A session's reading, before its artwork is stored. */
-    private class Reading(val media: PlayingMedia, val art: Bitmap?)
+    private class Reading(val media: PlayingMedia, val art: Bitmap?, val artUri: String?)
+
+    // Per app, the title and picture last stored; and which titles have had their fields logged.
+    private val lastPicture = java.util.concurrent.ConcurrentHashMap<String, Pair<String?, String>>()
+    private val described: MutableSet<String> = java.util.Collections.newSetFromMap(java.util.concurrent.ConcurrentHashMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val nowPlaying: Flow<List<PlayingMedia>> = HomeNotificationListener.isConnected
@@ -91,24 +98,46 @@ class MediaSessions(private val context: Context) {
     }.flowOn(Dispatchers.Main)
 
     /** Reopens what [packageName] plays through its session, if it has one with somewhere to go. */
-    fun resume(packageName: String): Boolean {
-        val controller = runCatching { manager.getActiveSessions(listener) }.getOrNull()?.firstOrNull { it.packageName == packageName }
-        val activity = controller?.sessionActivity ?: return false
+    /**
+     * Reopens what [packageName] played through its live session, when it is still on [title]
+     * (or any session, for an app that names nothing): playback resumes, then the app's player opens.
+     */
+    fun resume(packageName: String, title: String?): Boolean {
+        val sessions = runCatching { manager.getActiveSessions(listener) }.getOrNull().orEmpty().filter { it.packageName == packageName }
+        val controller = sessions.firstOrNull { title == null || it.metadata?.titleOrNull() == title } ?: return false
+        runCatching { controller.transportControls.play() }
+        val activity = controller.sessionActivity ?: return false
         return runCatching { activity.send() }.isSuccess
     }
+
+    private fun MediaMetadata.titleOrNull(): String? = getString(MediaMetadata.METADATA_KEY_TITLE) ?: description?.title?.toString()
 
     private fun MediaController.read(): Reading {
         val state = playbackState
         val meta = metadata
         val description = meta?.description
-        val title = meta?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: description?.title?.toString()
+        val title = meta?.titleOrNull()
         val subtitle = meta?.getString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE)
             ?: description?.subtitle?.toString()
             ?: meta?.getString(MediaMetadata.METADATA_KEY_ARTIST)
-        val art = meta?.getBitmap(MediaMetadata.METADATA_KEY_ART)
-            ?: meta?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
-            ?: meta?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
-            ?: description?.iconBitmap
+        // Apps often hand a small bitmap and the full picture as a link: the link wins, then the biggest bitmap.
+        val art = listOfNotNull(
+            meta?.getBitmap(MediaMetadata.METADATA_KEY_ART),
+            meta?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART),
+            meta?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON),
+            description?.iconBitmap,
+        ).maxByOrNull { it.width * it.height }
+        val artUri = listOfNotNull(
+            meta?.getString(MediaMetadata.METADATA_KEY_ART_URI),
+            meta?.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI),
+            meta?.getString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI),
+            description?.iconUri?.toString(),
+        ).firstOrNull { it.startsWith("https://") || it.startsWith("http://") }
+        val mediaId = meta?.getString(MediaMetadata.METADATA_KEY_MEDIA_ID) ?: description?.mediaId
+        if (meta != null && described.add("$packageName|$title")) {
+            // Which fields each app fills, never their content: what the Up Next Tray can count on.
+            Log.d(TAG, "$packageName metadata keys=${meta.keySet().sorted()} art=${art?.let { "${it.width}x${it.height}" }} artUri=${artUri != null} mediaId=${mediaId != null}")
+        }
         return Reading(
             PlayingMedia(
                 packageName = packageName,
@@ -119,8 +148,10 @@ class MediaSessions(private val context: Context) {
                 durationMillis = meta?.getLong(MediaMetadata.METADATA_KEY_DURATION)?.takeIf { it > 0 },
                 audioApp = runCatching { context.packageManager.getApplicationInfo(packageName, 0).category == ApplicationInfo.CATEGORY_AUDIO }
                     .getOrDefault(false),
+                mediaId = mediaId,
             ),
             art,
+            artUri,
         )
     }
 
@@ -132,19 +163,52 @@ class MediaSessions(private val context: Context) {
         return position + ((SystemClock.elapsedRealtime() - lastPositionUpdateTime) * playbackSpeed).toLong()
     }
 
-    /** The stored artwork for this title: written once, at Top Shelf size at most (ADR 0004). */
+    /**
+     * The stored artwork for this title, one file per picture so a new picture is a new path.
+     * Apps often announce a new title before its picture: a picture still the previous title's
+     * is not taken for the new one.
+     */
     private fun store(reading: Reading): String? {
         val media = reading.media
-        val file = File(artworkDir, "${hash("${media.packageName}|${media.title.orEmpty()}")}.jpg")
+        val source = reading.artUri ?: reading.art?.let(::fingerprint) ?: return null
+        val sourceHash = hash(source).take(12)
+        val previous = lastPicture[media.packageName]
+        if (previous != null && previous.second == sourceHash && previous.first != media.title) return null
+        lastPicture[media.packageName] = media.title to sourceHash
+        val file = File(artworkDir, "${hash("${media.packageName}|${media.title.orEmpty()}")}-$sourceHash.jpg")
         if (file.exists()) return file.absolutePath
-        val art = reading.art ?: return null
+        val picture = reading.artUri?.let(::download) ?: reading.art ?: return null
         return runCatching {
             artworkDir.mkdirs()
-            val scale = min(1f, min(MAX_WIDTH.toFloat() / art.width, MAX_HEIGHT.toFloat() / art.height))
-            val scaled = if (scale < 1f) Bitmap.createScaledBitmap(art, (art.width * scale).toInt(), (art.height * scale).toInt(), true) else art
-            file.outputStream().use { scaled.compress(Bitmap.CompressFormat.JPEG, 85, it) }
+            val scale = min(1f, min(MAX_WIDTH.toFloat() / picture.width, MAX_HEIGHT.toFloat() / picture.height))
+            val scaled = if (scale < 1f) Bitmap.createScaledBitmap(picture, (picture.width * scale).toInt(), (picture.height * scale).toInt(), true) else picture
+            file.outputStream().use { scaled.compress(Bitmap.CompressFormat.JPEG, 90, it) }
             file.absolutePath
         }.getOrNull()
+    }
+
+    /** A picture behind a link; YouTube's thumbnails are asked for at their largest size first. */
+    private fun download(url: String): Bitmap? {
+        val candidates = if ("ytimg.com" in url) listOf(url.replace(YOUTUBE_THUMBNAIL, "/maxresdefault."), url).distinct() else listOf(url)
+        return candidates.firstNotNullOfOrNull { candidate ->
+            runCatching {
+                val connection = URL(candidate).openConnection() as HttpURLConnection
+                connection.connectTimeout = 10_000
+                connection.readTimeout = 10_000
+                try {
+                    if (connection.responseCode != HttpURLConnection.HTTP_OK) null else connection.inputStream.use { BitmapFactory.decodeStream(it) }
+                } finally {
+                    connection.disconnect()
+                }
+            }.getOrNull()
+        }
+    }
+
+    /** What a bitmap shows, cheaply: its pixels at 8 × 8. */
+    private fun fingerprint(bitmap: Bitmap): String {
+        val tiny = Bitmap.createScaledBitmap(bitmap, 8, 8, true)
+        val pixels = IntArray(64).also { tiny.getPixels(it, 0, 8, 0, 0, 8, 8) }
+        return pixels.joinToString(",")
     }
 
     fun deleteArtwork(path: String) {
@@ -159,5 +223,6 @@ class MediaSessions(private val context: Context) {
         const val POSITION_EVERY_MILLIS = 15_000L
         const val MAX_WIDTH = 1920
         const val MAX_HEIGHT = 1080
+        val YOUTUBE_THUMBNAIL = Regex("""/(hq|mq|sd|)default\.""")
     }
 }

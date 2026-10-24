@@ -418,8 +418,9 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override fun openPlayStore() = launch(PLAY_STORE)
 
-    override fun openYouTubeVideo(key: String) {
-        val video = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$key")).setPackage(YOUTUBE)
+    override fun openYouTubeVideo(key: String, startSeconds: Int) {
+        val start = if (startSeconds > 0) "&t=$startSeconds" else ""
+        val video = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$key$start")).setPackage(YOUTUBE)
         if (!tryStart(video)) openPlayStorePage(YOUTUBE)
     }
 
@@ -468,8 +469,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         withContext(Dispatchers.IO) { mediaSessions.deleteArtwork(path) }
     }
 
-    override fun resume(packageName: String) {
-        if (!mediaSessions.resume(packageName)) launch(packageName)
+    override fun resume(packageName: String, title: String?) {
+        if (!mediaSessions.resume(packageName, title)) launch(packageName)
     }
 
     override suspend fun loadUpNext(): List<UpNextEntry> = withContext(Dispatchers.IO) {

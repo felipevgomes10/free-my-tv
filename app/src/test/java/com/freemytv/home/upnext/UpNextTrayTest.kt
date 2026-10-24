@@ -209,14 +209,15 @@ class UpNextTrayTest {
     fun `the Tray holds 20 entries and the 21st pushes out the oldest`() = runTest {
         val tray = following()
         repeat(21) { n ->
-            play(PlayingMedia(DISNEY, playing = true, title = "Episódio ${n + 1}"))
+            // Five apps take turns, so no app reaches its own limit of five first.
+            play(PlayingMedia("app.number${n % 5}", playing = true, title = "Título ${n + 1}"))
             later(1)
         }
 
         val titles = tray.state.value.entries.map { it.title }
         assertEquals(20, titles.size)
-        assertEquals("Episódio 21", titles.first())
-        assertEquals("Episódio 2", titles.last())
+        assertEquals("Título 21", titles.first())
+        assertEquals("Título 2", titles.last())
     }
 
     @Test
@@ -251,6 +252,53 @@ class UpNextTrayTest {
         assertEquals(listOf(NETFLIX), tray.state.value.entries.map { it.packageName })
         assertEquals(listOf(NETFLIX), platform.upNext.map { it.packageName })
         assertEquals(listOf("moana.jpg"), platform.deletedArtwork)
+    }
+
+    @Test
+    fun `one app keeps at most five entries, its latest`() = runTest {
+        val tray = following()
+        repeat(7) { n ->
+            play(PlayingMedia(DISNEY, playing = true, title = "Episódio ${n + 1}"))
+            later(1)
+        }
+        play(PlayingMedia(NETFLIX, playing = true))
+
+        val titles = tray.state.value.entries.filter { it.packageName == DISNEY }.map { it.title }
+        assertEquals(listOf("Episódio 7", "Episódio 6", "Episódio 5", "Episódio 4", "Episódio 3"), titles)
+        assertEquals(6, tray.state.value.entries.size)
+    }
+
+    @Test
+    fun `a YouTube video reopens at its position from its id`() = runTest {
+        val tray = following()
+        play(PlayingMedia(YOUTUBE, playing = true, title = "Voltei a programar", positionMillis = 125_400, mediaId = "WpSweeyuHbM"))
+
+        tray.select(tray.state.value.entries.single())
+
+        assertEquals(listOf("WpSweeyuHbM"), platform.youTubeVideos)
+        assertEquals(listOf(125), platform.youTubeStarts)
+        assertEquals(emptyList<String>(), platform.resumed)
+    }
+
+    @Test
+    fun `an id that isn't a YouTube video's resumes through the app`() = runTest {
+        val tray = following()
+        play(PlayingMedia(YOUTUBE, playing = true, title = "Algo", mediaId = "not-a-video-id/123"))
+
+        tray.select(tray.state.value.entries.single())
+
+        assertEquals(listOf(YOUTUBE), platform.resumed)
+    }
+
+    @Test
+    fun `new artwork for a title replaces the old one, which is deleted`() = runTest {
+        val tray = following()
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", artwork = "moana-1.jpg"))
+
+        play(PlayingMedia(DISNEY, playing = true, title = "Moana", artwork = "moana-2.jpg"))
+
+        assertEquals("moana-2.jpg", tray.state.value.entries.single().artwork)
+        assertEquals(listOf("moana-1.jpg"), platform.deletedArtwork)
     }
 
     private companion object {
