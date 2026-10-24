@@ -9,9 +9,10 @@ import kotlin.concurrent.thread
 
 /**
  * Notes in the log what the main thread was doing whenever it stalled long enough to drop
- * frames, over [STALL_MILLIS] (two and a half frames): how long, and the code on its stack midway. It asks the main thread for a tiny task
- * every [PING_MILLIS] and looks at its stack only when that task is late, so it costs next to
- * nothing. Read from the computer with `adb logcat -s Stall`.
+ * frames, over [STALL_MILLIS] (two and a half frames): how long, and the code on its stack
+ * midway. It asks the main thread for a tiny task every [PING_MILLIS] and looks at its stack
+ * only when that task is late, so it costs next to nothing. Read from the computer with
+ * `adb logcat -s Stall`.
  */
 internal object StallWatch {
 
