@@ -33,7 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.res.painterResource
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.Icon
@@ -63,11 +64,17 @@ fun TitleDetailsScreen(
     images: TmdbImages,
     onBack: () -> Unit,
     onWatch: (WatchOption) -> Unit,
+    onTrailer: () -> Unit,
     statusWidgets: @Composable () -> Unit,
 ) {
     val back = remember { FocusRequester() }
-    LaunchedEffect(Unit) { runCatching { back.requestFocus() } }
+    val trailer = remember { FocusRequester() }
+    val firstOffer = remember { FocusRequester() }
     val details = state.details
+    val hasTrailer = state.trailer != null
+    val hasOffers = state.whereToWatch.isNotEmpty()
+    // The trailer is the screen's main action when there is one; otherwise the way back.
+    LaunchedEffect(hasTrailer) { runCatching { (if (hasTrailer) trailer else back).requestFocus() } }
     val summary = state.summary
     Box(Modifier.fillMaxSize().background(Tokens.Background)) {
         (details?.backdrop ?: summary.backdrop)?.let { path ->
@@ -78,7 +85,15 @@ fun TitleDetailsScreen(
         }
         Column(Modifier.fillMaxSize().padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop)) {
             StatusBar(clock, trailing = statusWidgets)
-            PillButton(stringResource(R.string.section_explorar), R.drawable.ic_chevron_left, onBack, Modifier.padding(top = NAVIGATION_TOP).focusRequester(back))
+            PillButton(
+                stringResource(R.string.section_explorar),
+                R.drawable.ic_chevron_left,
+                onBack,
+                Modifier
+                    .padding(top = NAVIGATION_TOP)
+                    .focusRequester(back)
+                    .focusProperties { down = if (hasTrailer) trailer else if (hasOffers) firstOffer else FocusRequester.Default },
+            )
             Text(
                 details?.name ?: summary.name,
                 color = Tokens.TextPrimary,
@@ -102,8 +117,23 @@ fun TitleDetailsScreen(
                     }
                 }
             }
-            (details?.overview ?: summary.overview)?.let {
-                Text(it, color = Color(0xD9FFFFFF), fontSize = 12.sp, lineHeight = 18.sp, maxLines = 4, overflow = TextOverflow.Ellipsis, modifier = Modifier.width(470.dp).padding(top = 12.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                (details?.overview ?: summary.overview)?.let {
+                    Text(it, color = Color(0xD9FFFFFF), fontSize = 12.sp, lineHeight = 18.sp, maxLines = 4, overflow = TextOverflow.Ellipsis, modifier = Modifier.width(470.dp).padding(top = 12.dp))
+                }
+                Box(Modifier.weight(1f))
+                if (hasTrailer) {
+                    PillButton(
+                        stringResource(R.string.watch_trailer),
+                        R.drawable.ic_play,
+                        onTrailer,
+                        Modifier.focusRequester(trailer).focusProperties {
+                            up = back
+                            left = back
+                            down = if (hasOffers) firstOffer else FocusRequester.Default
+                        },
+                    )
+                }
             }
             when {
                 state.problem == ExplorarProblem.MissingToken -> Problem(stringResource(R.string.explorar_missing_token))
@@ -116,7 +146,10 @@ fun TitleDetailsScreen(
                     contentPadding = PaddingValues(vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    items(state.whereToWatch, key = { it.name }) { option -> WatchCard(option) { onWatch(option) } }
+                    itemsIndexed(state.whereToWatch, key = { _, option -> option.name }) { index, option ->
+                        val toTop = Modifier.focusProperties { up = if (hasTrailer) trailer else back }
+                        WatchCard(option, if (index == 0) toTop.focusRequester(firstOffer) else toTop) { onWatch(option) }
+                    }
                 }
                 Text(stringResource(R.string.where_to_watch_note), color = Tokens.TextSecondary, fontSize = 10.sp)
             }
@@ -139,11 +172,11 @@ fun TitleDetailsScreen(
 
 /** A service offering the Title: ▷ opens its app, ↗ its Play Store page; one without a TV app can't be selected. */
 @Composable
-private fun WatchCard(option: WatchOption, onClick: () -> Unit) {
+private fun WatchCard(option: WatchOption, modifier: Modifier, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         enabled = option.packageName != null,
-        modifier = Modifier.width(190.dp),
+        modifier = modifier.width(190.dp),
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(12.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.03f),
         colors = ClickableSurfaceDefaults.colors(

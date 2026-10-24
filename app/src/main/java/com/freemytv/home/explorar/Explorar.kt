@@ -54,6 +54,8 @@ data class DetailsState(
     val problem: ExplorarProblem? = null,
     /** "Onde assistir"; empty hides the section. */
     val whereToWatch: List<WatchOption> = emptyList(),
+    /** The Trailer to play; null hides "Assistir trailer". */
+    val trailer: TitleVideo? = null,
 )
 
 data class ExplorarState(
@@ -113,7 +115,13 @@ class Explorar(
     suspend fun openDetails(summary: TitleSummary) {
         _state.update { it.copy(hero = summary, details = DetailsState(summary)) }
         val details = when (val lookup = platform.titleDetails(summary.kind, summary.id)) {
-            is DetailsLookup.Found -> DetailsState(summary, lookup.details, loading = false, whereToWatch = whereToWatch(lookup.details.offers, platform::isLaunchable))
+            is DetailsLookup.Found -> DetailsState(
+                summary,
+                lookup.details,
+                loading = false,
+                whereToWatch = whereToWatch(lookup.details.offers, platform::isLaunchable),
+                trailer = chooseTrailer(lookup.details.videos),
+            )
             DetailsLookup.Offline -> DetailsState(summary, loading = false, problem = ExplorarProblem.Offline)
             DetailsLookup.MissingToken -> DetailsState(summary, loading = false, problem = ExplorarProblem.MissingToken)
         }
@@ -126,6 +134,12 @@ class Explorar(
         val packageName = option.packageName ?: return
         if (platform.isLaunchable(packageName)) platform.launch(packageName) else platform.openPlayStorePage(packageName)
     }
+
+    /**
+     * The embedded player couldn't play the Trailer (YouTube refuses embedding for some videos,
+     * or the WebView failed): the YouTube app plays it instead (ADR 0009).
+     */
+    fun trailerFailed(video: TitleVideo) = platform.openYouTubeVideo(video.key)
 
     fun closeDetails() {
         _state.update { it.copy(details = null) }

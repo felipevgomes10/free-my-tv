@@ -418,6 +418,11 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override fun openPlayStore() = launch(PLAY_STORE)
 
+    override fun openYouTubeVideo(key: String) {
+        val video = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$key")).setPackage(YOUTUBE)
+        if (!tryStart(video)) openPlayStorePage(YOUTUBE)
+    }
+
     override fun openPlayStorePage(packageName: String) {
         if (!tryStart(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")).setPackage(PLAY_STORE))) openPlayStore()
     }
@@ -544,6 +549,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         val STOCK_HOME = listOf("com.google.android.apps.tv.launcherx", "com.google.android.tungsten.setupwraith")
         const val SEPARATOR = ","
         const val PLAY_STORE = "com.android.vending"
+        const val YOUTUBE = "com.google.android.youtube.tv"
         const val PLAY_STORE_MY_APPS = "com.google.android.finsky.VIEW_MY_DOWNLOADS"
         const val SYSTEM_UPDATE_SETTINGS = "android.settings.SYSTEM_UPDATE_SETTINGS"
     }

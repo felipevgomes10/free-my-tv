@@ -6,6 +6,7 @@ import com.freemytv.home.explorar.CastMember
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
 import com.freemytv.home.explorar.OfferKind
+import com.freemytv.home.explorar.TitleVideo
 import com.freemytv.home.explorar.WatchOffer
 import com.freemytv.home.explorar.TitleDetails
 import com.freemytv.home.explorar.TitleKind
@@ -116,6 +117,11 @@ class Tmdb(private val context: Context) {
             cast = cast,
             backdrop = json.optString("backdrop_path").takeIf { it.startsWith("/") },
             offers = brazilOffers(json),
+            videos = json.optJSONObject("videos")?.optJSONArray("results")?.let { list ->
+                List(list.length()) { list.getJSONObject(it) }.map {
+                    TitleVideo(it.optString("key"), it.optString("site"), it.optString("type"), it.optString("iso_639_1").takeIf(String::isNotBlank), it.optBoolean("official"))
+                }
+            }.orEmpty(),
         )
     }
 

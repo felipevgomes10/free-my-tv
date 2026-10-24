@@ -165,6 +165,11 @@ class FakeTvPlatform(
     override suspend fun titleDetails(kind: TitleKind, id: Int) = details[id] ?: DetailsLookup.Offline
 
     val playStorePages = mutableListOf<String>()
+    val youTubeVideos = mutableListOf<String>()
+
+    override fun openYouTubeVideo(key: String) {
+        youTubeVideos += key
+    }
 
     override fun openPlayStorePage(packageName: String) {
         playStorePages += packageName

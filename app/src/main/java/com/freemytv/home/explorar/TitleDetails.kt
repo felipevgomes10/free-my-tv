@@ -23,6 +23,8 @@ data class TitleDetails(
     val backdrop: String?,
     /** Brazil's watch offers, best first, as TMDB lists them. */
     val offers: List<WatchOffer> = emptyList(),
+    /** Videos in Portuguese or English. */
+    val videos: List<TitleVideo> = emptyList(),
 )
 
 sealed interface DetailsLookup {
