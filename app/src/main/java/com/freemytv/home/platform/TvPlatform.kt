@@ -214,7 +214,10 @@ interface TvPlatform {
     /** Opens YouTube's search for [query]. */
     fun openYouTubeSearch(query: String)
 
-    /** What streaming apps list in Android TV's Watch Next, pictures stored; null without the access Setup grants. */
+    /**
+     * What streaming apps list in Android TV's Watch Next, from apps that can be opened, pictures
+     * stored; null without the access Setup grants.
+     */
     suspend fun watchNext(): List<WatchNextProgram>?
 
     /** Opens [packageName]'s own link, an intent URI, in that app only; false when it doesn't open. */

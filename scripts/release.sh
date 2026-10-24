@@ -50,6 +50,8 @@ trap 'git checkout --quiet gradle.properties' ERR
 apk="build/free-my-tv-$version-tv.apk"
 mkdir -p build
 cp app/build/outputs/apk/release/app-release.apk "$apk"
+# Retraces the release's stack traces: $ANDROID_HOME/cmdline-tools/latest/bin/retrace <mapping> <trace>
+cp app/build/outputs/mapping/release/mapping.txt "build/free-my-tv-$version-mapping.txt"
 echo "Built $apk ($version, versionCode $code)."
 
 if [[ "$dry_run" == "--dry-run" ]]; then
