@@ -52,7 +52,8 @@ class ApkInstaller(private val context: Context) {
     private fun PackageInfo.signers(): Set<String>? =
         (signingInfo?.apkContentsSigners ?: signatures)?.map { it.toCharsString() }?.toSet()?.takeIf { it.isNotEmpty() }
 
-    suspend fun install(path: String, silent: Boolean): InstallResult {
+    /** With [dexMetadata], the APK's ".dm", Android compiles the app as it installs it. */
+    suspend fun install(path: String, silent: Boolean, dexMetadata: String? = null): InstallResult {
         val installer = packageManager.packageInstaller
         val sessionId = withContext(Dispatchers.IO) {
             val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
@@ -65,6 +66,13 @@ class ApkInstaller(private val context: Context) {
                 session.openWrite("base.apk", 0, file.length()).use { sink ->
                     file.inputStream().use { it.copyTo(sink) }
                     session.fsync(sink)
+                }
+                // Named like the APK it goes with, as Android pairs them.
+                dexMetadata?.let(::File)?.let { dm ->
+                    session.openWrite("base.dm", 0, dm.length()).use { sink ->
+                        dm.inputStream().use { it.copyTo(sink) }
+                        session.fsync(sink)
+                    }
                 }
             }
             id

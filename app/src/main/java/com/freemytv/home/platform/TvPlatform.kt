@@ -252,7 +252,7 @@ interface TvPlatform {
      * Installs an APK through Android's package installer. Android asks the owner to confirm,
      * unless [silent] and the system allows it (the Home updating itself, once it installed itself).
      */
-    suspend fun installApk(path: String, silent: Boolean = false): InstallResult
+    suspend fun installApk(path: String, silent: Boolean = false, dexMetadata: String? = null): InstallResult
 
     suspend fun deleteFile(path: String)
 

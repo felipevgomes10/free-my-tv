@@ -52,7 +52,13 @@ mkdir -p build
 cp app/build/outputs/apk/release/app-release.apk "$apk"
 # Retraces the release's stack traces: $ANDROID_HOME/cmdline-tools/latest/bin/retrace <mapping> <trace>
 cp app/build/outputs/mapping/release/mapping.txt "build/free-my-tv-$version-mapping.txt"
-echo "Built $apk ($version, versionCode $code)."
+# The APK's dex metadata, named like it: the Home installs its updates with it, so Android compiles
+# them at install instead of running them slowly until the next night (ADR 0013). Android 12's
+# profile format, the TV's.
+sdk="$(grep '^sdk.dir=' local.properties | cut -d= -f2)"
+dm="${apk%.apk}.dm"
+"${ANDROID_HOME:-$sdk}/cmdline-tools/latest/bin/profgen" extractProfile --apk "$apk" --output-dex-metadata "$dm" --profile-format v0_1_5_s
+echo "Built $apk and $dm ($version, versionCode $code)."
 
 if [[ "$dry_run" == "--dry-run" ]]; then
   git checkout --quiet gradle.properties
@@ -71,5 +77,5 @@ fi
 git commit --quiet -am "chore: release $version"
 git tag -a "v$version" -m "Free My TV $version"
 git push origin main "v$version"
-gh release create "v$version" "$apk" --title "Free My TV $version" --generate-notes
+gh release create "v$version" "$apk" "$dm" --title "Free My TV $version" --generate-notes
 echo "Published v$version. On the TV: Atualizações → Free My TV → Atualizar para $version."

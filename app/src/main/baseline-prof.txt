@@ -1,0 +1,6 @@
+# Compiled at install from the release's dex metadata (scripts/release.sh, ADR 0013), on top of the
+# profiles the libraries ship: the Home's own code and TV Material, which ship none.
+HSPLcom/freemytv/home/**->**(**)**
+Lcom/freemytv/home/**;
+HSPLandroidx/tv/**->**(**)**
+Landroidx/tv/**;

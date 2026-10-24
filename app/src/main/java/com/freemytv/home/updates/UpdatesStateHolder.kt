@@ -37,7 +37,12 @@ data class SideloadedApp(
     val fixedSource: Boolean = false,
 )
 
-data class AvailableUpdate(val version: String, val asset: ReleaseAsset)
+data class AvailableUpdate(
+    val version: String,
+    val asset: ReleaseAsset,
+    /** The APK's dex metadata, when the release has it, for an update that runs compiled from the start. */
+    val dexMetadata: ReleaseAsset? = null,
+)
 
 enum class UpdateProblem {
     /** The repository doesn't exist or has no releases. */
@@ -157,9 +162,13 @@ class UpdatesStateHolder(private val platform: TvPlatform) {
             change(packageName) { it.copy(updating = false, problem = UpdateProblem.DownloadFailed) }
             return
         }
+        // Without its dex metadata the update still installs, only not compiled yet.
+        val dexMetadata = update.dexMetadata?.let { platform.download(it) }
         // A successful update of the Home ends this process; Android brings the new Home back.
-        val result = platform.installApk(path, silent = packageName == HOME)
+        var result = platform.installApk(path, silent = packageName == HOME, dexMetadata = dexMetadata)
+        if (result is InstallResult.Failed && dexMetadata != null) result = platform.installApk(path, silent = packageName == HOME)
         platform.deleteFile(path)
+        dexMetadata?.let { platform.deleteFile(it) }
         _state.update { it.copy(sideloaded = sideloadedApps()) }
         change(packageName) { it.copy(updating = false, problem = if (result is InstallResult.Failed) UpdateProblem.InstallFailed else null) }
     }
@@ -176,7 +185,7 @@ class UpdatesStateHolder(private val platform: TvPlatform) {
                 change(packageName) {
                     when {
                         asset == null -> it.copy(update = null, problem = UpdateProblem.NoApk)
-                        isNewer(release.version, it.version) -> it.copy(update = AvailableUpdate(release.version, asset), problem = null)
+                        isNewer(release.version, it.version) -> it.copy(update = AvailableUpdate(release.version, asset, release.dexMetadataFor(asset)), problem = null)
                         else -> it.copy(update = null, problem = null)
                     }
                 }
