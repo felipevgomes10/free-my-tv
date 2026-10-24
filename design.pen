@@ -13564,6 +13564,7 @@
                   "id": "fR8qs",
                   "name": "Step 3",
                   "gap": 28,
+                  "alignItems": "center",
                   "children": [
                     {
                       "type": "frame",
@@ -17919,6 +17920,5139 @@
               "fontFamily": "$font",
               "fontSize": 20,
               "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ELkJ0",
+      "x": 0,
+      "y": 4740,
+      "name": "Explorar — Hoje",
+      "context": "Design de TV em 1920 × 1080. Conteúdo e disponibilidade de streaming fictícios para demonstrar o fluxo. Direcionais movem o foco; OK abre os detalhes; Voltar retorna preservando período, filtro e posição.",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "cehnM",
+          "x": 0,
+          "y": 0,
+          "name": "Imagem de Sombras do Norte",
+          "metadata": {
+            "type": "unsplash",
+            "username": "timoun",
+            "link": "https://unsplash.com/@timoun",
+            "author": "Tim Oun"
+          },
+          "width": 1920,
+          "height": 720,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1791649108400-dd6bbc059f54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgyNTZ8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "cover"
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "YwLmh",
+          "x": 0,
+          "y": 0,
+          "name": "Contraste da imagem",
+          "width": 1920,
+          "height": 1080,
+          "fill": [
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 180,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000066",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.25
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.4
+                },
+                {
+                  "color": "#000000E6",
+                  "position": 0.62
+                },
+                {
+                  "color": "#000000",
+                  "position": 0.75
+                }
+              ]
+            },
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 90,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#000000B3",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.55
+                }
+              ]
+            }
+          ],
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "tczoj",
+          "x": 96,
+          "y": 48,
+          "name": "Status Bar",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Rvlsk",
+              "name": "Clock",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ZeKAO",
+                  "name": "Time",
+                  "fill": "$text-primary",
+                  "content": "21:40",
+                  "fontFamily": "$font",
+                  "fontSize": 34,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.5
+                },
+                {
+                  "type": "text",
+                  "id": "Y0Shu",
+                  "name": "Date",
+                  "fill": "$text-secondary",
+                  "content": "sexta, 23 de outubro",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "t7L3R",
+              "name": "Right",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "g7DZq",
+                  "name": "Weather Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "WLxqo",
+                      "name": "Weather Icon",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "cloud-moon",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "AuJKJ",
+                      "name": "Temp",
+                      "fill": "$text-primary",
+                      "content": "18°",
+                      "fontFamily": "$font",
+                      "fontSize": 26,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Jpx4q",
+                      "name": "Range",
+                      "fill": "$text-secondary",
+                      "content": "24° / 15°",
+                      "fontFamily": "$font",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lDWsR",
+                  "name": "System Monitor Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "z8Xj4",
+                      "name": "Metric hard-drive",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "EPPB4",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "hard-drive",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Wjca6",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "56%",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "yJFl0",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "usado",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "J2ZEhz",
+                      "name": "Metric memory-stick",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "RjOfw",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "memory-stick",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "q1Qo8",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "1,4 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "r3CoDx",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "de 2 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "r2yzj",
+                      "name": "Metric gauge",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "N6hqu8",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "gauge",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "PQN49",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "60 fps",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "oh5Qg",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "60 Hz",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "c84l1",
+                  "name": "System Icons",
+                  "gap": 28,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "O2J8h",
+                      "name": "Wi-Fi",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "wifi",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "dvjzf",
+                      "name": "Updates",
+                      "width": 24,
+                      "height": 24,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "J1iI7L",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Updates Icon",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow-down-to-line",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "o7iNjy",
+                          "x": 17,
+                          "y": 0,
+                          "name": "Attention Dot",
+                          "fill": "$attention",
+                          "width": 7,
+                          "height": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "L4LAXk",
+                      "name": "Settings",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "r4DwC",
+          "x": 96,
+          "y": 166,
+          "name": "Navegação principal",
+          "width": 1728,
+          "height": 72,
+          "gap": 16,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "mlJor",
+              "name": "Aba Início",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "BEgY9",
+                  "name": "Início",
+                  "fill": "$text-secondary",
+                  "content": "Início",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VFbiV",
+              "name": "Aba Explorar",
+              "fill": "$glass-strong",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "l7rU7e",
+                  "name": "Explorar",
+                  "fill": "$text-primary",
+                  "content": "Explorar",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lzCOA",
+              "name": "Aba Todos os apps",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "NXw8c",
+                  "name": "Todos os apps",
+                  "fill": "$text-secondary",
+                  "content": "Todos os apps",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "k3YtO",
+          "x": 96,
+          "y": 264,
+          "name": "Período e tipo de obra",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "yPyde",
+              "name": "Período dos destaques",
+              "fill": "$glass",
+              "cornerRadius": 999,
+              "gap": 8,
+              "padding": 6,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "T63wvB",
+                  "name": "Período Hoje",
+                  "fill": "$text-primary",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "oAfPq",
+                      "name": "Rótulo Hoje",
+                      "fill": "$bg",
+                      "content": "Hoje",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "IUART",
+                  "name": "Período Semana",
+                  "fill": "#00000000",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "c4v3i6",
+                      "name": "Rótulo Semana",
+                      "fill": "$text-primary",
+                      "content": "Semana",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "C5NJM",
+              "name": "Filtrar por tipo",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "e2CNW5",
+                  "name": "Filtro Todos",
+                  "fill": "$glass-strong",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    24
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DzbDw",
+                      "name": "Tipo Todos",
+                      "fill": "$text-primary",
+                      "content": "Todos",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "m0njF",
+                  "name": "Filtro Filmes",
+                  "fill": "#00000000",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    24
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "uaQZ3",
+                      "name": "Tipo Filmes",
+                      "fill": "$text-secondary",
+                      "content": "Filmes",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "W2PWV",
+                  "name": "Filtro Séries",
+                  "fill": "#00000000",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    24
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Bjncs",
+                      "name": "Tipo Séries",
+                      "fill": "$text-secondary",
+                      "content": "Séries",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "k25Onh",
+          "x": 96,
+          "y": 364,
+          "name": "Destaque de hoje — Sombras do Norte",
+          "width": 820,
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "gT0Dc",
+              "name": "Título da obra",
+              "fill": "$text-primary",
+              "content": "Sombras do Norte",
+              "lineHeight": 1,
+              "fontFamily": "$font",
+              "fontSize": 68,
+              "fontWeight": "700",
+              "letterSpacing": -1.5
+            },
+            {
+              "type": "text",
+              "id": "o0k5Z5",
+              "name": "Dados rápidos",
+              "fill": "#FFFFFFCC",
+              "content": "Série  •  Suspense  •  8,6 / 10",
+              "fontFamily": "$font",
+              "fontSize": 24,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "Lefug",
+              "name": "Resumo",
+              "fill": "#FFFFFFCC",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Uma guia de montanha volta à vila onde cresceu e encontra o irmão desaparecido há dez anos.",
+              "lineHeight": 1.35,
+              "fontFamily": "$font",
+              "fontSize": 26
+            },
+            {
+              "type": "frame",
+              "id": "wJCN5",
+              "name": "Ver detalhes — foco do controle",
+              "fill": "$text-primary",
+              "cornerRadius": 18,
+              "gap": 14,
+              "padding": [
+                16,
+                26
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "zPifl",
+                  "name": "Ícone de informações",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "info",
+                  "library": "lucide",
+                  "fill": "$bg"
+                },
+                {
+                  "type": "text",
+                  "id": "F2yYb7",
+                  "name": "Ver detalhes",
+                  "fill": "$bg",
+                  "content": "Ver detalhes",
+                  "fontFamily": "$font",
+                  "fontSize": 26,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ypdAA",
+          "x": 96,
+          "y": 670,
+          "name": "Bandeja de destaques de hoje",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "YrWnF",
+              "name": "Cabeçalho da bandeja",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "KswzQ",
+                  "name": "Destaques de hoje",
+                  "fill": "$text-primary",
+                  "content": "Destaques de hoje",
+                  "fontFamily": "$font",
+                  "fontSize": 32,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "K9U49y",
+                  "name": "Indicação de navegação",
+                  "fill": "$text-secondary",
+                  "content": "Filmes e séries para descobrir",
+                  "fontFamily": "$font",
+                  "fontSize": 22,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "VVSnL",
+              "name": "Obras de hoje",
+              "width": "fill_container",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ExYgS",
+                  "name": "Abrir detalhes — Último trem",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "RZMFj",
+                      "name": "Imagem — Último trem",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "davealmine",
+                        "link": "https://unsplash.com/@davealmine",
+                        "author": "Dawid Zawiła"
+                      },
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "QKdHd",
+                      "name": "Nome — Último trem",
+                      "fill": "$text-primary",
+                      "content": "Último trem",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "tenF6",
+                      "name": "Informações — Último trem",
+                      "fill": "$text-secondary",
+                      "content": "Filme  •  Suspense  •  8,4",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "gRDua",
+                  "name": "Abrir detalhes — Sombras do Norte",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "J2MMN",
+                      "name": "Imagem — Sombras do Norte",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1791649108400-dd6bbc059f54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgyNTZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "onCkB",
+                      "name": "Nome — Sombras do Norte",
+                      "fill": "$text-primary",
+                      "content": "Sombras do Norte",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "t3PW8",
+                      "name": "Informações — Sombras do Norte",
+                      "fill": "$text-secondary",
+                      "content": "Série  •  Suspense  •  8,6",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "oY9sj",
+                  "name": "Abrir detalhes — Maré alta",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "SOL9X",
+                      "name": "Imagem — Maré alta",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "waltc",
+                        "link": "https://unsplash.com/@waltc",
+                        "author": "Walter Coppola"
+                      },
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1719495438216-ab80ba874d81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3OTM0NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "NDvNX",
+                      "name": "Nome — Maré alta",
+                      "fill": "$text-primary",
+                      "content": "Maré alta",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "r8hKCX",
+                      "name": "Informações — Maré alta",
+                      "fill": "$text-secondary",
+                      "content": "Filme  •  Drama  •  7,9",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "q4n9X",
+                  "name": "Abrir detalhes — Entre prédios",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "aPDYS",
+                      "name": "Imagem — Entre prédios",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "tjump",
+                        "link": "https://unsplash.com/@tjump",
+                        "author": "Nik Shuliahin 💛💙"
+                      },
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1508849789987-4e5333c12b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3OTM0NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "leq5X",
+                      "name": "Nome — Entre prédios",
+                      "fill": "$text-primary",
+                      "content": "Entre prédios",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "WbD7N",
+                      "name": "Informações — Entre prédios",
+                      "fill": "$text-secondary",
+                      "content": "Série  •  Comédia  •  8,1",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "GLDOQ",
+          "x": 96,
+          "y": 1026,
+          "name": "Ajuda do controle",
+          "fill": "$text-secondary",
+          "content": "Use as setas para explorar. Pressione OK para ver os detalhes.",
+          "fontFamily": "$font",
+          "fontSize": 21
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "GLdFF",
+      "x": 2040,
+      "y": 4740,
+      "name": "Explorar — Semana",
+      "context": "Design de TV em 1920 × 1080. Conteúdo e disponibilidade de streaming fictícios para demonstrar o fluxo. Direcionais movem o foco; OK abre os detalhes; Voltar retorna preservando período, filtro e posição.",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "v4XxB4",
+          "x": 0,
+          "y": 0,
+          "name": "Imagem de Último trem",
+          "metadata": {
+            "type": "unsplash",
+            "username": "timoun",
+            "link": "https://unsplash.com/@timoun",
+            "author": "Tim Oun"
+          },
+          "width": 1920,
+          "height": 720,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated.png",
+            "mode": "cover"
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "w6LNT",
+          "x": 0,
+          "y": 0,
+          "name": "Contraste da imagem",
+          "width": 1920,
+          "height": 1080,
+          "fill": [
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 180,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000066",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.25
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.4
+                },
+                {
+                  "color": "#000000E6",
+                  "position": 0.62
+                },
+                {
+                  "color": "#000000",
+                  "position": 0.75
+                }
+              ]
+            },
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 90,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#000000B3",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.55
+                }
+              ]
+            }
+          ],
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "W90R6b",
+          "x": 96,
+          "y": 48,
+          "name": "Status Bar",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Fq6fg",
+              "name": "Clock",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "kURCU",
+                  "name": "Time",
+                  "fill": "$text-primary",
+                  "content": "21:40",
+                  "fontFamily": "$font",
+                  "fontSize": 34,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.5
+                },
+                {
+                  "type": "text",
+                  "id": "ZAcuZ",
+                  "name": "Date",
+                  "fill": "$text-secondary",
+                  "content": "sexta, 23 de outubro",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "b6Avl",
+              "name": "Right",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "CMv2y",
+                  "name": "Weather Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "PLeny",
+                      "name": "Weather Icon",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "cloud-moon",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "tQlUF",
+                      "name": "Temp",
+                      "fill": "$text-primary",
+                      "content": "18°",
+                      "fontFamily": "$font",
+                      "fontSize": 26,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "GZG2u",
+                      "name": "Range",
+                      "fill": "$text-secondary",
+                      "content": "24° / 15°",
+                      "fontFamily": "$font",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WfxE8",
+                  "name": "System Monitor Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "nufuQ",
+                      "name": "Metric hard-drive",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "MwiPw",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "hard-drive",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "g74rD",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "56%",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "B2BkzF",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "usado",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "S11j3",
+                      "name": "Metric memory-stick",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "RYrcJ",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "memory-stick",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "nzfEi",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "1,4 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "OtCNz",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "de 2 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "a4khc",
+                      "name": "Metric gauge",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "D2kQNC",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "gauge",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "m0NRH",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "60 fps",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "i1P2E",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "60 Hz",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UMMHP",
+                  "name": "System Icons",
+                  "gap": 28,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "MlQ1Z",
+                      "name": "Wi-Fi",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "wifi",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "M1nNAc",
+                      "name": "Updates",
+                      "width": 24,
+                      "height": 24,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "aibkV",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Updates Icon",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow-down-to-line",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "b84qh",
+                          "x": 17,
+                          "y": 0,
+                          "name": "Attention Dot",
+                          "fill": "$attention",
+                          "width": 7,
+                          "height": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "npTGd",
+                      "name": "Settings",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "WvTtk",
+          "x": 96,
+          "y": 166,
+          "name": "Navegação principal",
+          "width": 1728,
+          "height": 72,
+          "gap": 16,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "cQjMu",
+              "name": "Aba Início",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "POPbB",
+                  "name": "Início",
+                  "fill": "$text-secondary",
+                  "content": "Início",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nC4rr",
+              "name": "Aba Explorar",
+              "fill": "$glass-strong",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "iU0lT",
+                  "name": "Explorar",
+                  "fill": "$text-primary",
+                  "content": "Explorar",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fSQdr",
+              "name": "Aba Todos os apps",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "QauBh",
+                  "name": "Todos os apps",
+                  "fill": "$text-secondary",
+                  "content": "Todos os apps",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BqYSR",
+          "x": 96,
+          "y": 264,
+          "name": "Período e tipo de obra",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "TsoiF",
+              "name": "Período dos destaques",
+              "fill": "$glass",
+              "cornerRadius": 999,
+              "gap": 8,
+              "padding": 6,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Tiq9y",
+                  "name": "Período Hoje",
+                  "fill": "#00000000",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CZb6o",
+                      "name": "Rótulo Hoje",
+                      "fill": "$text-primary",
+                      "content": "Hoje",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "IXVdz",
+                  "name": "Período Semana",
+                  "fill": "$text-primary",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "WjFyV",
+                      "name": "Rótulo Semana",
+                      "fill": "$bg",
+                      "content": "Semana",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "R7AzS",
+              "name": "Filtrar por tipo",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "FyRaD",
+                  "name": "Filtro Todos",
+                  "fill": "$glass-strong",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    24
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Edxgg",
+                      "name": "Tipo Todos",
+                      "fill": "$text-primary",
+                      "content": "Todos",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Zttnc",
+                  "name": "Filtro Filmes",
+                  "fill": "#00000000",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    24
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "y3Pt5",
+                      "name": "Tipo Filmes",
+                      "fill": "$text-secondary",
+                      "content": "Filmes",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "l3N8r",
+                  "name": "Filtro Séries",
+                  "fill": "#00000000",
+                  "cornerRadius": 999,
+                  "padding": [
+                    12,
+                    24
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "TIpMN",
+                      "name": "Tipo Séries",
+                      "fill": "$text-secondary",
+                      "content": "Séries",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BPs23",
+          "x": 96,
+          "y": 364,
+          "name": "Destaque da semana — Último trem",
+          "width": 820,
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "RAXj2",
+              "name": "Título da obra",
+              "fill": "$text-primary",
+              "content": "Último trem",
+              "lineHeight": 1,
+              "fontFamily": "$font",
+              "fontSize": 68,
+              "fontWeight": "700",
+              "letterSpacing": -1.5
+            },
+            {
+              "type": "text",
+              "id": "Rw77m",
+              "name": "Dados rápidos",
+              "fill": "#FFFFFFCC",
+              "content": "Filme  •  Suspense  •  8,4 / 10",
+              "fontFamily": "$font",
+              "fontSize": 24,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "wMHyX",
+              "name": "Resumo",
+              "fill": "#FFFFFFCC",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Uma maquinista recebe uma mensagem impossível durante a última viagem da noite. A próxima parada pode mudar tudo.",
+              "lineHeight": 1.35,
+              "fontFamily": "$font",
+              "fontSize": 26
+            },
+            {
+              "type": "frame",
+              "id": "K2tzq",
+              "name": "Ver detalhes",
+              "fill": "$glass",
+              "cornerRadius": 18,
+              "gap": 14,
+              "padding": [
+                16,
+                26
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "MU4Rj",
+                  "name": "Ícone de informações",
+                  "width": 26,
+                  "height": 26,
+                  "icon": "info",
+                  "library": "lucide",
+                  "fill": "$text-primary"
+                },
+                {
+                  "type": "text",
+                  "id": "TExqY",
+                  "name": "Ver detalhes",
+                  "fill": "$text-primary",
+                  "content": "Ver detalhes",
+                  "fontFamily": "$font",
+                  "fontSize": 26,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "J5l9U",
+          "x": 96,
+          "y": 670,
+          "name": "Bandeja de destaques da semana",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "s7Qw5",
+              "name": "Cabeçalho da bandeja",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ZbpxS",
+                  "name": "Destaques de hoje",
+                  "fill": "$text-primary",
+                  "content": "Destaques da semana",
+                  "fontFamily": "$font",
+                  "fontSize": 32,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "n20lp",
+                  "name": "Indicação de navegação",
+                  "fill": "$text-secondary",
+                  "content": "As obras mais vistas nesta semana",
+                  "fontFamily": "$font",
+                  "fontSize": 22,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "K2zPY",
+              "name": "Obras da semana",
+              "width": "fill_container",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "o8QGh6",
+                  "name": "Abrir detalhes — Último trem",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Etgir",
+                      "name": "Imagem — Último trem — foco do controle",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "davealmine",
+                        "link": "https://unsplash.com/@davealmine",
+                        "author": "Dawid Zawiła"
+                      },
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "generated.png",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "stroke": "$text-primary",
+                      "strokeWidth": 4,
+                      "strokeAlignment": "inner",
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "o4Jfu",
+                      "name": "Nome — Último trem",
+                      "fill": "$text-primary",
+                      "content": "Último trem",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Twvhw",
+                      "name": "Informações — Último trem",
+                      "fill": "$text-secondary",
+                      "content": "Filme  •  Suspense  •  8,4",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "vZV8N",
+                  "name": "Abrir detalhes — Maré alta",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "t8orn",
+                      "name": "Imagem — Maré alta",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "waltc",
+                        "link": "https://unsplash.com/@waltc",
+                        "author": "Walter Coppola"
+                      },
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1719495438216-ab80ba874d81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3OTM0NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "U2QDpQ",
+                      "name": "Nome — Maré alta",
+                      "fill": "$text-primary",
+                      "content": "Maré alta",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "h1hzpB",
+                      "name": "Informações — Maré alta",
+                      "fill": "$text-secondary",
+                      "content": "Filme  •  Drama  •  7,9",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "s4bzS",
+                  "name": "Abrir detalhes — Sombras do Norte",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "qMJy0",
+                      "name": "Imagem — Sombras do Norte",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1791649108400-dd6bbc059f54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgyNTZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Ht6WZ",
+                      "name": "Nome — Sombras do Norte",
+                      "fill": "$text-primary",
+                      "content": "Sombras do Norte",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jJGyR",
+                      "name": "Informações — Sombras do Norte",
+                      "fill": "$text-secondary",
+                      "content": "Série  •  Suspense  •  8,6",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "HcvYD",
+                  "name": "Abrir detalhes — Entre prédios",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "q5B74S",
+                      "name": "Imagem — Entre prédios",
+                      "metadata": {
+                        "type": "unsplash",
+                        "username": "tjump",
+                        "link": "https://unsplash.com/@tjump",
+                        "author": "Nik Shuliahin 💛💙"
+                      },
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 210,
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "https://images.unsplash.com/photo-1508849789987-4e5333c12b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3OTM0NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                        "mode": "cover"
+                      },
+                      "cornerRadius": 20,
+                      "layout": "none"
+                    },
+                    {
+                      "type": "text",
+                      "id": "hdjaU",
+                      "name": "Nome — Entre prédios",
+                      "fill": "$text-primary",
+                      "content": "Entre prédios",
+                      "fontFamily": "$font",
+                      "fontSize": 28,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "p7zyDA",
+                      "name": "Informações — Entre prédios",
+                      "fill": "$text-secondary",
+                      "content": "Série  •  Comédia  •  8,1",
+                      "fontFamily": "$font",
+                      "fontSize": 21,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "cQbIW",
+          "x": 96,
+          "y": 1026,
+          "name": "Ajuda do controle",
+          "fill": "$text-secondary",
+          "content": "Use as setas para explorar. Pressione OK para ver os detalhes.",
+          "fontFamily": "$font",
+          "fontSize": 21
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "elsO9",
+      "x": 0,
+      "y": 5940,
+      "name": "Explorar — Detalhes do filme",
+      "context": "Ficha de obra fictícia. Atalhos abrem a página da obra no app do serviço; se não estiver instalado, oferecer instalação. Voltar restaura a seleção em Explorar.",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "ujPwx",
+          "x": 0,
+          "y": 0,
+          "name": "Último trem — imagem da obra",
+          "width": 1920,
+          "height": 820,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated.png",
+            "mode": "cover"
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "Iju2G",
+          "x": 0,
+          "y": 0,
+          "name": "Contraste de leitura",
+          "width": 1920,
+          "height": 1080,
+          "fill": [
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 90,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#000000F2",
+                  "position": 0
+                },
+                {
+                  "color": "#000000BB",
+                  "position": 0.4
+                },
+                {
+                  "color": "#00000033",
+                  "position": 0.75
+                },
+                {
+                  "color": "#00000000",
+                  "position": 1
+                }
+              ]
+            },
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 180,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000033",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.3
+                },
+                {
+                  "color": "#000000AA",
+                  "position": 0.6
+                },
+                {
+                  "color": "#000000",
+                  "position": 0.8
+                }
+              ]
+            }
+          ],
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "iZhi4",
+          "x": 96,
+          "y": 48,
+          "name": "Status Bar",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "G087z",
+              "name": "Clock",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "TF5Cu",
+                  "name": "Time",
+                  "fill": "$text-primary",
+                  "content": "21:40",
+                  "fontFamily": "$font",
+                  "fontSize": 34,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.5
+                },
+                {
+                  "type": "text",
+                  "id": "p0WcSN",
+                  "name": "Date",
+                  "fill": "$text-secondary",
+                  "content": "sexta, 23 de outubro",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "kvCys",
+              "name": "Right",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Kaarj",
+                  "name": "Weather Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "vk1MZ",
+                      "name": "Weather Icon",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "cloud-moon",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zimoM",
+                      "name": "Temp",
+                      "fill": "$text-primary",
+                      "content": "18°",
+                      "fontFamily": "$font",
+                      "fontSize": 26,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "I4HW9T",
+                      "name": "Range",
+                      "fill": "$text-secondary",
+                      "content": "24° / 15°",
+                      "fontFamily": "$font",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "i2WM3Q",
+                  "name": "System Monitor Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "G28Adh",
+                      "name": "Metric hard-drive",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "MmvC8",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "hard-drive",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "x9Fw6",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "56%",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "CuOoa",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "usado",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "J1FfW5",
+                      "name": "Metric memory-stick",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "N8Uh6W",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "memory-stick",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "PXO7K",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "1,4 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "J8ZAP",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "de 2 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "k8NduU",
+                      "name": "Metric gauge",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "DXoT3",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "gauge",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "H67Xmm",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "60 fps",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xAVdH",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "60 Hz",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "H7UawL",
+                  "name": "System Icons",
+                  "gap": 28,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "XpbEO",
+                      "name": "Wi-Fi",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "wifi",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "J3gNEw",
+                      "name": "Updates",
+                      "width": 24,
+                      "height": 24,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "NG2xo",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Updates Icon",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow-down-to-line",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "L7fRO",
+                          "x": 17,
+                          "y": 0,
+                          "name": "Attention Dot",
+                          "fill": "$attention",
+                          "width": 7,
+                          "height": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "P9oen7",
+                      "name": "Settings",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "rI2Vz",
+          "x": 96,
+          "y": 172,
+          "name": "Voltar para Explorar",
+          "fill": "$glass",
+          "cornerRadius": 999,
+          "gap": 12,
+          "padding": [
+            14,
+            22
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "G89nA",
+              "name": "Voltar",
+              "width": 26,
+              "height": 26,
+              "icon": "arrow-left",
+              "library": "lucide",
+              "fill": "$text-primary"
+            },
+            {
+              "type": "text",
+              "id": "julBx",
+              "name": "Destino do retorno",
+              "fill": "$text-primary",
+              "content": "Explorar",
+              "fontFamily": "$font",
+              "fontSize": 26,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "l2gwX",
+          "x": 96,
+          "y": 282,
+          "name": "Informações de Último trem",
+          "width": 850,
+          "layout": "vertical",
+          "gap": 22,
+          "children": [
+            {
+              "type": "text",
+              "id": "HS6yo",
+              "name": "Nome do filme",
+              "fill": "$text-primary",
+              "content": "Último trem",
+              "lineHeight": 1,
+              "fontFamily": "$font",
+              "fontSize": 80,
+              "fontWeight": "700",
+              "letterSpacing": -1.5
+            },
+            {
+              "type": "frame",
+              "id": "x2WHAd",
+              "name": "Classificação e ficha rápida",
+              "gap": 20,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "cnVkz",
+                  "name": "Classificação indicativa — 14 anos",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#F5A623",
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "sIjRX",
+                      "name": "Idade mínima",
+                      "fill": "$bg",
+                      "content": "14",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "p7BlN",
+                  "name": "Tipo",
+                  "fill": "#FFFFFFCC",
+                  "content": "Filme",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "c6tOy",
+                  "name": "Ano",
+                  "fill": "#FFFFFFCC",
+                  "content": "2025",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "pzYiY",
+                  "name": "Gênero",
+                  "fill": "#FFFFFFCC",
+                  "content": "Suspense",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "nGOcS",
+                  "name": "Duração",
+                  "fill": "#FFFFFFCC",
+                  "content": "2 h 08 min",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "q1I7FU",
+              "name": "Avaliação da obra",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "d3RJeN",
+                  "name": "Estrela",
+                  "width": 25,
+                  "height": 25,
+                  "icon": "star",
+                  "library": "lucide",
+                  "fill": "$text-primary"
+                },
+                {
+                  "type": "text",
+                  "id": "faRcd",
+                  "name": "Nota",
+                  "fill": "$text-primary",
+                  "content": "8,4 / 10",
+                  "fontFamily": "$font",
+                  "fontSize": 25,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "w4fgxq",
+                  "name": "Fonte da avaliação",
+                  "fill": "$text-secondary",
+                  "content": "Avaliação do público",
+                  "fontFamily": "$font",
+                  "fontSize": 22,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "eXH9v",
+              "name": "Sinopse",
+              "fill": "#FFFFFFCC",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Uma maquinista recebe uma mensagem da filha desaparecida durante a última viagem da noite. Sem poder parar o trem, ela precisa descobrir quem está a bordo antes que a próxima estação chegue.",
+              "lineHeight": 1.4,
+              "fontFamily": "$font",
+              "fontSize": 27
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "cwJHc",
+          "x": 96,
+          "y": 652,
+          "name": "Onde assistir ao filme",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 18,
+          "children": [
+            {
+              "type": "text",
+              "id": "iF0IU",
+              "name": "Onde assistir",
+              "fill": "$text-primary",
+              "content": "Onde assistir",
+              "fontFamily": "$font",
+              "fontSize": 30,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "BGutj",
+              "name": "Atalhos para os streamings",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fBkrw",
+                  "name": "Assistir no Prime Video",
+                  "width": 380,
+                  "fill": "$text-primary",
+                  "cornerRadius": 20,
+                  "gap": 20,
+                  "padding": [
+                    20,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "ul5z3",
+                      "name": "Abrir Prime Video",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "play",
+                      "library": "lucide",
+                      "fill": "$bg"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "RfkNy",
+                      "name": "Informações do serviço",
+                      "layout": "vertical",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "FQP0s",
+                          "name": "Nome do streaming",
+                          "fill": "$bg",
+                          "content": "Prime Video",
+                          "fontFamily": "$font",
+                          "fontSize": 27,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "KdxES",
+                          "name": "Forma de acesso",
+                          "fill": "#00000099",
+                          "content": "Incluído na assinatura",
+                          "fontFamily": "$font",
+                          "fontSize": 20
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "EV47b",
+                  "name": "Assistir no Apple TV",
+                  "width": 380,
+                  "fill": "$glass",
+                  "cornerRadius": 20,
+                  "gap": 20,
+                  "padding": [
+                    20,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "ILgde",
+                      "name": "Abrir Apple TV",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "external-link",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "RDblx",
+                      "name": "Informações do serviço",
+                      "layout": "vertical",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "IzD46",
+                          "name": "Nome do streaming",
+                          "fill": "$text-primary",
+                          "content": "Apple TV",
+                          "fontFamily": "$font",
+                          "fontSize": 27,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "c775k",
+                          "name": "Forma de acesso",
+                          "fill": "$text-secondary",
+                          "content": "Alugar ou comprar",
+                          "fontFamily": "$font",
+                          "fontSize": 20
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "MKYsH",
+              "name": "Orientação de acesso",
+              "fill": "$text-secondary",
+              "content": "Abre a obra no app do streaming. Pode exigir assinatura ou pagamento.",
+              "fontFamily": "$font",
+              "fontSize": 21
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "rXHp6",
+          "x": 96,
+          "y": 878,
+          "name": "Elenco principal",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 22,
+          "children": [
+            {
+              "type": "text",
+              "id": "mxrUx",
+              "name": "Título do elenco",
+              "fill": "$text-primary",
+              "content": "Elenco",
+              "fontFamily": "$font",
+              "fontSize": 30,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "S4UTUo",
+              "name": "Atores e personagens",
+              "width": "fill_container",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "LdioH",
+                  "name": "Ator — Helena Duarte",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "i2CBgI",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "Helena Duarte",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "RgxYg",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Clara",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "MJolj",
+                  "name": "Ator — Rafael Lins",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "leP0G",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "Rafael Lins",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "naaGH",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Miguel",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "avNba",
+                  "name": "Ator — Lia Campos",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "CoikH",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "Lia Campos",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zLPga",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Laura",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "El2m5",
+                  "name": "Ator — Marcos Reis",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "S1v25",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "Marcos Reis",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mzJsC",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Inspetor Azevedo",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "WJcPI",
+          "x": 1444,
+          "y": 546,
+          "name": "Assistir trailer",
+          "context": "OK abre o trailer oficial desta obra em tela cheia, conforme a tela Explorar — Trailer em reprodução (C1DDJs). O título e o vídeo acompanham a obra selecionada. Voltar retorna a esta ficha e restaura o foco neste botão.",
+          "width": 380,
+          "height": 80,
+          "fill": "$glass-strong",
+          "cornerRadius": 20,
+          "effect": {
+            "type": "background_blur",
+            "radius": 18
+          },
+          "gap": 16,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "jQVRT",
+              "name": "Reproduzir trailer",
+              "width": 28,
+              "height": 28,
+              "icon": "play",
+              "library": "lucide",
+              "fill": "$text-primary"
+            },
+            {
+              "type": "text",
+              "id": "YT4UW",
+              "name": "Assistir trailer",
+              "fill": "$text-primary",
+              "content": "Assistir trailer",
+              "fontFamily": "$font",
+              "fontSize": 28,
+              "fontWeight": "600"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "e3PKP",
+      "x": 2040,
+      "y": 5940,
+      "name": "Explorar — Detalhes da série",
+      "context": "Ficha de obra fictícia. Atalhos abrem a página da obra no app do serviço; se não estiver instalado, oferecer instalação. Voltar restaura a seleção em Explorar.",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Xdo5f",
+          "x": 0,
+          "y": 0,
+          "name": "Sombras do Norte — imagem da obra",
+          "width": 1920,
+          "height": 820,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1791649108400-dd6bbc059f54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgyNTZ8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "cover"
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "XF14N",
+          "x": 0,
+          "y": 0,
+          "name": "Contraste de leitura",
+          "width": 1920,
+          "height": 1080,
+          "fill": [
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 90,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#000000F2",
+                  "position": 0
+                },
+                {
+                  "color": "#000000BB",
+                  "position": 0.4
+                },
+                {
+                  "color": "#00000033",
+                  "position": 0.75
+                },
+                {
+                  "color": "#00000000",
+                  "position": 1
+                }
+              ]
+            },
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 180,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000033",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.3
+                },
+                {
+                  "color": "#000000AA",
+                  "position": 0.6
+                },
+                {
+                  "color": "#000000",
+                  "position": 0.8
+                }
+              ]
+            }
+          ],
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "YDmIC",
+          "x": 96,
+          "y": 48,
+          "name": "Status Bar",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Fvy3k",
+              "name": "Clock",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "mYzE0",
+                  "name": "Time",
+                  "fill": "$text-primary",
+                  "content": "21:40",
+                  "fontFamily": "$font",
+                  "fontSize": 34,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.5
+                },
+                {
+                  "type": "text",
+                  "id": "mduZY",
+                  "name": "Date",
+                  "fill": "$text-secondary",
+                  "content": "sexta, 23 de outubro",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lAr3M",
+              "name": "Right",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Cjm1r",
+                  "name": "Weather Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "tV4ga",
+                      "name": "Weather Icon",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "cloud-moon",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zGIMR",
+                      "name": "Temp",
+                      "fill": "$text-primary",
+                      "content": "18°",
+                      "fontFamily": "$font",
+                      "fontSize": 26,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "oQeG9",
+                      "name": "Range",
+                      "fill": "$text-secondary",
+                      "content": "24° / 15°",
+                      "fontFamily": "$font",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "g5BHe1",
+                  "name": "System Monitor Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "dbC6C",
+                      "name": "Metric hard-drive",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "q4PPbJ",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "hard-drive",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "aDfDH",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "56%",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "hh1Sf",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "usado",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SPnTa",
+                      "name": "Metric memory-stick",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "NAxHr",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "memory-stick",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "t85atq",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "1,4 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "gjV3A",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "de 2 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SMXAv",
+                      "name": "Metric gauge",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "gmYE3",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "gauge",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ZBLTH",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "60 fps",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "AhNz8",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "60 Hz",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kBdTb",
+                  "name": "System Icons",
+                  "gap": 28,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "Q4ADf",
+                      "name": "Wi-Fi",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "wifi",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "moGhk",
+                      "name": "Updates",
+                      "width": 24,
+                      "height": 24,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "xDZut",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Updates Icon",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow-down-to-line",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "evT1G",
+                          "x": 17,
+                          "y": 0,
+                          "name": "Attention Dot",
+                          "fill": "$attention",
+                          "width": 7,
+                          "height": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "T0v96",
+                      "name": "Settings",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bCLwb",
+          "x": 96,
+          "y": 172,
+          "name": "Voltar para Explorar",
+          "fill": "$glass",
+          "cornerRadius": 999,
+          "gap": 12,
+          "padding": [
+            14,
+            22
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "a3LbRj",
+              "name": "Voltar",
+              "width": 26,
+              "height": 26,
+              "icon": "arrow-left",
+              "library": "lucide",
+              "fill": "$text-primary"
+            },
+            {
+              "type": "text",
+              "id": "uWro2",
+              "name": "Destino do retorno",
+              "fill": "$text-primary",
+              "content": "Explorar",
+              "fontFamily": "$font",
+              "fontSize": 26,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "yyupt",
+          "x": 96,
+          "y": 282,
+          "name": "Informações de Sombras do Norte",
+          "width": 850,
+          "layout": "vertical",
+          "gap": 22,
+          "children": [
+            {
+              "type": "text",
+              "id": "huEQK",
+              "name": "Nome da série",
+              "fill": "$text-primary",
+              "content": "Sombras do Norte",
+              "lineHeight": 1,
+              "fontFamily": "$font",
+              "fontSize": 76,
+              "fontWeight": "700",
+              "letterSpacing": -1.5
+            },
+            {
+              "type": "frame",
+              "id": "p2gU7D",
+              "name": "Classificação e ficha rápida",
+              "gap": 20,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Y3Sqc",
+                  "name": "Classificação indicativa — 14 anos",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#F5A623",
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "R6k0p",
+                      "name": "Idade mínima",
+                      "fill": "$bg",
+                      "content": "14",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "AWac0",
+                  "name": "Tipo",
+                  "fill": "#FFFFFFCC",
+                  "content": "Série",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "RVC41",
+                  "name": "Ano",
+                  "fill": "#FFFFFFCC",
+                  "content": "2025",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "vaPo6",
+                  "name": "Gênero",
+                  "fill": "#FFFFFFCC",
+                  "content": "Suspense",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "K0wLI",
+                  "name": "Duração",
+                  "fill": "#FFFFFFCC",
+                  "content": "48 min/episódio",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "vpoSK",
+                  "name": "Temporadas",
+                  "fill": "#FFFFFFCC",
+                  "content": "2 temporadas",
+                  "fontFamily": "$font",
+                  "fontSize": 24,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "PS8kE",
+              "name": "Avaliação da obra",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "c4XAX",
+                  "name": "Estrela",
+                  "width": 25,
+                  "height": 25,
+                  "icon": "star",
+                  "library": "lucide",
+                  "fill": "$text-primary"
+                },
+                {
+                  "type": "text",
+                  "id": "UnBLj",
+                  "name": "Nota",
+                  "fill": "$text-primary",
+                  "content": "8,6 / 10",
+                  "fontFamily": "$font",
+                  "fontSize": 25,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "T26UJA",
+                  "name": "Fonte da avaliação",
+                  "fill": "$text-secondary",
+                  "content": "Avaliação do público",
+                  "fontFamily": "$font",
+                  "fontSize": 22,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "psfHZ",
+              "name": "Sinopse",
+              "fill": "#FFFFFFCC",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Uma guia de montanha retorna à vila onde cresceu e encontra o irmão desaparecido há dez anos. Enquanto tenta entender o que aconteceu, antigos segredos da comunidade começam a vir à tona.",
+              "lineHeight": 1.4,
+              "fontFamily": "$font",
+              "fontSize": 27
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GDnN6",
+          "x": 96,
+          "y": 652,
+          "name": "Onde assistir à série",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 18,
+          "children": [
+            {
+              "type": "text",
+              "id": "Eu9rT",
+              "name": "Onde assistir",
+              "fill": "$text-primary",
+              "content": "Onde assistir",
+              "fontFamily": "$font",
+              "fontSize": 30,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "Z5Wdf0",
+              "name": "Atalhos para os streamings",
+              "gap": 20,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "YrU9W",
+                  "name": "Assistir na Netflix",
+                  "width": 380,
+                  "fill": "$text-primary",
+                  "cornerRadius": 20,
+                  "gap": 20,
+                  "padding": [
+                    20,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "nlmVb",
+                      "name": "Abrir Netflix",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "play",
+                      "library": "lucide",
+                      "fill": "$bg"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GtBeD",
+                      "name": "Informações do serviço",
+                      "layout": "vertical",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Gh6gd",
+                          "name": "Nome do streaming",
+                          "fill": "$bg",
+                          "content": "Netflix",
+                          "fontFamily": "$font",
+                          "fontSize": 27,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Z9lst",
+                          "name": "Forma de acesso",
+                          "fill": "#00000099",
+                          "content": "Incluído na assinatura",
+                          "fontFamily": "$font",
+                          "fontSize": 20
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "pCOfn",
+                  "name": "Assistir no Prime Video",
+                  "width": 380,
+                  "fill": "$glass",
+                  "cornerRadius": 20,
+                  "gap": 20,
+                  "padding": [
+                    20,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "K1SU3K",
+                      "name": "Abrir Prime Video",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "external-link",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "aFt5e",
+                      "name": "Informações do serviço",
+                      "layout": "vertical",
+                      "gap": 5,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "smSGF",
+                          "name": "Nome do streaming",
+                          "fill": "$text-primary",
+                          "content": "Prime Video",
+                          "fontFamily": "$font",
+                          "fontSize": 27,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "pP3d8",
+                          "name": "Forma de acesso",
+                          "fill": "$text-secondary",
+                          "content": "Incluído na assinatura",
+                          "fontFamily": "$font",
+                          "fontSize": 20
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "B0jAF",
+              "name": "Orientação de acesso",
+              "fill": "$text-secondary",
+              "content": "Abre a obra no app do streaming. Pode exigir assinatura ou pagamento.",
+              "fontFamily": "$font",
+              "fontSize": 21
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "EYVc6",
+          "x": 96,
+          "y": 878,
+          "name": "Elenco principal",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 22,
+          "children": [
+            {
+              "type": "text",
+              "id": "BUdMG",
+              "name": "Título do elenco",
+              "fill": "$text-primary",
+              "content": "Elenco",
+              "fontFamily": "$font",
+              "fontSize": 30,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "LUqxJ",
+              "name": "Atores e personagens",
+              "width": "fill_container",
+              "gap": 32,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "W1sdf",
+                  "name": "Ator — Marina Vidal",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "r8Ljvh",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "Marina Vidal",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "vkRfL",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Nora",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "t9HAAJ",
+                  "name": "Ator — Caio Brandão",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gwL0Q",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "Caio Brandão",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "C27df7",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Tomás",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UvMDK",
+                  "name": "Ator — Ana Prado",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "cWhwP",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "Ana Prado",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "TthOM",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Inês",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "i35FAM",
+                  "name": "Ator — João Leal",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jUCRA",
+                      "name": "Nome do ator",
+                      "fill": "$text-primary",
+                      "content": "João Leal",
+                      "fontFamily": "$font",
+                      "fontSize": 27,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "r2aBzI",
+                      "name": "Personagem",
+                      "fill": "$text-secondary",
+                      "content": "Elias",
+                      "fontFamily": "$font",
+                      "fontSize": 23
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "dot3P",
+          "x": 1444,
+          "y": 546,
+          "name": "Assistir trailer",
+          "context": "OK abre o trailer oficial desta obra em tela cheia, conforme a tela Explorar — Trailer em reprodução (C1DDJs). O título e o vídeo acompanham a obra selecionada. Voltar retorna a esta ficha e restaura o foco neste botão.",
+          "width": 380,
+          "height": 80,
+          "fill": "$glass-strong",
+          "cornerRadius": 20,
+          "effect": {
+            "type": "background_blur",
+            "radius": 18
+          },
+          "gap": 16,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "uPeXF",
+              "name": "Reproduzir trailer",
+              "width": 28,
+              "height": 28,
+              "icon": "play",
+              "library": "lucide",
+              "fill": "$text-primary"
+            },
+            {
+              "type": "text",
+              "id": "Sf3Mc",
+              "name": "Assistir trailer",
+              "fill": "$text-primary",
+              "content": "Assistir trailer",
+              "fontFamily": "$font",
+              "fontSize": 28,
+              "fontWeight": "600"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "JwoJy",
+      "x": -2040,
+      "y": 4740,
+      "name": "Home — Navegação com Explorar",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "eUqxk",
+          "x": 0,
+          "y": 0,
+          "name": "Top Shelf Image",
+          "metadata": {
+            "type": "unsplash",
+            "username": "timoun",
+            "link": "https://unsplash.com/@timoun",
+            "author": "Tim Oun"
+          },
+          "width": 1920,
+          "height": 760,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1791649108400-dd6bbc059f54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgyNTZ8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "cover"
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "lTdFO",
+          "x": 0,
+          "y": 0,
+          "name": "Top Shelf Fade",
+          "width": 1920,
+          "height": 1080,
+          "fill": [
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 180,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000066",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.25
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.4
+                },
+                {
+                  "color": "#000000E6",
+                  "position": 0.62
+                },
+                {
+                  "color": "#000000",
+                  "position": 0.75
+                }
+              ]
+            },
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 90,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#000000B3",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.55
+                }
+              ]
+            }
+          ],
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "xAkyV",
+          "x": 96,
+          "y": 48,
+          "name": "Status Bar",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "mebhU",
+              "name": "Clock",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "O4QFm",
+                  "name": "Time",
+                  "fill": "$text-primary",
+                  "content": "21:40",
+                  "fontFamily": "$font",
+                  "fontSize": 34,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.5
+                },
+                {
+                  "type": "text",
+                  "id": "Z8YntZ",
+                  "name": "Date",
+                  "fill": "$text-secondary",
+                  "content": "sexta, 23 de outubro",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "iX2fd",
+              "name": "Right",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zVkAt",
+                  "name": "Weather Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "EoMjW",
+                      "name": "Weather Icon",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "cloud-moon",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "gq2Lz",
+                      "name": "Temp",
+                      "fill": "$text-primary",
+                      "content": "18°",
+                      "fontFamily": "$font",
+                      "fontSize": 26,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "v7OaH",
+                      "name": "Range",
+                      "fill": "$text-secondary",
+                      "content": "24° / 15°",
+                      "fontFamily": "$font",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "dKCK6",
+                  "name": "System Monitor Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "N2p8e",
+                      "name": "Metric hard-drive",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "EcEux",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "hard-drive",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "RHE7E",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "56%",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "o5PsX",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "usado",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JNzmQ",
+                      "name": "Metric memory-stick",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "aDwzZ",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "memory-stick",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "lsb4y",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "1,4 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "EgplX",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "de 2 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "lPlwp",
+                      "name": "Metric gauge",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "jzSA9",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "gauge",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "bGCIx",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "60 fps",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "e6RGpD",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "60 Hz",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "v8UZX8",
+                  "name": "System Icons",
+                  "gap": 28,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "J7d6Dy",
+                      "name": "Wi-Fi",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "wifi",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "A34Xal",
+                      "name": "Updates",
+                      "width": 24,
+                      "height": 24,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "S2wwHp",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Updates Icon",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow-down-to-line",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "tyNYu",
+                          "x": 17,
+                          "y": 0,
+                          "name": "Attention Dot",
+                          "fill": "$attention",
+                          "width": 7,
+                          "height": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "QSOj4",
+                      "name": "Settings",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "D1eKDv",
+          "x": 96,
+          "y": 330,
+          "name": "Top Shelf Content",
+          "width": 760,
+          "layout": "vertical",
+          "gap": 18,
+          "children": [
+            {
+              "type": "text",
+              "id": "BUs3N",
+              "name": "Source",
+              "fill": "$text-secondary",
+              "content": "Netflix",
+              "fontFamily": "$font",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "me3Sd",
+              "name": "Title",
+              "fill": "$text-primary",
+              "content": "Sombras do Norte",
+              "lineHeight": 1,
+              "fontFamily": "$font",
+              "fontSize": 72,
+              "fontWeight": "700",
+              "letterSpacing": -1.5
+            },
+            {
+              "type": "text",
+              "id": "FwoPW",
+              "name": "Detail",
+              "fill": "#FFFFFFCC",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Nova temporada. Uma guia de montanha volta à vila onde cresceu e encontra o irmão desaparecido há dez anos.",
+              "lineHeight": 1.4,
+              "fontFamily": "$font",
+              "fontSize": 24,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "KYPHn",
+              "name": "Shelf Pager",
+              "gap": 10,
+              "padding": [
+                8,
+                0,
+                0,
+                0
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "rqYr3",
+                  "name": "Dot 1",
+                  "fill": "$text-primary",
+                  "width": 28,
+                  "height": 10
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "pRfq6",
+                  "name": "Dot 2",
+                  "fill": "#FFFFFF4D",
+                  "width": 10,
+                  "height": 10
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "d4uZJ",
+                  "name": "Dot 3",
+                  "fill": "#FFFFFF4D",
+                  "width": 10,
+                  "height": 10
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "DLiA2",
+                  "name": "Dot 4",
+                  "fill": "#FFFFFF4D",
+                  "width": 10,
+                  "height": 10
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 5,
+                  "id": "V6RZrq",
+                  "name": "Dot 5",
+                  "fill": "#FFFFFF4D",
+                  "width": 10,
+                  "height": 10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "pLc25",
+          "x": 96,
+          "y": 660,
+          "name": "App Tray",
+          "width": 1728,
+          "height": 230,
+          "gap": 40,
+          "children": [
+            {
+              "type": "frame",
+              "id": "E3DIu",
+              "name": "App Netflix",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "EmilG",
+                  "name": "Tile",
+                  "width": 276,
+                  "height": 166,
+                  "fill": "#B20710",
+                  "cornerRadius": 26,
+                  "stroke": "#FFFFFF59",
+                  "strokeWidth": 2,
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#000000B3",
+                      "offset": {
+                        "x": 0,
+                        "y": 24
+                      },
+                      "blur": 48
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#00000000"
+                    }
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "u83hrh",
+                      "name": "Wordmark",
+                      "fill": "#FFFFFF",
+                      "content": "Netflix",
+                      "fontFamily": "$font",
+                      "fontSize": 36,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "hZIDO",
+                  "name": "Focused Name",
+                  "fill": "$text-primary",
+                  "content": "Netflix",
+                  "fontFamily": "$font",
+                  "fontSize": 22,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "HyQxd",
+              "name": "App YouTube",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Sfuhi",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "dQ4KO",
+                      "name": "Wordmark",
+                      "fill": "#E62117",
+                      "content": "YouTube",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "O2BBF2",
+              "name": "App Prime Video",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "hCwkx",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#0F79AF",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "oot2s",
+                      "name": "Wordmark",
+                      "fill": "#FFFFFF",
+                      "content": "Prime Video",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JkuoJ",
+              "name": "App Plex",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "rsR5B",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#1F1F1F",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qzev6",
+                      "name": "Wordmark",
+                      "fill": "#E5A00D",
+                      "content": "Plex",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cjTfb",
+              "name": "App Spotify",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "JqCKX",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#1DB954",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "SNnhp",
+                      "name": "Wordmark",
+                      "fill": "#000000",
+                      "content": "Spotify",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "N4g9xX",
+              "name": "All Apps",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "aNt7V",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "$glass",
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "JwnZx",
+                      "name": "Grid",
+                      "width": 36,
+                      "height": 36,
+                      "icon": "layout-grid",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "g8gnX",
+                      "name": "Label",
+                      "fill": "$text-primary",
+                      "content": "Todos os apps",
+                      "fontFamily": "$font",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "RNrs2",
+          "x": 96,
+          "y": 930,
+          "name": "Continuar assistindo — prévia",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 20,
+          "children": [
+            {
+              "type": "text",
+              "id": "RurYT",
+              "name": "Tray Title",
+              "fill": "$text-secondary",
+              "content": "Continuar assistindo",
+              "fontFamily": "$font",
+              "fontSize": 24,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "y0LbYH",
+              "name": "Row",
+              "gap": 40,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "umvex",
+                  "name": "Card a",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "dream_anchor",
+                    "link": "https://unsplash.com/@dream_anchor",
+                    "author": "Nathan Payne"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1620356186668-5b94db4a3b94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "Rz5RQ",
+                  "name": "Card b",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "califso",
+                    "link": "https://unsplash.com/@califso",
+                    "author": "Shinichiro Ichimura"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1631874890481-672f848d6c50?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "T10QRC",
+                  "name": "Card c",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "cvbattum",
+                    "link": "https://unsplash.com/@cvbattum",
+                    "author": "Casper van Battum"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1674857145833-1f9ef5823a57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "tAnXP",
+                  "name": "Card d",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "kylejglenn",
+                    "link": "https://unsplash.com/@kylejglenn",
+                    "author": "Kyle Glenn"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1506452305024-9d3f02d1c9b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "LekQ1",
+          "x": 96,
+          "y": 166,
+          "name": "Navegação principal",
+          "width": 1728,
+          "height": 72,
+          "gap": 16,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "Hs0at",
+              "name": "Aba Início",
+              "fill": "$glass-strong",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "g3kiF",
+                  "name": "Início",
+                  "fill": "$text-primary",
+                  "content": "Início",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "e2YvL",
+              "name": "Aba Explorar",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "MEy6G",
+                  "name": "Explorar",
+                  "fill": "$text-secondary",
+                  "content": "Explorar",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "rTNVM",
+              "name": "Aba Todos os apps",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "p7zS5n",
+                  "name": "Todos os apps",
+                  "fill": "$text-secondary",
+                  "content": "Todos os apps",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "C1DDJs",
+      "x": 4080,
+      "y": 5940,
+      "name": "Explorar — Trailer em reprodução",
+      "context": "Exemplo visual de reprodução em tela cheia. A imagem representa o vídeo. O player recebe o trailer da obra selecionada, seja filme ou série. OK pausa ou retoma; esquerda/direita voltam/avançam 10 segundos; Voltar fecha o trailer e restaura o foco em Assistir trailer na ficha de origem. Controles ocultam durante a reprodução e reaparecem ao usar o controle remoto.",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "ETiiF",
+          "x": 0,
+          "y": 0,
+          "name": "Cena do trailer — Último trem",
+          "width": 1920,
+          "height": 1080,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "generated.png",
+            "mode": "cover"
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "Dr4aa",
+          "x": 0,
+          "y": 0,
+          "name": "Contraste dos controles",
+          "width": 1920,
+          "height": 1080,
+          "fill": {
+            "type": "gradient",
+            "gradientType": "linear",
+            "enabled": true,
+            "rotation": 180,
+            "size": {
+              "height": 1
+            },
+            "colors": [
+              {
+                "color": "#00000088",
+                "position": 0
+              },
+              {
+                "color": "#00000000",
+                "position": 0.22
+              },
+              {
+                "color": "#00000000",
+                "position": 0.5
+              },
+              {
+                "color": "#000000DD",
+                "position": 0.83
+              },
+              {
+                "color": "#000000",
+                "position": 1
+              }
+            ]
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "Neaas",
+          "x": 96,
+          "y": 64,
+          "name": "Voltar aos detalhes",
+          "fill": "$glass",
+          "cornerRadius": 999,
+          "gap": 14,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon",
+              "id": "LtjpF",
+              "name": "Fechar reprodução",
+              "width": 28,
+              "height": 28,
+              "icon": "arrow-left",
+              "library": "lucide",
+              "fill": "$text-primary"
+            },
+            {
+              "type": "text",
+              "id": "uBVpl",
+              "name": "Retornar à obra",
+              "fill": "$text-primary",
+              "content": "Voltar aos detalhes",
+              "fontFamily": "$font",
+              "fontSize": 27,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "G4VNYC",
+          "x": 96,
+          "y": 728,
+          "name": "Identificação do trailer",
+          "width": 1000,
+          "layout": "vertical",
+          "gap": 10,
+          "children": [
+            {
+              "type": "text",
+              "id": "y57vZ",
+              "name": "Obra em reprodução",
+              "fill": "$text-primary",
+              "content": "Último trem",
+              "fontFamily": "$font",
+              "fontSize": 56,
+              "fontWeight": "700",
+              "letterSpacing": -1
+            },
+            {
+              "type": "text",
+              "id": "CQU0k",
+              "name": "Tipo de vídeo",
+              "fill": "#FFFFFFCC",
+              "content": "Trailer oficial",
+              "fontFamily": "$font",
+              "fontSize": 27,
+              "fontWeight": "500"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "s1wmTL",
+          "x": 96,
+          "y": 870,
+          "name": "Progresso do trailer — 42 segundos de 2 minutos e 18",
+          "width": 1728,
+          "height": 8,
+          "fill": "#FFFFFF4D",
+          "cornerRadius": 4,
+          "layout": "none",
+          "children": [
+            {
+              "type": "frame",
+              "id": "HBgej",
+              "x": 0,
+              "y": 0,
+              "name": "Tempo reproduzido",
+              "width": 526,
+              "height": 8,
+              "fill": "$text-primary",
+              "cornerRadius": 4,
+              "layout": "none"
+            }
+          ]
+        },
+        {
+          "type": "ellipse",
+          "id": "F3XvU",
+          "x": 610,
+          "y": 862,
+          "name": "Posição atual na linha do tempo",
+          "fill": "$text-primary",
+          "width": 24,
+          "height": 24
+        },
+        {
+          "type": "frame",
+          "id": "cUqEN",
+          "x": 96,
+          "y": 922,
+          "name": "Controles de reprodução",
+          "width": 1728,
+          "height": 88,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "JOikT",
+              "name": "Tempo atual",
+              "fill": "#FFFFFFCC",
+              "content": "0:42",
+              "fontFamily": "$font",
+              "fontSize": 27,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "fb9sK",
+              "name": "Retroceder pausar e avançar",
+              "gap": 32,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "npeG0",
+                  "name": "Retroceder 10 segundos",
+                  "width": 116,
+                  "height": 88,
+                  "fill": "$glass",
+                  "cornerRadius": 20,
+                  "gap": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "qvfC6",
+                      "name": "Ícone Retroceder 10 segundos",
+                      "width": 32,
+                      "height": 32,
+                      "icon": "rotate-ccw",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "RN8jf",
+                      "name": "Intervalo Retroceder 10 segundos",
+                      "fill": "$text-primary",
+                      "content": "10 s",
+                      "fontFamily": "$font",
+                      "fontSize": 23,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "fN6Vh",
+                  "name": "Pausar trailer — foco do controle",
+                  "width": 88,
+                  "height": 88,
+                  "fill": "$text-primary",
+                  "cornerRadius": 999,
+                  "gap": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "B7hA4",
+                      "name": "Ícone Pausar trailer — foco do controle",
+                      "width": 32,
+                      "height": 32,
+                      "icon": "pause",
+                      "library": "lucide",
+                      "fill": "$bg"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hTHeo",
+                  "name": "Avançar 10 segundos",
+                  "width": 116,
+                  "height": 88,
+                  "fill": "$glass",
+                  "cornerRadius": 20,
+                  "gap": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "TXcPo",
+                      "name": "Ícone Avançar 10 segundos",
+                      "width": 32,
+                      "height": 32,
+                      "icon": "rotate-cw",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zJrVy",
+                      "name": "Intervalo Avançar 10 segundos",
+                      "fill": "$text-primary",
+                      "content": "10 s",
+                      "fontFamily": "$font",
+                      "fontSize": 23,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "QNKwZ",
+              "name": "Duração total",
+              "fill": "#FFFFFFCC",
+              "content": "2:18",
+              "fontFamily": "$font",
+              "fontSize": 27,
+              "fontWeight": "500"
             }
           ]
         }

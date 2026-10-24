@@ -113,6 +113,11 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch { inputs.followInputChanges() }
         lifecycleScope.launch { notifications.follow() }
         lifecycleScope.launch {
+            updates.load()
+            // Update Sources are checked about once a day while the Home runs, and whenever Updates opens.
+            updates.keepChecking()
+        }
+        lifecycleScope.launch {
             multitasking.load()
             // The Open App Limit holds while the Home is alive, whichever app is in front.
             multitasking.keepLimit()
@@ -160,7 +165,7 @@ class MainActivity : ComponentActivity() {
                 NotificationsBell(notificationsState) { notificationsOpen = true }
                 WeatherPill(weatherState) { screen = Screen.Weather }
                 MonitorPill(monitorState) { screen = Screen.Monitor }
-                UpdatesStatusButton(updatesState.patchOutdated, getString(R.string.updates)) { screen = Screen.Updates }
+                UpdatesStatusButton(updatesState.needsAttention, getString(R.string.updates)) { screen = Screen.Updates }
                 StatusIconButton(R.drawable.ic_settings, getString(R.string.settings)) { screen = Screen.Settings }
             }
             Box {
@@ -264,13 +269,18 @@ class MainActivity : ComponentActivity() {
                     },
                     onClose = multitasking::close,
                 )
-                Screen.Updates -> UpdatesScreen(
-                    state = updatesState,
-                    clock = homeState.statusClock,
-                    statusWidgets = statusWidgets,
-                    onCheckSystemUpdate = updates::checkSystemUpdate,
-                    onOpenPlayStoreApps = updates::openPlayStoreApps,
-                )
+                Screen.Updates -> {
+                    LaunchedEffect(Unit) { updates.checkSources() }
+                    UpdatesScreen(
+                        state = updatesState,
+                        clock = homeState.statusClock,
+                        statusWidgets = statusWidgets,
+                        onCheckSystemUpdate = updates::checkSystemUpdate,
+                        onOpenPlayStoreApps = updates::openPlayStoreApps,
+                        onSetSource = { pkg, input -> scope.launch { updates.setSource(pkg, input) } },
+                        onUpdate = { pkg -> scope.launch { updates.update(pkg) } },
+                    )
+                }
                 Screen.Monitor -> MonitorScreen(
                     state = monitorState,
                     clock = homeState.statusClock,

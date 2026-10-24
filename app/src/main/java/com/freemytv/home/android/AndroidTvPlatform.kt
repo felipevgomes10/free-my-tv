@@ -40,6 +40,8 @@ import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.updates.InstalledPackage
+import com.freemytv.home.updates.ReleaseAsset
+import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.upnext.UpNextEntry
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
@@ -61,6 +63,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     private val mediaSessions = MediaSessions(context)
     private val apkDropServer = ApkDropServer(java.io.File(context.cacheDir, "apkdrop"))
     private val apkInstaller = ApkInstaller(context)
+    private val gitHub = GitHubReleases(java.io.File(context.cacheDir, "updates"))
 
     override suspend fun installedApps(): List<InstalledApp> = withContext(Dispatchers.IO) {
         val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
@@ -428,6 +431,19 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         withContext(Dispatchers.IO) { java.io.File(path).delete() }
     }
 
+    override suspend fun latestRelease(repository: String): ReleaseLookup = gitHub.latest(repository)
+
+    override suspend fun download(asset: ReleaseAsset): String? = gitHub.download(asset)
+
+    override suspend fun loadUpdateSources(): Map<String, String> = withContext(Dispatchers.IO) {
+        val json = prefs.getString(UPDATE_SOURCES, null)?.let(::JSONObject) ?: return@withContext emptyMap()
+        json.keys().asSequence().associateWith { json.getString(it) }
+    }
+
+    override suspend fun saveUpdateSources(sources: Map<String, String>) = withContext(Dispatchers.IO) {
+        prefs.edit().putString(UPDATE_SOURCES, JSONObject(sources).toString()).apply()
+    }
+
     override suspend fun deleteArtwork(path: String) {
         withContext(Dispatchers.IO) { mediaSessions.deleteArtwork(path) }
     }
@@ -508,6 +524,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val SETUP_HISTORY = "setup_history"
         const val SETUP_ANNOUNCED = "setup_announced"
         const val UP_NEXT = "up_next"
+        const val UPDATE_SOURCES = "update_sources"
         /** The Stock Launcher and Google TV's setup app, whose recovery screen takes Home over without it. */
         val STOCK_HOME = listOf("com.google.android.apps.tv.launcherx", "com.google.android.tungsten.setupwraith")
         const val SEPARATOR = ","
