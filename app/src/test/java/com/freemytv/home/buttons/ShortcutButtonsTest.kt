@@ -66,6 +66,16 @@ class ShortcutButtonsTest {
     }
 
     @Test
+    fun `the remote's settings button opens the Android settings once`() = runTest {
+        val platform = FakeTvPlatform(apps = factoryApps)
+
+        val decisions = buttons(platform).press(scanCode = 561, keyCode = 83)
+
+        assertEquals(listOf(KeyDecision.Consume(ButtonTarget.AndroidSettings), KeyDecision.Consume(null)), decisions)
+        assertEquals(1, platform.androidSettingsOpened)
+    }
+
+    @Test
     fun `a button can be reassigned to another app, an Input or the App Switcher, and it persists`() = runTest {
         val platform = FakeTvPlatform(apps = factoryApps)
         val buttons = buttons(platform)
