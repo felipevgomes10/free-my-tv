@@ -45,27 +45,6 @@ class AppArtworkLoader(context: Context) {
         artwork.also { cache[packageName] = it }
     }
 
-    private val backdrops = ConcurrentHashMap<String, Bitmap>()
-
-    /**
-     * The app's banner blurred for the Top Shelf: shrunk to a few pixels, then grown back in
-     * steps with filtering, which smooths it into a soft blur. Computed once per app, never
-     * live (ADR 0004).
-     */
-    suspend fun backdrop(packageName: String): Bitmap? = backdrops[packageName] ?: run {
-        val art = load(packageName, TileArt.Banner) ?: return null
-        withContext(Dispatchers.Default) {
-            when (art) {
-                is AppArtwork.Banner -> {
-                    var blurred = Bitmap.createScaledBitmap(art.bitmap, BACKDROP_WIDTH, BACKDROP_HEIGHT, true)
-                    repeat(BACKDROP_STEPS) { blurred = Bitmap.createScaledBitmap(blurred, blurred.width * 2, blurred.height * 2, true) }
-                    blurred
-                }
-                is AppArtwork.IconOnColor -> Bitmap.createBitmap(BACKDROP_WIDTH, BACKDROP_HEIGHT, Bitmap.Config.ARGB_8888).apply { eraseColor(art.color) }
-            }
-        }.also { backdrops[packageName] = it }
-    }
-
     private val icons = ConcurrentHashMap<String, Bitmap>()
 
     fun cachedIcon(packageName: String): Bitmap? = icons[packageName]
@@ -80,8 +59,5 @@ class AppArtworkLoader(context: Context) {
         const val BANNER_WIDTH = 320
         const val BANNER_HEIGHT = 180
         const val ICON_SIZE = 96
-        const val BACKDROP_WIDTH = 24
-        const val BACKDROP_HEIGHT = 14
-        const val BACKDROP_STEPS = 3
     }
 }

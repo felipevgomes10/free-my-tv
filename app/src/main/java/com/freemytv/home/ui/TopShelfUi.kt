@@ -2,8 +2,12 @@ package com.freemytv.home.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.animateFloatAsState
+import android.graphics.Canvas
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Shader
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,10 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -33,35 +34,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Text
 import com.freemytv.home.R
-import com.freemytv.home.android.AppArtworkLoader
 import com.freemytv.home.topshelf.TopShelfState
 import com.freemytv.home.ui.theme.Tokens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/** The Top Shelf's picture, behind the top of the Home; it dims when focus moves to the lower Trays. */
+/**
+ * The Top Shelf's picture, behind the top of the Home, shown only for something the owner
+ * watched. It is baked once per picture, darkened and faded, so a frame draws one image
+ * (ADR 0004); moving down to the lower Trays covers it with black instead of fading a layer.
+ */
 @Composable
-fun TopShelfBackdrop(state: TopShelfState, artwork: AppArtworkLoader, lowered: Boolean, modifier: Modifier = Modifier) {
-    val app = state.app ?: return
-    val alpha by animateFloatAsState(if (lowered) LOWERED_ALPHA else 1f, label = "top shelf")
+fun TopShelfBackdrop(state: TopShelfState, lowered: Boolean, modifier: Modifier = Modifier) {
     val path = state.current?.artwork
-    val picture by produceState<Bitmap?>(null, app.packageName, path) {
-        value = path?.let { decodeBackdrop(it) } ?: artwork.backdrop(app.packageName)
-    }
-    Box(modifier.alpha(alpha)) {
-        Crossfade(picture, label = "top shelf picture") { bitmap ->
-            bitmap?.let {
-                Image(
-                    it.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    filterQuality = FilterQuality.Medium,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-        }
-        Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(0f to Color(0xB3000000), 0.6f to Color.Transparent)))
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.45f to Color.Transparent, 1f to Tokens.Background)))
+    val picture by produceState<Bitmap?>(null, path) { value = path?.let { bakeBackdrop(it) } }
+    val cover by animateColorAsState(if (lowered) Color(0xD9000000) else Color.Transparent, label = "top shelf")
+    val bitmap = picture ?: return
+    Box(modifier) {
+        Image(bitmap.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize())
+        Box(Modifier.fillMaxSize().background(cover))
     }
 }
 
@@ -69,11 +60,12 @@ fun TopShelfBackdrop(state: TopShelfState, artwork: AppArtworkLoader, lowered: B
 @Composable
 fun TopShelfText(state: TopShelfState, modifier: Modifier = Modifier) {
     val app = state.app ?: return
-    val entry = state.current
+    // Nothing watched in this app: the top of the Home stays dark and quiet.
+    val entry = state.current ?: return
     Column(modifier.width(440.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        if (entry != null) Text(app.label, color = Tokens.TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+        Text(app.label, color = Tokens.TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
         Text(
-            entry?.title ?: if (entry != null) stringResource(R.string.up_next_app, app.label) else app.label,
+            entry.title ?: stringResource(R.string.up_next_app, app.label),
             color = Tokens.TextPrimary,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
@@ -81,7 +73,7 @@ fun TopShelfText(state: TopShelfState, modifier: Modifier = Modifier) {
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        entry?.let { upNextDetail(it) }?.let { Text(it, color = Color(0xD9FFFFFF), fontSize = 12.sp, maxLines = 2) }
+        upNextDetail(entry)?.let { Text(it, color = Color(0xD9FFFFFF), fontSize = 12.sp, maxLines = 2) }
         if (state.entries.size > 1) {
             Row(Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 state.entries.indices.forEach { i ->
@@ -97,16 +89,38 @@ fun TopShelfText(state: TopShelfState, modifier: Modifier = Modifier) {
     }
 }
 
-/** Decoded at 1080p at most (ADR 0004), and smaller when the stored artwork allows. */
-private suspend fun decodeBackdrop(path: String): Bitmap? = withContext(Dispatchers.IO) {
+/**
+ * The stored artwork cropped to the Top Shelf's shape and baked with what keeps the UI
+ * readable on top of it: an overall dim, shade behind the Status Bar and the title, and a
+ * fade to black before the App Tray.
+ */
+private suspend fun bakeBackdrop(path: String): Bitmap? = withContext(Dispatchers.Default) {
     runCatching {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(path, bounds)
         var sample = 1
         while (bounds.outWidth / (sample * 2) >= BACKDROP_WIDTH) sample *= 2
-        BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = sample })
+        val source = BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = sample }) ?: return@runCatching null
+        val baked = Bitmap.createBitmap(BACKDROP_WIDTH, BACKDROP_HEIGHT, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(baked)
+        // Crop to the backdrop's shape around the middle of the picture.
+        val scale = maxOf(BACKDROP_WIDTH.toFloat() / source.width, BACKDROP_HEIGHT.toFloat() / source.height)
+        val cropWidth = (BACKDROP_WIDTH / scale).toInt()
+        val cropHeight = (BACKDROP_HEIGHT / scale).toInt()
+        val left = (source.width - cropWidth) / 2
+        val top = (source.height - cropHeight) / 2
+        canvas.drawBitmap(source, Rect(left, top, left + cropWidth, top + cropHeight), Rect(0, 0, BACKDROP_WIDTH, BACKDROP_HEIGHT), Paint(Paint.FILTER_BITMAP_FLAG))
+        source.recycle()
+        val w = BACKDROP_WIDTH.toFloat()
+        val h = BACKDROP_HEIGHT.toFloat()
+        canvas.drawColor(0x4D000000)
+        canvas.drawRect(0f, 0f, w, h, Paint().apply { shader = LinearGradient(0f, 0f, w * 0.65f, 0f, 0xD9000000.toInt(), 0, Shader.TileMode.CLAMP) })
+        canvas.drawRect(0f, 0f, w, h, Paint().apply { shader = LinearGradient(0f, 0f, 0f, h * 0.35f, 0xB3000000.toInt(), 0, Shader.TileMode.CLAMP) })
+        canvas.drawRect(0f, 0f, w, h, Paint().apply { shader = LinearGradient(0f, h * 0.45f, 0f, h, 0, 0xFF000000.toInt(), Shader.TileMode.CLAMP) })
+        baked
     }.getOrNull()
 }
 
+// The Top Shelf's shape (960 × 300 dp), at two thirds of the 1080p panel's pixels.
 private const val BACKDROP_WIDTH = 1280
-private const val LOWERED_ALPHA = 0.2f
+private const val BACKDROP_HEIGHT = 400

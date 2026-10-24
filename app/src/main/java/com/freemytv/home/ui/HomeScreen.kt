@@ -90,7 +90,7 @@ fun HomeScreen(
             .background(Tokens.Background)
             .background(Brush.verticalGradient(0f to Color(0xFF14161C), 0.6f to Tokens.Background)),
     ) {
-        TopShelfBackdrop(topShelf, artwork, lowered, Modifier.fillMaxWidth().height(TOP_SHELF_HEIGHT))
+        TopShelfBackdrop(topShelf, lowered, Modifier.fillMaxWidth().height(TOP_SHELF_HEIGHT))
         // Laid out at full height and clipped by the screen: trays below the fold peek in, nothing scrolls.
         Column(Modifier.fillMaxSize().wrapContentHeight(Alignment.Top, unbounded = true)) {
             StatusBar(state.statusClock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
@@ -271,7 +271,7 @@ private fun GridGlyph() {
     }
 }
 
-private val TOP_SHELF_HEIGHT = 400.dp
+private val TOP_SHELF_HEIGHT = 300.dp
 private val TILE_WIDTH = 124.dp
 private val TILE_HEIGHT = 75.dp
 private const val FOCUSED_SCALE = 1.11f
