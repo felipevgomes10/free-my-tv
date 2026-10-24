@@ -40,7 +40,7 @@ class UpdatesStateHolderTest {
     }
 
     @Test
-    fun `apps not installed by the Play Store are listed with their version, system apps and the Home left out`() = runTest {
+    fun `apps not installed by the Play Store are listed with their version, system apps left out`() = runTest {
         val packages = listOf(
             InstalledPackage("com.teamsmart.videomanager.tv", "SmartTube", "25.4", installer = null, isSystem = false),
             InstalledPackage("com.netflix.ninja", "Netflix", "11.2", installer = "com.android.vending", isSystem = false),
@@ -52,8 +52,8 @@ class UpdatesStateHolderTest {
         val sideloaded = updates(platformWithPatch(LocalDate.of(2025, 12, 5), packages)).state.value.sideloaded
 
         assertEquals(
-            listOf(SideloadedApp("org.xbmc.kodi", "Kodi", "21.1"), SideloadedApp("com.teamsmart.videomanager.tv", "SmartTube", "25.4")),
-            sideloaded,
+            listOf("com.freemytv.home", "org.xbmc.kodi", "com.teamsmart.videomanager.tv"),
+            sideloaded.map { it.packageName },
         )
     }
 

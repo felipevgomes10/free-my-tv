@@ -12,8 +12,9 @@ android {
         applicationId = "com.freemytv.home"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        // Bumped by scripts/release.sh, which publishes the release the Home updates itself from.
+        versionCode = providers.gradleProperty("homeVersionCode").get().toInt()
+        versionName = providers.gradleProperty("homeVersionName").get()
         resourceConfigurations += listOf("pt-rBR")
     }
 

@@ -9,8 +9,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] The Home appears in "Apps instalados por APK" with its version and fixed source
-- [ ] The release script publishes a release whose APK installs over the running Home
-- [ ] On the emulator, a published newer release updates the Home; the first time asks, the second doesn't
-- [ ] After the update the Home is back in front as HOME
-- [ ] Tests cover the Home's fixed source and that a self-update requests the no-action install
+- [x] The Home appears in "Apps instalados por APK" with its version and fixed source
+- [ ] The release script publishes a release whose APK installs over the running Home (dry run checked; the first real release is in 08, as it pushes to GitHub)
+- [x] On the emulator, a published newer release updates the Home; the first time asks, the second doesn't
+- [x] After the update the Home is back in front as HOME
+- [x] Tests cover the Home's fixed source and that a self-update requests the no-action install

@@ -24,6 +24,11 @@ if [[ "$serial" != emulator-* ]] || [[ "$(adb -s "$serial" shell getprop ro.kern
   exit 1
 fi
 
+if [[ -z "${JAVA_HOME:-}" ]] && command -v brew >/dev/null && [[ -d "$(brew --prefix openjdk@17 2>/dev/null)" ]]; then
+  export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
+fi
+
 ./gradlew --quiet :app:assembleDebug
-adb -s "$serial" install -r app/build/outputs/apk/debug/app-debug.apk
+# -d: an emulator that tried a self-update may hold a higher version than this checkout.
+adb -s "$serial" install -r -d app/build/outputs/apk/debug/app-debug.apk
 echo "Installed on $serial."

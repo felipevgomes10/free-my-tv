@@ -139,6 +139,35 @@ class UpdateSourcesTest {
     }
 
     @Test
+    fun `the Home updates itself from this project's releases, without asking after the first time`() = runTest {
+        platform.packages = platform.packages + InstalledPackage(HOME, "Free My TV", "0.1.0", installer = null, isSystem = false)
+        platform.releases = mapOf(HOME_REPO to ReleaseLookup.Found(release("v0.2.0", "free-my-tv-0.2.0-tv.apk")))
+        val updates = updates()
+
+        updates.checkSources()
+        val home = updates.state.value.sideloaded.first { it.packageName == HOME }
+        assertEquals(HOME_REPO, home.source)
+        assertTrue(home.fixedSource)
+        assertEquals("0.2.0", home.update?.version)
+
+        updates.update(HOME)
+
+        assertEquals(listOf("/cache/updates/free-my-tv-0.2.0-tv.apk" to true), platform.installed)
+    }
+
+    @Test
+    fun `the Home's Update Source can't be changed or removed`() = runTest {
+        platform.packages = platform.packages + InstalledPackage(HOME, "Free My TV", "0.1.0", installer = null, isSystem = false)
+        val updates = updates()
+
+        updates.setSource(HOME, "someone/else")
+        updates.setSource(HOME, "")
+
+        assertEquals(HOME_REPO, updates.state.value.sideloaded.first { it.packageName == HOME }.source)
+        assertEquals(emptyMap<String, String>(), platform.updateSources)
+    }
+
+    @Test
     fun `versions compare by their numbers`() {
         assertTrue(isNewer("v25.6", "25.4"))
         assertTrue(isNewer("1.10", "1.9"))
@@ -171,5 +200,7 @@ class UpdateSourcesTest {
     private companion object {
         const val SMARTTUBE = "com.teamsmart.videomanager.tv"
         const val REPO = "yuliskov/SmartTube"
+        const val HOME = "com.freemytv.home"
+        const val HOME_REPO = "felipevgomes10/free-my-tv"
     }
 }
