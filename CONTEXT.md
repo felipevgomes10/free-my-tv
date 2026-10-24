@@ -21,6 +21,26 @@ The strip at the top of the Home showing time, connectivity and notifications.
 The large area at the top of the Home that shows content from the app currently focused in the App Tray, as on Apple TV: what the owner last watched in that app; it stays dark when there is nothing.
 _Avoid_: Hero, banner, featured
 
+**Home Navigation**:
+The row under the Status Bar that moves between the Home's sections: Início, Explorar and Todos os apps.
+_Avoid_: Tabs, menu, top bar
+
+**Explorar**:
+The section for discovering movies and series, from TMDB's trending titles of the day or the week; it only informs and points to where to watch, never plays a title itself.
+_Avoid_: Discover, browse, catalog, store
+
+**Title** (Obra):
+A movie or a series as Explorar shows it, with its details, trailer and where to watch it.
+_Avoid_: Content, item, show, media
+
+**Where to Watch** (Onde assistir):
+The streaming services that offer a Title in Brazil, each opening its app on the TV: included in a subscription, or to rent or buy.
+_Avoid_: Providers, sources, offers
+
+**Trailer**:
+A Title's video preview, played inside the Home with the Home's own controls.
+_Avoid_: Preview, clip, teaser
+
 **Settings** (Configurações):
 The Home's own settings screen (Widgets, Cast, Setup status, About); distinct from Android Settings, which it only links to.
 _Avoid_: Preferences, options

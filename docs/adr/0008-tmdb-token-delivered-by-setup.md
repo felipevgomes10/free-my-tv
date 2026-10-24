@@ -1,0 +1,5 @@
+# The TMDB token reaches the TV through Setup, never through the repository or the APK
+
+Explorar reads titles from TMDB with the owner's read access token. This repository is public and so are the Home's releases on GitHub (the Home updates itself from them), so a token in the code, in a build config or baked into the APK could be pulled out by anyone. The token instead lives in a file on the owner's Mac that Git ignores, and Setup hands it to the Home over ADB: a broadcast to a receiver that only a sender holding `WRITE_SECURE_SETTINGS` may reach, which on this TV means the ADB shell (and the Home itself, which Setup granted it to). The Home keeps it in its private storage.
+
+Setup never prints the token or writes it to its journal; the step shows it redacted, and Restore's inverse tells the Home to forget it. Without a token Explorar says so and points at Setup, like the other parts of Setup do in Preparação. Only the read access token is used (sent as a bearer header, never in a URL); the v3 API key isn't needed.
