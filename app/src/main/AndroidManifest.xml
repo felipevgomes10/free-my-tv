@@ -10,6 +10,8 @@
 
     <!-- APK Drop shows the TV's address on the home network. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Weather screensaver delay; Setup grants the WRITE_SETTINGS app-op. -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions" />
 
     <!-- System Monitor. Usage access and DUMP are granted by Setup over ADB; without them the per-app rankings say so. -->
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
@@ -87,6 +89,15 @@
         </receiver>
 
         <!-- Puts the Home back in front after it updates itself. -->
+        <receiver android:name=".android.ScreensaverSetupReceiver" android:exported="true" android:permission="android.permission.WRITE_SECURE_SETTINGS">
+            <intent-filter>
+                <action android:name="com.freemytv.home.action.APPLY_SCREENSAVER" />
+                <action android:name="com.freemytv.home.action.RESET_SCREENSAVER" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".android.WeatherDreamService" android:exported="true" android:label="@string.section_screensaver" android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter><action android:name="android.service.dreams.DreamService" /></intent-filter>
+        </service>
         <receiver
             android:name=".android.SelfUpdateReceiver"
             android:exported="false">

@@ -60,6 +60,7 @@ fun WeatherScreen(
     onToggleSound: () -> Unit,
     active: Boolean,
     statusWidgets: @Composable () -> Unit,
+    showSoundControl: Boolean = true,
 ) {
     val pill = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { pill.requestFocus() } }
@@ -88,7 +89,7 @@ fun WeatherScreen(
                         Now(report, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
                         NextDays(report.days, Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
                         NextHours(report.hours, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
-                        if (atmosphere != null) PillButton(
+                        if (atmosphere != null && showSoundControl) PillButton(
                             label = stringResource(if (soundMuted) R.string.weather_unmute else R.string.weather_mute),
                             icon = if (soundMuted) R.drawable.ic_volume_off else R.drawable.ic_volume_on,
                             onClick = onToggleSound,

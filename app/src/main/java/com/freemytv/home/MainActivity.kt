@@ -80,6 +80,9 @@ import com.freemytv.home.weather.WeatherWidget
 import com.freemytv.home.widgets.WidgetSettings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.awaitCancellation
 
 class MainActivity : ComponentActivity() {
 
@@ -153,9 +156,14 @@ class MainActivity : ComponentActivity() {
             widgetSettings.load()
             // Widgets only work while the Home is visible; a TV app in front never pays for them.
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { topShelf.run() }
-                launch { weather.follow() }
-                launch { monitor.follow() }
+                app.screensaverActive.collectLatest { dreaming ->
+                    if (!dreaming) coroutineScope {
+                        launch { topShelf.run() }
+                        launch { weather.follow() }
+                        launch { monitor.follow() }
+                        awaitCancellation()
+                    }
+                }
             }
         }
         lifecycleScope.launch {
@@ -184,6 +192,7 @@ class MainActivity : ComponentActivity() {
             val inputState by inputs.state.collectAsStateWithLifecycle()
             val weatherState by weather.state.collectAsStateWithLifecycle()
             val widgetPreferences by widgetSettings.preferences.collectAsStateWithLifecycle()
+            val screensaverActive by app.screensaverActive.collectAsStateWithLifecycle()
             val monitorState by monitor.state.collectAsStateWithLifecycle()
             val updatesState by updates.state.collectAsStateWithLifecycle()
             val notificationsState by notifications.state.collectAsStateWithLifecycle()
@@ -319,7 +328,7 @@ class MainActivity : ComponentActivity() {
                             clock = homeState.statusClock,
                             soundMuted = widgetPreferences.weatherSoundMuted,
                             onToggleSound = { scope.launch { widgetSettings.setWeatherSoundMuted(!widgetPreferences.weatherSoundMuted) } },
-                            active = screen == Screen.Weather,
+                            active = screen == Screen.Weather && !screensaverActive,
                             statusWidgets = statusWidgets,
                         )
                         Screen.Settings -> {
@@ -340,6 +349,8 @@ class MainActivity : ComponentActivity() {
                                 clock = homeState.statusClock,
                                 statusWidgets = statusWidgets,
                                 actions = SettingsActions(
+                                    onScreensaverEnabled = { scope.launch { settings.setScreensaverEnabled(it) } },
+                                    onScreensaverMinutes = { scope.launch { settings.setScreensaverMinutes(it) } },
                                     onWeatherVisible = { scope.launch { settings.setWeatherVisible(it) } },
                                     onMonitorVisible = { scope.launch { settings.setMonitorVisible(it) } },
                                     onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },

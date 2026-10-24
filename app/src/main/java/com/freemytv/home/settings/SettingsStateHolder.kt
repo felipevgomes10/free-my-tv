@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
+import com.freemytv.home.screensaver.ScreensaverSettings
+import com.freemytv.home.screensaver.ScreensaverState
 
 /** The packages behind each kind of Cast on the owner's TV (ADR 0002). */
 enum class CastReceiver(val packages: List<String>) {
@@ -38,6 +40,7 @@ data class SettingsState(
     val tvName: String? = null,
     val cast: List<CastReceiverStatus> = emptyList(),
     val device: DeviceInfo? = null,
+    val screensaver: ScreensaverState = ScreensaverState(),
 )
 
 class SettingsStateHolder(
@@ -47,11 +50,13 @@ class SettingsStateHolder(
 ) {
 
     private val system = MutableStateFlow(SettingsState())
+    private val screensaver = ScreensaverSettings(platform)
 
-    val state: StateFlow<SettingsState> = combine(system, widgetSettings.preferences) { system, widgets -> system.copy(widgets = widgets) }
+    val state: StateFlow<SettingsState> = combine(system, widgetSettings.preferences, screensaver.state) { system, widgets, saver -> system.copy(widgets = widgets, screensaver = saver) }
         .stateIn(scope, SharingStarted.Eagerly, SettingsState())
 
     suspend fun load() {
+        screensaver.load()
         system.value = SettingsState(
             tvName = platform.tvName(),
             cast = CastReceiver.entries.map { CastReceiverStatus(it, stateOf(it)) },
@@ -62,6 +67,9 @@ class SettingsStateHolder(
     suspend fun setWeatherVisible(visible: Boolean) = widgetSettings.setWeatherVisible(visible)
 
     suspend fun setMonitorVisible(visible: Boolean) = widgetSettings.setMonitorVisible(visible)
+
+    suspend fun setScreensaverEnabled(enabled: Boolean) = screensaver.setEnabled(enabled)
+    suspend fun setScreensaverMinutes(minutes: Int) = screensaver.setMinutes(minutes)
 
     /** A blank city means "Automático". */
     suspend fun setWeatherCity(city: String?) = widgetSettings.setWeatherCity(city)

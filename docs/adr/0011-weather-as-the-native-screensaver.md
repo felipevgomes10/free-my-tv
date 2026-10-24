@@ -1,0 +1,7 @@
+# Weather runs as Android's native screensaver
+
+The owner wants the weather screen after 2, 5 or 10 idle minutes across all TV apps, without interrupting playback. It is a `DreamService`, so Android owns inactivity, apps' keep-screen-on requests and returning to the previous app on a key; observing media sessions also prevents or ends the dream when playback begins. A Home-only timer or bringing a Home activity over another app was rejected because it cannot reliably respect other apps' screen-on policy or return to their exact state.
+
+This changes ADR 0003's earlier choice to leave the Google screensaver selected. Setup now selects the Home's dream, disables automatic dreaming until the owner opts in, and grants the settings app-op needed for the chosen delay; it keeps the Google dream package installed and enabled. Original dream selection, enabled state and power timers are backed up both in Setup's journal and in secure settings. Restore disables the Home's preference and recovers those values, including any timers subsequently changed by the Home; rerunning Setup never replaces the original backups with the owner's newer choices.
+
+The developer stay-awake override is cleared only while Weather is enabled, otherwise it prevents native inactivity entirely; disabling Weather or running Restore recovers the original override. A native dream may cover a still-resumed Home activity, so the Home suspends its own widgets and weather player until the dream ends, avoiding duplicate decoders and sound.

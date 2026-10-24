@@ -10,6 +10,8 @@ coroutines = "1.9.0"
 palette = "1.0.0"
 junit = "4.13.2"
 zxing = "3.5.3"
+# Matches the project's compileSdk 35 / AndroidX baseline.
+media3 = "1.5.1"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -28,6 +30,7 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 junit = { module = "junit:junit", version.ref = "junit" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

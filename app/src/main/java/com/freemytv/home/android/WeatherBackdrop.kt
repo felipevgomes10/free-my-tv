@@ -6,14 +6,23 @@ import android.graphics.SurfaceTexture
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import com.freemytv.home.weather.WeatherAtmosphere
 import kotlin.math.max
 
 /** One native decoder, sized at 720p, only while Weather is in front. No media session or network. */
+@androidx.annotation.OptIn(UnstableApi::class)
 class WeatherBackdrop(context: Context, private val atmosphere: WeatherAtmosphere) : TextureView(context), TextureView.SurfaceTextureListener {
     private val audio = context.getSystemService(AudioManager::class.java)
     private val attributes = AudioAttributes.Builder()
@@ -30,7 +39,7 @@ class WeatherBackdrop(context: Context, private val atmosphere: WeatherAtmospher
         .build()
     private var requestedFocus = false
     private var hasFocus = false
-    private var player: MediaPlayer? = null
+    private var player: ExoPlayer? = null
     private var surface: Surface? = null
     private var prepared = false
     private var active = false
@@ -38,6 +47,7 @@ class WeatherBackdrop(context: Context, private val atmosphere: WeatherAtmospher
     private var failed = false
     private var videoWidth = 1280
     private var videoHeight = 720
+    private val loopProbe = WeatherLoopProbe()
 
     init {
         isOpaque = false
@@ -62,38 +72,60 @@ class WeatherBackdrop(context: Context, private val atmosphere: WeatherAtmospher
 
     private fun prepare() {
         val texture = surfaceTexture ?: return
-        val next = MediaPlayer()
-        player = next
-        surface = Surface(texture)
         try {
-            next.setAudioAttributes(attributes)
-            next.setVolume(0f, 0f)
-            next.setSurface(surface)
-            context.assets.openFd(atmosphere.asset).use { next.setDataSource(it.fileDescriptor, it.startOffset, it.length) }
-            next.isLooping = true
-            next.setOnVideoSizeChangedListener { _, width, height ->
-                videoWidth = width
-                videoHeight = height
-                crop()
-            }
-            next.setOnInfoListener { _, what, _ ->
-                if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) alpha = 1f
-                false
-            }
-            next.setOnPreparedListener {
-                if (player === it && active) {
-                    prepared = true
-                    it.start()
+            // Prebuffer the next repetition and preserve the decoder/audio sink across it.
+            // The default video buffer is far too large for this 2 GB TV (ADR 0004).
+            val buffers = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(1_000, 10_000, 100, 250)
+                .setTargetBufferBytes(4 * 1024 * 1024)
+                .setPrioritizeTimeOverSizeThresholds(false)
+                .build()
+            // Android 12's asynchronous c2 AAC adapter can fail after a few repetitions. Keep
+            // native decoding, with synchronous queueing for the TV/emulator's older codec stack.
+            val renderers = DefaultRenderersFactory(context).forceDisableMediaCodecAsynchronousQueueing()
+            val next = ExoPlayer.Builder(context, renderers).setLoadControl(buffers).build()
+            player = next
+            surface = Surface(texture)
+            next.setAudioAttributes(androidx.media3.common.AudioAttributes.Builder()
+                .setUsage(androidx.media3.common.C.USAGE_MEDIA)
+                .setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_SONIFICATION)
+                .build(), false) // Keep the existing mute/focus policy; don't request focus twice.
+            next.volume = 0f
+            next.setVideoSurface(surface)
+            next.repeatMode = Player.REPEAT_MODE_ONE
+            next.addListener(object : Player.Listener {
+                override fun onVideoSizeChanged(size: VideoSize) {
+                    videoWidth = size.width
+                    videoHeight = size.height
+                    crop()
+                }
+
+                override fun onRenderedFirstFrame() {
+                    if (active && player === next) alpha = 1f
+                }
+
+                override fun onPlaybackStateChanged(state: Int) {
+                    if (player !== next) return
+                    prepared = state == Player.STATE_READY
                     updateSound()
                 }
-            }
-            next.setOnErrorListener { _, what, extra ->
-                Log.w(TAG, "Weather footage unavailable ($what/$extra): ${atmosphere.file}")
-                failed = true
-                releasePlayback()
-                true
-            }
-            next.prepareAsync()
+
+                override fun onPlayerError(error: PlaybackException) {
+                    if (player !== next) return
+                    Log.w(TAG, "Weather footage unavailable: ${atmosphere.file}", error)
+                    failed = true
+                    releasePlayback()
+                }
+            })
+            if (WeatherLoopProbe.ENABLED) next.addAnalyticsListener(object : AnalyticsListener {
+                override fun onVideoDecoderInitialized(eventTime: AnalyticsListener.EventTime, decoderName: String, initializedTimestampMs: Long, initializationDurationMs: Long) = loopProbe.decoder("video")
+                override fun onAudioDecoderInitialized(eventTime: AnalyticsListener.EventTime, decoderName: String, initializedTimestampMs: Long, initializationDurationMs: Long) = loopProbe.decoder("audio")
+                override fun onAudioUnderrun(eventTime: AnalyticsListener.EventTime, bufferSize: Int, bufferSizeMs: Long, elapsedSinceLastFeedMs: Long) = loopProbe.audioUnderrun()
+                override fun onAudioPositionAdvancing(eventTime: AnalyticsListener.EventTime, playoutStartSystemTimeMs: Long) = loopProbe.audioOutputStarted()
+            })
+            next.setMediaItem(MediaItem.fromUri("asset:///${atmosphere.asset}"))
+            next.playWhenReady = true
+            next.prepare()
         } catch (error: Exception) {
             Log.w(TAG, "Weather footage unavailable: ${atmosphere.file}", error)
             failed = true
@@ -113,7 +145,7 @@ class WeatherBackdrop(context: Context, private val atmosphere: WeatherAtmospher
 
     private fun applyVolume() {
         val level = if (active && !muted && hasFocus) 0.45f else 0f
-        player?.setVolume(level, level)
+        player?.volume = level
     }
 
     private fun abandonFocus() {
@@ -125,14 +157,10 @@ class WeatherBackdrop(context: Context, private val atmosphere: WeatherAtmospher
     fun releasePlayback() {
         abandonFocus()
         prepared = false
-        player?.apply {
-            setOnPreparedListener(null)
-            setOnErrorListener(null)
-            setOnInfoListener(null)
-            setOnVideoSizeChangedListener(null)
-            release()
-        }
+        val previous = player
         player = null
+        previous?.release()
+        loopProbe.reset()
         surface?.release()
         surface = null
         alpha = 0f
@@ -153,7 +181,9 @@ class WeatherBackdrop(context: Context, private val atmosphere: WeatherAtmospher
     }
 
     override fun onSurfaceTextureSizeChanged(texture: SurfaceTexture, width: Int, height: Int) = crop()
-    override fun onSurfaceTextureUpdated(texture: SurfaceTexture) = Unit
+    override fun onSurfaceTextureUpdated(texture: SurfaceTexture) {
+        if (WeatherLoopProbe.ENABLED && prepared) loopProbe.frame(player?.currentPosition ?: 0L)
+    }
     override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
         releasePlayback()
         return true // TextureView releases its texture; the decoder's Surface is released above.

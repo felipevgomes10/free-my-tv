@@ -224,4 +224,10 @@
     </plurals>
     <string name="weather_mute">Silenciar ambiente</string>
     <string name="weather_unmute">Ativar som ambiente</string>
+    <string name="section_screensaver">Descanso de tela</string>
+    <string name="screensaver_use_weather">Usar tela de clima como descanso de tela</string>
+    <string name="screensaver_after">Mostra tela de clima após</string>
+    <string name="screensaver_minutes">%1$d minutos</string>
+    <string name="screensaver_note">Pressione OK para escolher 2, 5 ou 10 minutos. Qualquer tecla encerra o descanso. A reprodução dos apps é respeitada.</string>
+    <string name="screensaver_setup_needed">Execute o Setup no computador para preparar o descanso de tela.</string>
 </resources>

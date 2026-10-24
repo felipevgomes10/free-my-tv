@@ -32,6 +32,7 @@ enum class SetupCheck(
 
     /** Explorar's TMDB token, handed over by Setup (ADR 0008). */
     Explorar(announcedWhenLost = false),
+    Screensaver,
 }
 
 data class SetupState(

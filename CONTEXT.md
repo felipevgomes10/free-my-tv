@@ -108,6 +108,10 @@ _Avoid_: Logo, thumbnail
 
 ### Upkeep
 
+**Screensaver** (Descanso de tela):
+The weather screen shown after the TV is idle for the owner's chosen 2, 5 or 10 minutes, across the TV's apps, while leaving playback alone. Any remote key ends it and returns to the app beneath.
+_Avoid_: Sleep timer, screen timeout, wallpaper
+
 **Updates** (Atualizações):
 The screen gathering everything that keeps the TV current: the system security patch, Play Store app updates, and apps installed from an APK.
 

@@ -58,6 +58,7 @@ import java.util.Locale
 /** The sections of Settings, in the order the owner sees them. */
 enum class SettingsSection(val title: Int, val icon: Int) {
     Widgets(R.string.section_widgets, R.drawable.ic_widgets),
+    Screensaver(R.string.section_screensaver, R.drawable.ic_screensaver),
     OpenApps(R.string.section_open_apps, R.drawable.ic_apps),
     Buttons(R.string.section_buttons, R.drawable.ic_settings_remote),
     Cast(R.string.section_cast, R.drawable.ic_cast),
@@ -73,6 +74,8 @@ class SettingsActions(
     val onOpenAndroidSettings: () -> Unit,
     val onOpenAppLimit: (Int) -> Unit,
     val onAssignButton: (ShortcutButton, ButtonTarget?) -> Unit,
+    val onScreensaverEnabled: (Boolean) -> Unit,
+    val onScreensaverMinutes: (Int) -> Unit,
 )
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -131,6 +134,20 @@ fun SettingsScreen(
                 Column(Modifier.weight(1f).padding(top = 48.dp).then(group).then(panelExit)) {
                     when (section) {
                         SettingsSection.Widgets -> WidgetsPanel(state, actions)
+                        SettingsSection.Screensaver -> {
+                            val saver = state.screensaver
+                            ToggleRow(stringResource(R.string.screensaver_use_weather), null, saver.preferences.enabled) {
+                                actions.onScreensaverEnabled(!saver.preferences.enabled)
+                            }
+                            if (saver.preferences.enabled) {
+                                ValueRow(stringResource(R.string.screensaver_after), null, stringResource(R.string.screensaver_minutes, saver.preferences.afterMinutes)) {
+                                    val values = com.freemytv.home.screensaver.ScreensaverPreferences.MINUTES
+                                    actions.onScreensaverMinutes(values[(values.indexOf(saver.preferences.afterMinutes) + 1) % values.size])
+                                }
+                                Note(stringResource(R.string.screensaver_note))
+                                if (!saver.ready) Note(stringResource(R.string.screensaver_setup_needed))
+                            }
+                        }
                         SettingsSection.OpenApps -> {
                             ValueRow(stringResource(R.string.open_app_limit), stringResource(R.string.open_app_limit_detail), stringResource(R.string.open_app_limit_value, openAppLimit)) {
                                 actions.onOpenAppLimit(if (openAppLimit >= OpenAppLimit.RANGE.last) OpenAppLimit.RANGE.first else openAppLimit + 1)

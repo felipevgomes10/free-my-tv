@@ -63,7 +63,12 @@ original audio is discarded. The catalog and filter parameters live in `config/w
 
 - Ten 7-second H.264 Baseline 3.1, 1280×720, 24 fps loops with mono AAC sound, about **11.6 MiB total**.
 - The preparation script cross-fades the last second into the first for both picture and noise.
-- One native `MediaPlayer` with a non-focusable `TextureView`, filling the screen with center crop.
+- One Media3 ExoPlayer with native decoders and a non-focusable `TextureView`, filling the screen
+  with center crop. Repeat mode prebuffers the next repetition without reopening the decoders or
+  the audio output. AAC encoder delay/padding is trimmed for gapless sound. Compressed buffering
+  is capped at 4 MiB, rather than the library's default video buffer (ADR 0004).
+  Codec queueing is synchronous: the Android 12 emulator's asynchronous AAC adapter failed after
+  repeated loops in extended testing. This still uses native decoding, with one video decoder.
   No WebView, live blur, media session, image cache or dependency on a remote media host.
 - A uniform 62% black overlay limits even white video frames to 38% white. Weather's secondary
   text is 85% white, providing over 5:1 contrast against that worst case; top/bottom scrims add shade.
@@ -96,3 +101,25 @@ adb -s emulator-5554 shell am start -S \
 
 Try 0 (day and night), 2 (day and night), 3, 45, 51, 61, 71 and 97. Preview is absent from the
 release APK. JVM tests cover all 29 codes, day/night, unknown codes and mute persistence.
+
+### Continuous-loop regression check
+
+After installing a debug APK on an existing emulator:
+
+```bash
+python3 scripts/check-weather-loop.py --serial emulator-5554 --seconds 35
+python3 scripts/check-weather-loop.py --serial emulator-5554 --weather-code 97 --night --seconds 35
+```
+
+This drives the actual Weather preview, measures delivered video frames across loop boundaries,
+and fails on a hold above 125 ms, decoder reinitialization, audio output restart or an audio underrun. It requires at
+least two repetitions. It refuses a physical TV and never starts an emulator. The probe exists
+only in debug builds; release builds perform no per-frame position/clock queries or logging.
+
+On the existing headless emulator (2026-10-24), the original `MediaPlayer` failed two runs with
+99–138 ms boundary holds. With the same files and synchronous codec queueing, the rain regression
+run measured 33–65 ms across three loops, one audio decoder, one video decoder, one audio output
+start and no audio underruns. The thunderstorm run measured 65–78 ms with the same decoder/output
+counts and no underruns. Both debug and optimized release builds pass, as do all 203 JVM tests.
+The emulator has no audible output, so these
+are frame timing and audio pipeline checks, not a listening test on the TCL.

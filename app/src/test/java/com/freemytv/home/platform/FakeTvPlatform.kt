@@ -72,6 +72,14 @@ class FakeTvPlatform(
     var device: DeviceInfo = DeviceInfo("TCL", "Smart TV Pro", "12", LocalDate.of(2025, 12, 5), "STT2.230203.001.AS24", "0.1.0"),
     var clock: ZonedDateTime = ZonedDateTime.of(2026, 10, 23, 21, 40, 0, 0, ZoneId.of("America/Sao_Paulo")),
 ) : TvPlatform {
+    var screensaverPreferences = com.freemytv.home.screensaver.ScreensaverPreferences()
+    var screensaverReady = true
+    val screensaverConfigurations = mutableListOf<com.freemytv.home.screensaver.ScreensaverPreferences>()
+    override suspend fun loadScreensaverPreferences() = screensaverPreferences
+    override suspend fun saveScreensaverPreferences(preferences: com.freemytv.home.screensaver.ScreensaverPreferences) { screensaverPreferences = preferences }
+    override suspend fun isScreensaverReady() = screensaverReady
+    override suspend fun configureScreensaver(preferences: com.freemytv.home.screensaver.ScreensaverPreferences): Boolean { if (screensaverReady) screensaverConfigurations += preferences; return screensaverReady }
+
 
     val launched = mutableListOf<String>()
 

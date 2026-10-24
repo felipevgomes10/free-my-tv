@@ -76,6 +76,7 @@ Screenshots come from the Google TV emulator; the designs live in [`design.pen`]
 - Trailers play inside the Home in YouTube's embedded player, with the Home's own controls.
 
 **Everyday control**
+- **Descanso de tela** — optionally shows Weather after 2, 5 or 10 idle minutes across the TV's apps, respecting playback. Any key returns to the previous app. Setup prepares it; Restore recovers the TV's original screensaver and timers.
 - **App Switcher** — press Home twice. Closing an app really ends it (Settings' *Force stop*, pressed for you, hidden behind a still of the screen). Apps playing music are never closed.
 - **Open App Limit** — keeps at most 2–5 apps open and frees memory on a 2 GB TV.
 - **Remote buttons** — the Netflix, Globoplay, Prime Video, Disney+ and YouTube buttons keep working once the stock launcher is gone, and each can open any app, an input or the App Switcher. The gear opens the Home's Settings; holding Home opens notifications.
@@ -162,6 +163,7 @@ Setup reads the TV's state over ADB and plans **only what isn't in place yet**:
 
 - grants the Home `DUMP`, `PACKAGE_USAGE_STATS` and `WRITE_SECURE_SETTINGS`, and allows usage history and installing apps;
 - allows the Home to read notifications;
+- prepares the optional Weather screensaver: saves the original screensaver and power timers, disables the default screensaver, selects Weather, and allows the Home to set its delay. Turn it on in *Configurações → Descanso de tela* after Setup;
 - hands Explorar its TMDB token from `config/tmdb-token.local`, if there is one. The token is shown as `[token]` in the plan and never written to the journal;
 - disables (`pm disable-user`, never uninstall) the extras listed in `config/bloatware-approved.txt`, then Google TV's setup app and launcher;
 - opens the Home, which turns its key filter on.
@@ -175,7 +177,7 @@ scripts/restore.sh --serial 192.168.100.18:5555            # print the plan
 scripts/restore.sh --serial 192.168.100.18:5555 --apply    # run it (type "sim")
 ```
 
-Restore replays Setup's journal backwards (re-enabling packages, revoking permissions, forgetting the token) and turns the key filter off last. Lost the journal? `--without-journal` undoes whatever of Setup's changes it finds on the TV.
+Restore replays Setup's journal backwards (re-enabling packages, revoking permissions, forgetting the token), restores the original screensaver and power timers even if you changed the Weather delay later, and turns the key filter off last. Lost the journal? `--without-journal` undoes whatever of Setup's changes it finds on the TV; the screensaver's originals are also backed up on the TV.
 
 ### `tvsetup.py candidates` — what could go
 

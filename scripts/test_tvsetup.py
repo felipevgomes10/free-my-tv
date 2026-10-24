@@ -28,14 +28,18 @@ class FakeTv:
         self.enabled = {HOME, STOCK_LAUNCHER, SETUP_WRAITH, *BLOAT, "com.tcl.miracast", "com.google.android.apps.mediashell", "com.android.vending"}
         self.disabled = {"com.tcl.exhibit"}
         self.granted = set()
-        self.appops = {"GET_USAGE_STATS": "default", "REQUEST_INSTALL_PACKAGES": "default"}
+        self.appops = {"GET_USAGE_STATS": "default", "REQUEST_INSTALL_PACKAGES": "default", "WRITE_SETTINGS": "default"}
         self.secure = {
             "enabled_notification_listeners": "com.google.android.apps.tv.launcherx/.coreservices.notificationlistener.TvNotificationListenerService",
             "enabled_accessibility_services": "",
             "accessibility_enabled": "0",
         }
+        self.system = {"screen_off_timeout": "2147483647"}
+        self.global_settings = {"stay_on_while_plugged_in": "1"}
+        self.secure.update({"sleep_timeout": "1200000", "screensaver_activate_on_sleep": "0", "screensaver_enabled": "1", "screensaver_components": "com.google.android.apps.tv.dreamx/.service.Backdrop"})
         self.ran = []
         self.tmdb_token = None
+        self.has_screensaver = True
 
 
     def snapshot(self):
@@ -49,6 +53,9 @@ class FakeTv:
             return "com.google.android.tungsten.setupwraith/.RecoveryActivity"
         return "com.freemytv.home/.MainActivity"
 
+    def settings(self, namespace):
+        return {"secure": self.secure, "system": self.system, "global": self.global_settings}[namespace]
+
     def query(self, command):
         c = list(command)
         if c == ["pm", "list", "packages", "-e"]:
@@ -56,11 +63,11 @@ class FakeTv:
         if c == ["pm", "list", "packages", "-d"]:
             return "".join(f"package:{p}\n" for p in sorted(self.disabled))
         if c == ["dumpsys", "package", HOME]:
-            return "".join(f"      {p}: granted=true\n" for p in sorted(self.granted))
+            return ("Service WeatherDreamService\n" if self.has_screensaver else "") + "".join(f"      {p}: granted=true\n" for p in sorted(self.granted))
         if c[:3] == ["appops", "get", HOME] and c[3] in self.appops:
             return f"{c[3]}: {self.appops[c[3]]}\n"
-        if c[:3] == ["settings", "get", "secure"]:
-            return self.secure.get(c[3]) or "null"
+        if c[:2] == ["settings", "get"]:
+            return self.settings(c[2]).get(c[3]) or "null"
         if c[:2] == ["am", "broadcast"] and TMDB_STATE in c:
             data = f' data="{tvsetup.sha256(self.tmdb_token)}"' if self.tmdb_token else ""
             return f"Broadcasting: Intent {{ act={TMDB_STATE} }}\nBroadcast completed: result=0{data}\n"
@@ -96,10 +103,14 @@ class FakeTv:
             self.tmdb_token = c[c.index("token") + 1]
         elif c[:2] == ["am", "broadcast"] and TMDB_FORGET in c:
             self.tmdb_token = None
-        elif c[:3] == ["settings", "put", "secure"]:
-            self.secure[c[3]] = c[4]
-        elif c[:3] == ["settings", "delete", "secure"]:
-            self.secure[c[3]] = ""
+        elif c[:2] == ["am", "broadcast"] and any(action in c for action in (tvsetup.SCREENSAVER_APPLY, tvsetup.SCREENSAVER_RESET)):
+            pass
+        elif c[:2] == ["settings", "put"]:
+            self.settings(c[2])[c[3]] = c[4]
+        elif c[:2] == ["settings", "delete"]:
+            target = self.settings(c[2])
+            if c[3] == "enabled_accessibility_services": target[c[3]] = ""
+            else: target.pop(c[3], None)
         else:
             raise AssertionError(f"unexpected command {command}")
         return ""
@@ -121,7 +132,7 @@ class SetupTest(unittest.TestCase):
         tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
 
         self.assertEqual(set(tvsetup.GRANTED_PERMISSIONS), tv.granted)
-        self.assertEqual({"GET_USAGE_STATS": "allow", "REQUEST_INSTALL_PACKAGES": "allow"}, tv.appops)
+        self.assertEqual({"GET_USAGE_STATS": "allow", "REQUEST_INSTALL_PACKAGES": "allow", "WRITE_SETTINGS": "allow"}, tv.appops)
         self.assertIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertTrue({STOCK_LAUNCHER, *BLOAT} <= tv.disabled)
         self.assertEqual(KEY_FILTER, tv.secure["enabled_accessibility_services"])
@@ -214,8 +225,10 @@ class RestoreTest(unittest.TestCase):
         restore = tvsetup.plan_restore(done, tvsetup.read_state(tv))
 
         commands = [s.command for s in restore]
-        self.assertEqual(["pm", "enable", STOCK_LAUNCHER], commands[0])
-        self.assertEqual(["pm", "enable", SETUP_WRAITH], commands[1])
+        enables = [c for c in commands if c[:2] == ["pm", "enable"]]
+        self.assertEqual(["pm", "enable", STOCK_LAUNCHER], enables[0])
+        self.assertEqual(["pm", "enable", SETUP_WRAITH], enables[1])
+        self.assertIn(tvsetup.SCREENSAVER_RESET, commands[0])
         revoke = commands.index(["pm", "revoke", HOME, "android.permission.WRITE_SECURE_SETTINGS"])
         key_filter = commands.index(["settings", "delete", "secure", "enabled_accessibility_services"])
         self.assertLess(revoke, key_filter)
@@ -286,7 +299,7 @@ class RestoreTest(unittest.TestCase):
 
         self.assertTrue({STOCK_LAUNCHER, SETUP_WRAITH, *BLOAT} <= tv.enabled)
         self.assertEqual(set(), tv.granted)
-        self.assertEqual({"GET_USAGE_STATS": "default", "REQUEST_INSTALL_PACKAGES": "default"}, tv.appops)
+        self.assertEqual({"GET_USAGE_STATS": "default", "REQUEST_INSTALL_PACKAGES": "default", "WRITE_SETTINGS": "default"}, tv.appops)
         self.assertNotIn(NOTIFICATION_LISTENER, tv.secure["enabled_notification_listeners"])
         self.assertEqual("", tv.secure["enabled_accessibility_services"])
 
@@ -403,6 +416,60 @@ class CommandLineTest(unittest.TestCase):
         code, _ = self.run_main(tv, "restore")
 
         self.assertEqual(1, code)
+
+
+class ScreensaverPlanTest(unittest.TestCase):
+    def test_an_old_apk_cannot_disable_the_default_screensaver_before_its_replacement_is_installed(self):
+        tv = FakeTv()
+        tv.has_screensaver = False
+        with self.assertRaises(PlanError): setup_plan(tv)
+        self.assertEqual("1", tv.secure["screensaver_enabled"])
+        self.assertEqual([], tv.ran)
+
+    def test_setup_disables_the_default_screensaver_and_preserves_the_receivers_package(self):
+        tv = FakeTv()
+        tv.enabled.add("com.google.android.apps.tv.dreamx")
+        tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
+        self.assertEqual("0", tv.secure["screensaver_enabled"])
+        self.assertEqual(tvsetup.SCREENSAVER_COMPONENT, tv.secure["screensaver_components"])
+        self.assertIn("com.google.android.apps.tv.dreamx", tv.enabled)
+        self.assertEqual("allow", tv.appops["WRITE_SETTINGS"])
+
+    def test_restore_recovers_every_original_setting_after_the_owner_changes_the_delay(self):
+        for journal in (True, False):
+            with self.subTest(journal=journal):
+                tv = FakeTv()
+                original = {name: tv.settings(namespace).get(name) for name, namespace in tvsetup.SCREENSAVER_SETTINGS.items()}
+                done = tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
+                tv.system["screen_off_timeout"] = "120000"
+                tv.global_settings["stay_on_while_plugged_in"] = "0"
+                tv.secure.update(sleep_timeout="-1", screensaver_activate_on_sleep="1", screensaver_enabled="1")
+                state = tvsetup.read_state(tv)
+                steps = tvsetup.plan_restore(done, state) if journal else tvsetup.plan_restore_without_journal(state, BLOAT)
+                tvsetup.apply(tv, steps, out=lambda _: None)
+                actual = {name: tv.settings(namespace).get(name) for name, namespace in tvsetup.SCREENSAVER_SETTINGS.items()}
+                self.assertEqual(original, actual)
+                self.assertFalse(any(k.startswith(tvsetup.SCREENSAVER_BACKUP) for k in tv.secure))
+
+    def test_rerunning_setup_preserves_the_original_backups_and_an_enabled_weather_screensaver(self):
+        tv = FakeTv()
+        tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
+        before = dict(tv.secure)
+        tv.secure["screensaver_enabled"] = "1"
+        tv.system["screen_off_timeout"] = "600000"
+        again = setup_plan(tv)
+        self.assertEqual([["am", "start", "-n", f"{HOME}/.MainActivity"]], [s.command for s in again])
+        self.assertEqual(before[tvsetup.SCREENSAVER_BACKUP + "screen_off_timeout"], tv.secure[tvsetup.SCREENSAVER_BACKUP + "screen_off_timeout"])
+
+    def test_originally_unset_settings_and_a_previously_disabled_screensaver_are_restored_as_such(self):
+        tv = FakeTv()
+        tv.secure["screensaver_enabled"] = "0"
+        tv.secure.pop("sleep_timeout")
+        done = tvsetup.apply(tv, setup_plan(tv), out=lambda _: None)
+        tv.secure["sleep_timeout"] = "-1"
+        tvsetup.apply(tv, tvsetup.plan_restore(done, tvsetup.read_state(tv)), out=lambda _: None)
+        self.assertEqual("0", tv.secure["screensaver_enabled"])
+        self.assertNotIn("sleep_timeout", tv.secure)
 
 
 class CandidatesTest(unittest.TestCase):

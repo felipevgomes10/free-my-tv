@@ -63,6 +63,11 @@ import java.time.ZonedDateTime
 
 class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
+    override suspend fun loadScreensaverPreferences() = withContext(Dispatchers.IO) { AndroidScreensaver.preferences(context) }
+    override suspend fun saveScreensaverPreferences(preferences: com.freemytv.home.screensaver.ScreensaverPreferences) = withContext(Dispatchers.IO) { AndroidScreensaver.save(context, preferences) }
+    override suspend fun isScreensaverReady() = withContext(Dispatchers.IO) { AndroidScreensaver.ready(context) }
+    override suspend fun configureScreensaver(preferences: com.freemytv.home.screensaver.ScreensaverPreferences) = withContext(Dispatchers.IO) { AndroidScreensaver.configure(context, preferences) }
+
     private val packageManager = context.packageManager
     private val prefs = context.getSharedPreferences("home", Context.MODE_PRIVATE)
     private val mediaSessions = MediaSessions(context)
@@ -280,6 +285,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
             SetupCheck.KeyFilter to (granted(android.Manifest.permission.WRITE_SECURE_SETTINGS) && isKeyFilterEnabled()),
             SetupCheck.InstallApps to context.packageManager.canRequestPackageInstalls(),
             SetupCheck.Explorar to (TmdbToken.read(context) != null),
+            SetupCheck.Screensaver to AndroidScreensaver.ready(context),
         )
     }
 

@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 
 /** What the Home's screens and its key filter share for as long as the process lives. */
 class HomeApplication : Application() {
+    /** A native dream can cover the Home without pausing its activity. */
+    val screensaverActive = kotlinx.coroutines.flow.MutableStateFlow(false)
 
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 

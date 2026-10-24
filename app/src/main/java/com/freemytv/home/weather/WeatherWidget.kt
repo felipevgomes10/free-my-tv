@@ -54,9 +54,9 @@ class WeatherWidget(private val platform: TvPlatform, private val settings: Widg
     private val _state = MutableStateFlow(WeatherState(visible = true, report = null))
     val state: StateFlow<WeatherState> = _state.asStateFlow()
 
-    suspend fun follow() {
+    suspend fun follow(forScreensaver: Boolean = false) {
         settings.preferences
-            .map { it.weatherVisible to it.weatherCity }
+            .map { (it.weatherVisible || forScreensaver) to it.weatherCity }
             .distinctUntilChanged()
             .collectLatest { (visible, city) ->
                 if (!visible) {

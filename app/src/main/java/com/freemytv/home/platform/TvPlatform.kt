@@ -40,6 +40,11 @@ import java.time.ZonedDateTime
  */
 interface TvPlatform {
 
+    suspend fun loadScreensaverPreferences(): com.freemytv.home.screensaver.ScreensaverPreferences
+    suspend fun saveScreensaverPreferences(preferences: com.freemytv.home.screensaver.ScreensaverPreferences)
+    suspend fun isScreensaverReady(): Boolean
+    suspend fun configureScreensaver(preferences: com.freemytv.home.screensaver.ScreensaverPreferences): Boolean
+
     /** Launchable TV apps currently installed, excluding the Home itself. */
     suspend fun installedApps(): List<InstalledApp>
 

@@ -20,7 +20,7 @@ import os
 import re
 import subprocess
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Set
 
@@ -39,6 +39,19 @@ TMDB_SET = "com.freemytv.home.action.SET_TMDB_TOKEN"
 TMDB_FORGET = "com.freemytv.home.action.FORGET_TMDB_TOKEN"
 TMDB_STATE = "com.freemytv.home.action.TMDB_TOKEN_STATE"
 TOKEN_FILE = Path(__file__).resolve().parent.parent / "config" / "tmdb-token.local"
+SCREENSAVER_COMPONENT = f"{HOME}/.android.WeatherDreamService"
+SCREENSAVER_RECEIVER = f"{HOME}/.android.ScreensaverSetupReceiver"
+SCREENSAVER_APPLY = "com.freemytv.home.action.APPLY_SCREENSAVER"
+SCREENSAVER_RESET = "com.freemytv.home.action.RESET_SCREENSAVER"
+SCREENSAVER_SETTINGS = {
+    "screen_off_timeout": "system",
+    "sleep_timeout": "secure",
+    "screensaver_activate_on_sleep": "secure",
+    "screensaver_enabled": "secure",
+    "screensaver_components": "secure",
+    "stay_on_while_plugged_in": "global",
+}
+SCREENSAVER_BACKUP = "freemytv_screensaver_"
 GRANTED_PERMISSIONS = [
     "android.permission.DUMP",
     "android.permission.PACKAGE_USAGE_STATS",
@@ -49,6 +62,7 @@ ALLOWED_APP_OPS = {
     "GET_USAGE_STATS": "usage history",
     # APK Drop, Update Sources and the Home's own updates.
     "REQUEST_INSTALL_PACKAGES": "installing apps",
+    "WRITE_SETTINGS": "choosing the weather screensaver delay",
 }
 
 # Never disabled, whatever the approved list says (ADR 0002 and ticket 13).
@@ -160,6 +174,9 @@ class DeviceState:
     is_emulator: bool
     # SHA-256 of the TMDB token the Home holds, or None when it holds none.
     tmdb_token_hash: Optional[str] = None
+    screensaver_settings: Dict[str, Optional[str]] = field(default_factory=dict)
+    screensaver_backups: Dict[str, str] = field(default_factory=dict)
+    home_has_screensaver: bool = False
 
 
 def read_state(adb: Adb) -> DeviceState:
@@ -180,6 +197,12 @@ def read_state(adb: Adb) -> DeviceState:
         value = adb.query(["settings", "get", "secure", name]).strip()
         return [] if value in ("", "null") else [item for item in value.split(":") if item]
 
+    def setting(namespace: str, name: str) -> Optional[str]:
+        value = adb.query(["settings", "get", namespace, name]).strip()
+        return None if value in ("", "null") else value
+
+    backups = {name: setting("secure", SCREENSAVER_BACKUP + name) for name in SCREENSAVER_SETTINGS}
+
     return DeviceState(
         enabled=packages("-e"),
         disabled=packages("-d"),
@@ -189,6 +212,9 @@ def read_state(adb: Adb) -> DeviceState:
         accessibility_services=secure_list("enabled_accessibility_services"),
         is_emulator=adb.query(["getprop", "ro.kernel.qemu"]).strip() == "1",
         tmdb_token_hash=token_hash_on_tv(tolerant(["am", "broadcast", "-n", TMDB_RECEIVER, "-a", TMDB_STATE])),
+        screensaver_settings={name: setting(namespace, name) for name, namespace in SCREENSAVER_SETTINGS.items()},
+        screensaver_backups={name: value for name, value in backups.items() if value is not None},
+        home_has_screensaver="WeatherDreamService" in dump,
     )
 
 
@@ -222,6 +248,8 @@ def plan_setup(state: DeviceState, approved: Sequence[str], token: Optional[str]
     check_approved(approved)
     if HOME not in state.enabled:
         raise PlanError(f"The Home ({HOME}) isn't installed on this device. Install it first.")
+    if not state.home_has_screensaver:
+        raise PlanError("Install the current Home APK first: this version has no weather screensaver. The TV's default screensaver was not changed.")
     steps: List[Step] = []
     for permission in GRANTED_PERMISSIONS:
         if permission not in state.granted:
@@ -238,6 +266,8 @@ def plan_setup(state: DeviceState, approved: Sequence[str], token: Optional[str]
         ))
     if NOTIFICATION_LISTENER not in state.notification_listeners:
         steps.append(Step(["cmd", "notification", "allow_listener", NOTIFICATION_LISTENER], ["cmd", "notification", "disallow_listener", NOTIFICATION_LISTENER], "allow reading notifications"))
+    saver_steps = plan_screensaver(state)
+    steps.extend(saver_steps)
     for package in [*sorted(set(approved) - set(STOCK_HOME)), *STOCK_HOME]:
         if package in state.enabled:
             why = {
@@ -245,6 +275,8 @@ def plan_setup(state: DeviceState, approved: Sequence[str], token: Optional[str]
                 SETUP_WRAITH: "disable Google TV's setup app, whose recovery screen would take over Home",
             }.get(package) or f"disable {package} ({CANDIDATES.get(package, 'approved by the owner')})"
             steps.append(Step(["pm", "disable-user", "--user", "0", package], ["pm", "enable", package], why))
+    if saver_steps or "WRITE_SETTINGS" not in state.allowed_app_ops:
+        steps.append(Step(["am", "broadcast", "-n", SCREENSAVER_RECEIVER, "-a", SCREENSAVER_APPLY], None, "apply the owner's weather screensaver choice"))
     # The Home turns its key filter on itself once it holds WRITE_SECURE_SETTINGS; opening it does that now.
     steps.append(Step(["am", "start", "-n", f"{HOME}/.MainActivity"], None, "open the Home, which turns on its key filter"))
     return steps
@@ -256,7 +288,33 @@ def plan_restore(journal: List[Step], state: DeviceState) -> List[Step]:
     The key filter goes last: once WRITE_SECURE_SETTINGS is revoked the Home can't turn it back on.
     """
     steps = [Step(step.undo, None, f"undo: {step.why}") for step in reversed(journal) if step.undo is not None]
-    return steps + key_filter_off(state)
+    if state.screensaver_backups:
+        steps.insert(0, Step(["am", "broadcast", "-n", SCREENSAVER_RECEIVER, "-a", SCREENSAVER_RESET], None, "turn off the weather screensaver preference"))
+    return steps + clear_screensaver_backups(state) + key_filter_off(state)
+
+
+def setting_command(namespace: str, name: str, value: Optional[str]) -> List[str]:
+    return ["settings", "delete", namespace, name] if value is None else ["settings", "put", namespace, name, value]
+
+
+def plan_screensaver(state: DeviceState) -> List[Step]:
+    steps: List[Step] = []
+    for name, namespace in SCREENSAVER_SETTINGS.items():
+        if name not in state.screensaver_backups:
+            original = state.screensaver_settings.get(name)
+            steps.append(Step(
+                ["settings", "put", "secure", SCREENSAVER_BACKUP + name, original if original is not None else "__unset__"],
+                setting_command(namespace, name, original),
+                f"keep the original {name} for Restore (including later changes from the Home)",
+            ))
+    if state.screensaver_settings.get("screensaver_components") != SCREENSAVER_COMPONENT:
+        steps.append(Step(["settings", "put", "secure", "screensaver_enabled", "0"], setting_command("secure", "screensaver_enabled", state.screensaver_settings.get("screensaver_enabled")), "disable the TV's default screensaver"))
+        steps.append(Step(["settings", "put", "secure", "screensaver_components", SCREENSAVER_COMPONENT], setting_command("secure", "screensaver_components", state.screensaver_settings.get("screensaver_components")), "select Weather as the optional screensaver"))
+    return steps
+
+
+def clear_screensaver_backups(state: DeviceState) -> List[Step]:
+    return [Step(["settings", "delete", "secure", SCREENSAVER_BACKUP + name], None, f"forget the restored {name} backup") for name in state.screensaver_backups]
 
 
 def key_filter_off(state: DeviceState) -> List[Step]:
@@ -275,6 +333,11 @@ def plan_restore_without_journal(state: DeviceState, approved: Sequence[str]) ->
     """When the journal is lost: undo whatever of Setup's changes is in place now."""
     check_approved(approved)
     steps: List[Step] = []
+    if state.screensaver_backups:
+        steps.append(Step(["am", "broadcast", "-n", SCREENSAVER_RECEIVER, "-a", SCREENSAVER_RESET], None, "turn off the weather screensaver preference"))
+        for name, value in state.screensaver_backups.items():
+            steps.append(Step(setting_command(SCREENSAVER_SETTINGS[name], name, None if value == "__unset__" else value), None, f"restore the original {name}"))
+        steps.extend(clear_screensaver_backups(state))
     for package in [STOCK_LAUNCHER, SETUP_WRAITH, *sorted(set(approved) - set(STOCK_HOME))]:
         if package in state.disabled:
             steps.append(Step(["pm", "enable", package], None, f"enable {package}"))

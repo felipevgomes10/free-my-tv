@@ -208,4 +208,15 @@ class WeatherWidgetTest {
             listOf(0, 2, 3, 45, 53, 80, 73, 95).map(Condition::fromWmo),
         )
     }
+
+    @Test
+    fun `the screensaver gets weather even when the compact widget is hidden`() = runTest(UnconfinedTestDispatcher()) {
+        val platform = FakeTvPlatform(ipPlace = saoPaulo, forecasts = mapOf("São Paulo" to forecast()))
+        val settings = WidgetSettings(platform).also { it.load(); it.setWeatherVisible(false) }
+        val weather = WeatherWidget(platform, settings)
+        backgroundScope.launch { weather.follow(forScreensaver = true) }
+        runCurrent()
+        assertEquals("São Paulo", weather.state.value.report?.place)
+        assertFalse(platform.widgetPreferences.weatherVisible)
+    }
 }
