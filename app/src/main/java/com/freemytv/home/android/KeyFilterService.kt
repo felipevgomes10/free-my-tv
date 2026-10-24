@@ -16,7 +16,9 @@ import java.util.concurrent.Executor
  * Sees remote keys before the system does (ADR 0005): keeps every Shortcut Button working
  * after Setup, applies the owner's reassignments, and turns long-press Home into the
  * Notification Panel. Every decision is ShortcutButtons'; this only relays. Its accessibility
- * access also lets the Home force stop apps through Settings ([ForceStopper]).
+ * access also lets the Home force stop apps through Settings ([ForceStopper]); it listens to
+ * Settings alone, since once it has read a window Android would otherwise send it every change
+ * on screen from every app, onto the thread that answers keys.
  *
  * Every key on the TV waits for this filter's answer, so it answers on a thread of its own:
  * on the Home's main thread a slow frame delayed the answer for a key's release past the

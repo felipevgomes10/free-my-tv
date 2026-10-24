@@ -6,4 +6,5 @@
     android:canRequestFilterKeyEvents="true"
     android:canRetrieveWindowContent="true"
     android:canTakeScreenshot="true"
+    android:packageNames="com.android.tv.settings"
     android:description="@string/key_filter_description" />
