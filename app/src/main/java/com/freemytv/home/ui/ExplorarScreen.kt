@@ -207,7 +207,7 @@ private fun meta(title: TitleSummary, ratingOutOfTen: Boolean): String {
 /** Two or three choices in a glass capsule, the chosen one in white. */
 @Composable
 private fun <T> Segmented(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
-    Row(Modifier.background(Tokens.Glass, CircleShape).padding(3.dp)) {
+    Row(Modifier.background(Tokens.Glass, CircleShape).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         options.forEach { (value, label) ->
             val isSelected = value == selected
             Surface(
@@ -220,7 +220,7 @@ private fun <T> Segmented(options: List<Pair<T, String>>, selected: T, onSelect:
                     focusedContentColor = if (isSelected) Color.Black else Tokens.TextPrimary,
                 ),
             ) {
-                Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp))
+                Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp))
             }
         }
     }
