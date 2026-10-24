@@ -20,4 +20,5 @@ com.tcl.waterfall.overseas
 # Approved by the owner on 2026-10-24.
 com.google.android.play.games
 com.google.android.videos
+com.tcl.suspension
 com.tcl.dashboard
