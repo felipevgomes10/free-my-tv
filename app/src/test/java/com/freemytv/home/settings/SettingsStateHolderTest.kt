@@ -2,6 +2,7 @@ package com.freemytv.home.settings
 
 import com.freemytv.home.monitor.SystemMonitor
 import com.freemytv.home.platform.FakeTvPlatform
+import com.freemytv.home.upnext.WatchNextRow
 import com.freemytv.home.weather.WeatherWidget
 import com.freemytv.home.widgets.WidgetSettings
 import kotlinx.coroutines.launch
@@ -98,5 +99,33 @@ class SettingsStateHolderTest {
         screens(platform).settings.openAndroidSettings()
 
         assertEquals(1, platform.androidSettingsOpened)
+    }
+
+    @Test
+    fun `the Watch Next probe counts each app's entries and what they carry, most entries first`() = runTest(UnconfinedTestDispatcher()) {
+        val platform = FakeTvPlatform(labels = mapOf("com.netflix.ninja" to "Netflix", "com.google.android.youtube.tv" to "YouTube")).apply {
+            watchNext = listOf(
+                WatchNextRow("com.google.android.youtube.tv", hasLink = true, hasProgress = false, hasPicture = true),
+                WatchNextRow("com.netflix.ninja", hasLink = true, hasProgress = true, hasPicture = true),
+                WatchNextRow("com.netflix.ninja", hasLink = true, hasProgress = false, hasPicture = false),
+            )
+        }
+
+        val probe = screens(platform).settings.state.value.watchNext
+
+        assertEquals(
+            listOf(
+                WatchNextPublisher("Netflix", entries = 2, withLink = 2, withProgress = 1, withPicture = 1),
+                WatchNextPublisher("YouTube", entries = 1, withLink = 1, withProgress = 0, withPicture = 1),
+            ),
+            probe,
+        )
+    }
+
+    @Test
+    fun `without the access Setup grants, the Watch Next probe has nothing to say`() = runTest(UnconfinedTestDispatcher()) {
+        val platform = FakeTvPlatform().apply { watchNext = null }
+
+        assertNull(screens(platform).settings.state.value.watchNext)
     }
 }

@@ -29,6 +29,8 @@
 
     <!-- APK Drop, Update Sources and the Home's own updates; Setup allows it over ADB. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- Reading other apps' Watch Next programs; Setup grants it. -->
+    <uses-permission android:name="android.permission.READ_TV_LISTINGS" />
     <!-- The Home's own updates go through without asking once it is its own installer (Android 12+). -->
     <uses-permission android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION" />
 

@@ -26,6 +26,7 @@ import com.freemytv.home.updates.ReleaseAsset
 import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.upnext.PlayingMedia
 import com.freemytv.home.upnext.UpNextEntry
+import com.freemytv.home.upnext.WatchNextRow
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -212,6 +213,9 @@ interface TvPlatform {
 
     /** Opens YouTube's search for [query]. */
     fun openYouTubeSearch(query: String)
+
+    /** What streaming apps list in Android TV's Watch Next; null without the access Setup grants. */
+    suspend fun watchNextRows(): List<WatchNextRow>?
 
     suspend fun loadUpNext(): List<UpNextEntry>
 

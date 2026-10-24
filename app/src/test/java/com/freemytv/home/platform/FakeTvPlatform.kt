@@ -4,38 +4,39 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.buttons.HomeDestination
+import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
-import com.freemytv.home.buttons.HomeDestination
-import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.TvInputSource
 import com.freemytv.home.monitor.AppStorage
 import com.freemytv.home.monitor.MemoryUsage
 import com.freemytv.home.monitor.ProcessMemory
 import com.freemytv.home.monitor.StorageUsage
+import com.freemytv.home.notifications.TvNotification
 import com.freemytv.home.settings.DeviceInfo
-import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.settings.PackageState
+import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.updates.ReleaseAsset
 import com.freemytv.home.updates.ReleaseLookup
+import com.freemytv.home.upnext.PlayingMedia
+import com.freemytv.home.upnext.UpNextEntry
+import com.freemytv.home.upnext.WatchNextRow
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
-import com.freemytv.home.notifications.TvNotification
-import com.freemytv.home.upnext.PlayingMedia
-import com.freemytv.home.upnext.UpNextEntry
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeTvPlatform(
     var apps: List<InstalledApp> = emptyList(),
@@ -372,6 +373,11 @@ class FakeTvPlatform(
         networkRequests += "geocode:$city"
         return cities[city]
     }
+
+    /** Android TV's Watch Next programs; null without the access Setup grants. */
+    var watchNext: List<WatchNextRow>? = emptyList()
+
+    override suspend fun watchNextRows() = watchNext
 
     /** How long a forecast takes to arrive. */
     var forecastTakes: kotlin.time.Duration = kotlin.time.Duration.ZERO
