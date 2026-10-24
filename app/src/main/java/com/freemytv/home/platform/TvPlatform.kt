@@ -26,7 +26,7 @@ import com.freemytv.home.updates.ReleaseAsset
 import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.upnext.PlayingMedia
 import com.freemytv.home.upnext.UpNextEntry
-import com.freemytv.home.upnext.WatchNextRow
+import com.freemytv.home.upnext.WatchNextProgram
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -214,8 +214,16 @@ interface TvPlatform {
     /** Opens YouTube's search for [query]. */
     fun openYouTubeSearch(query: String)
 
-    /** What streaming apps list in Android TV's Watch Next; null without the access Setup grants. */
-    suspend fun watchNextRows(): List<WatchNextRow>?
+    /** What streaming apps list in Android TV's Watch Next, pictures stored; null without the access Setup grants. */
+    suspend fun watchNext(): List<WatchNextProgram>?
+
+    /** Opens [packageName]'s own link, an intent URI, in that app only; false when it doesn't open. */
+    fun openLink(packageName: String, link: String): Boolean
+
+    /** Watch Next entries the owner removed from the Up Next Tray, with when they were last watched then. */
+    suspend fun loadDismissedUpNext(): Map<String, Instant>
+
+    suspend fun saveDismissedUpNext(dismissed: Map<String, Instant>)
 
     suspend fun loadUpNext(): List<UpNextEntry>
 

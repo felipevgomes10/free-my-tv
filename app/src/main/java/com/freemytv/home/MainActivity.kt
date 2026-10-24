@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
                 app.shortcutButtons.ensureKeyFilter()
                 app.setupWatchdog.check()
                 home.refresh()
-                app.upNext.prune()
+                app.upNext.refresh()
                 inputs.load()
                 settings.load()
                 updates.load()

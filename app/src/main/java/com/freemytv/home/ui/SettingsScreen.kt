@@ -49,7 +49,6 @@ import com.freemytv.home.multitasking.OpenAppLimit
 import com.freemytv.home.settings.CastReceiver
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.settings.SettingsState
-import com.freemytv.home.settings.WatchNextPublisher
 import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.setup.SetupState
 import com.freemytv.home.ui.theme.Tokens
@@ -263,26 +262,6 @@ private fun AboutPanel(state: SettingsState) {
     // TMDB's terms ask for this credit wherever its data shows.
     InfoRow(stringResource(R.string.tmdb_credit), "TMDB")
     Note(stringResource(R.string.tmdb_notice))
-    WatchNextProbe(state.watchNext)
-}
-
-/** Which apps list what the owner is watching in Android TV's Watch Next, and with what. */
-@Composable
-private fun WatchNextProbe(publishers: List<WatchNextPublisher>?) {
-    Text(
-        stringResource(R.string.watch_next_probe),
-        color = Tokens.TextPrimary,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(start = 12.dp, top = 16.dp, bottom = 2.dp),
-    )
-    when {
-        publishers == null -> Note(stringResource(R.string.watch_next_no_access))
-        publishers.isEmpty() -> Note(stringResource(R.string.watch_next_none))
-        else -> publishers.forEach {
-            InfoRow(it.label, stringResource(R.string.watch_next_counts, it.entries, it.withLink, it.withProgress, it.withPicture))
-        }
-    }
 }
 
 /** A setting the owner turns on and off. */

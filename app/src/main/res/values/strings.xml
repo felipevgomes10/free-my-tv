@@ -171,10 +171,6 @@
     <string name="explorar_offline_stale">Sem internet: mostrando os últimos destaques.</string>
     <string name="loading">Carregando…</string>
     <string name="tmdb_credit">Dados de filmes e séries</string>
-    <string name="watch_next_probe">Sondagem: apps no Watch Next</string>
-    <string name="watch_next_no_access">Sem acesso ainda. Rode a Preparação no computador.</string>
-    <string name="watch_next_none">Nenhum app publica no Watch Next.</string>
-    <string name="watch_next_counts">%1$d itens · %2$d com link · %3$d com progresso · %4$d com imagem</string>
     <string name="tmdb_notice">Este produto usa a API do TMDB, mas não é endossado nem certificado pelo TMDB.</string>
     <string name="send_apk">Enviar APK</string>
     <string name="no_update_source">Sem origem associada</string>

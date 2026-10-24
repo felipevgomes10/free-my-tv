@@ -48,7 +48,7 @@ import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.updates.ReleaseAsset
 import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.upnext.UpNextEntry
-import com.freemytv.home.upnext.WatchNextRow
+import com.freemytv.home.upnext.WatchNextProgram
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
 import java.time.Instant
@@ -72,6 +72,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     private val packageManager = context.packageManager
     private val prefs = context.getSharedPreferences("home", Context.MODE_PRIVATE)
     private val mediaSessions = MediaSessions(context)
+    private val watchNextReader = WatchNextReader(context)
     private val apkDropServer = ApkDropServer(java.io.File(context.cacheDir, "apkdrop"))
     private val apkInstaller = ApkInstaller(context)
     private val tmdb = Tmdb(context)
@@ -493,38 +494,28 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         if (!tryStart(search)) openPlayStorePage(YOUTUBE)
     }
 
-    override suspend fun watchNextRows(): List<WatchNextRow>? = withContext(Dispatchers.IO) {
-        if (context.checkSelfPermission(READ_TV_LISTINGS) != PackageManager.PERMISSION_GRANTED) return@withContext null
-        val columns = arrayOf(
-            TvContract.WatchNextPrograms.COLUMN_PACKAGE_NAME,
-            TvContract.WatchNextPrograms.COLUMN_INTENT_URI,
-            TvContract.WatchNextPrograms.COLUMN_LAST_PLAYBACK_POSITION_MILLIS,
-            TvContract.WatchNextPrograms.COLUMN_POSTER_ART_URI,
-            TvContract.WatchNextPrograms.COLUMN_THUMBNAIL_URI,
-        )
-        // With READ_TV_LISTINGS the TV provider answers with every app's searchable programs, which Watch Next's are by default.
-        val rows = try {
-            context.contentResolver.query(TvContract.WatchNextPrograms.CONTENT_URI, columns, null, null, null)?.use { c ->
-                buildList {
-                    while (c.moveToNext()) {
-                        add(
-                            WatchNextRow(
-                                packageName = c.getString(0).orEmpty(),
-                                hasLink = !c.isNull(1),
-                                hasProgress = !c.isNull(2) && c.getLong(2) > 0,
-                                hasPicture = !c.isNull(3) || !c.isNull(4),
-                            ),
-                        )
-                    }
-                }
-            }.orEmpty()
+    override suspend fun watchNext(): List<WatchNextProgram>? = withContext(Dispatchers.IO) { watchNextReader.read() }
+
+    override fun openLink(packageName: String, link: String): Boolean {
+        val intent = WatchNextReader.safeIntent(packageName, link, context.packageName) ?: return false
+        return try {
+            context.startActivity(intent)
+            true
         } catch (e: RuntimeException) {
-            Log.w(TAG, "Watch Next can't be read", e)
-            return@withContext null
+            Log.w(TAG, "$packageName's link doesn't open", e)
+            false
         }
-        // Counts per app only, for reading the probe's result from logcat.
-        Log.i(TAG, "Watch Next: ${rows.groupingBy { it.packageName }.eachCount()}")
-        rows
+    }
+
+    override suspend fun loadDismissedUpNext(): Map<String, Instant> = withContext(Dispatchers.IO) {
+        val json = prefs.getString(UP_NEXT_DISMISSED, null)?.let(::JSONObject) ?: return@withContext emptyMap()
+        json.keys().asSequence().associateWith { Instant.ofEpochMilli(json.getLong(it)) }
+    }
+
+    override suspend fun saveDismissedUpNext(dismissed: Map<String, Instant>) = withContext(Dispatchers.IO) {
+        val json = JSONObject()
+        dismissed.forEach { (key, at) -> json.put(key, at.toEpochMilli()) }
+        prefs.edit().putString(UP_NEXT_DISMISSED, json.toString()).apply()
     }
 
     override suspend fun loadUpNext(): List<UpNextEntry> = withContext(Dispatchers.IO) {
@@ -589,7 +580,6 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     private companion object {
         const val TAG = "AndroidTvPlatform"
-        const val READ_TV_LISTINGS = "android.permission.READ_TV_LISTINGS"
         const val PINNED_APPS = "pinned_apps"
         const val INPUT_PREFERENCES = "input_preferences"
         const val WEATHER_VISIBLE = "weather_visible"
@@ -600,6 +590,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         const val SETUP_HISTORY = "setup_history"
         const val SETUP_ANNOUNCED = "setup_announced"
         const val UP_NEXT = "up_next"
+        const val UP_NEXT_DISMISSED = "up_next_dismissed"
         const val UPDATE_SOURCES = "update_sources"
         /** The Stock Launcher and Google TV's setup app, whose recovery screen takes Home over without it. */
         val STOCK_HOME = listOf("com.google.android.apps.tv.launcherx", "com.google.android.tungsten.setupwraith")

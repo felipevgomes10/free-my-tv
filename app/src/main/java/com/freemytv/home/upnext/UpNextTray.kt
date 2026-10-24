@@ -42,6 +42,8 @@ data class UpNextEntry(
     val lastWatched: Instant,
     /** The app's own id for the title, which lets YouTube reopen the very video. */
     val mediaId: String? = null,
+    /** The app's own link to the title, from Watch Next. */
+    val link: String? = null,
 ) {
     /** What is left to watch, when the app tells both its position and its duration. */
     val remainingMillis: Long?
@@ -58,9 +60,10 @@ data class UpNextState(
 )
 
 /**
- * The Up Next Tray. Android keeps the apps' own "continue watching" rows from a Home like
- * this one (ADR 0007), so the Tray is built from what the Home sees playing: one entry per
- * title, or one per app for apps that don't name what is playing. Entries leave once
+ * The Up Next Tray (ADR 0011). Apps that list what the owner is watching in Android TV's Watch
+ * Next are read from there, with their own episode, progress, picture and link, even while
+ * closed. Apps that don't (YouTube, Prime Video) come from what the Home sees playing: one entry
+ * per title, or one per app for apps that don't name what is playing. Entries leave once
  * finished, after [EXPIRES_AFTER] unwatched, with their app, or when the owner removes them.
  */
 class UpNextTray(private val platform: TvPlatform) {
@@ -68,9 +71,22 @@ class UpNextTray(private val platform: TvPlatform) {
     private val _state = MutableStateFlow(UpNextState())
     val state: StateFlow<UpNextState> = _state.asStateFlow()
 
+    /** What the Home saw play, for apps that don't list in Watch Next; saved across restarts. */
+    private var history: List<UpNextEntry> = emptyList()
+
+    /** What apps list in Watch Next, as last read. */
+    private var listed: List<UpNextEntry> = emptyList()
+
+    /** The apps that list in Watch Next at all: for them, Watch Next is the whole story. */
+    private var publishers: Set<String> = emptySet()
+
+    /** Watch Next entries the owner removed, with when they were last watched then. */
+    private var dismissed: Map<String, Instant> = emptyMap()
+
     suspend fun load() {
-        _state.value = UpNextState(platform.loadUpNext().sortedByDescending { it.lastWatched })
-        prune()
+        history = platform.loadUpNext().sortedByDescending { it.lastWatched }
+        dismissed = platform.loadDismissedUpNext()
+        refresh()
     }
 
     /** Follows what plays on the TV for as long as it is collected, whichever app is in front. */
@@ -83,19 +99,43 @@ class UpNextTray(private val platform: TvPlatform) {
         platform.nowPlaying.collect { sessions -> sessions.forEach { record(it) } }
     }
 
-    /** Drops what went unwatched for too long; run whenever the Home shows. */
-    suspend fun prune() = change { it }
+    /** Reads Watch Next again and drops what went unwatched for too long; run whenever the Home shows. */
+    suspend fun refresh() {
+        val programs = platform.watchNext().orEmpty()
+        publishers = programs.map { it.packageName }.toSet()
+        listed = programs
+            .filter { (it.kind == WatchNextKind.Continue || it.kind == WatchNextKind.Next) && platform.isLaunchable(it.packageName) }
+            .map { entryOf(it) }
+        // A removal lasts until the app lists the title as watched since, or stops listing it.
+        val stillDismissed = dismissed.filter { (key, at) -> listed.any { it.key == key && !it.lastWatched.isAfter(at) } }
+        if (stillDismissed != dismissed) {
+            dismissed = stillDismissed
+            platform.saveDismissedUpNext(dismissed)
+        }
+        change { entries -> entries.filterNot { it.packageName in publishers } }
+        publish()
+    }
 
-    /** "Remover da lista". */
-    suspend fun remove(entry: UpNextEntry) = change { entries -> entries.filterNot { it.key == entry.key } }
+    /** "Remover da lista". An app's Watch Next can't be changed from here, so the Home remembers it. */
+    suspend fun remove(entry: UpNextEntry) {
+        if (listed.any { it.key == entry.key }) {
+            dismissed = dismissed + (entry.key to entry.lastWatched)
+            platform.saveDismissedUpNext(dismissed)
+            publish()
+        } else {
+            change { entries -> entries.filterNot { it.key == entry.key } }
+        }
+    }
 
     /**
-     * Back to the entry where the owner stopped, as close as the app allows: a YouTube video with
-     * an id reopens at its position; an app whose session is still on the title resumes it; a
-     * YouTube video otherwise is searched for (YouTube's on-TV app names no id, and the video comes
-     * up first, at the owner's position); anything else opens its app.
+     * Back to the entry where the owner stopped, as close as the app allows: a Watch Next entry
+     * through the app's own link; a YouTube video with an id reopens at its position; an app whose
+     * session is still on the title resumes it; a YouTube video otherwise is searched for (YouTube's
+     * on-TV app names no id, and the video comes up first, at the owner's position); anything else
+     * opens its app.
      */
     fun select(entry: UpNextEntry) {
+        if (entry.link != null && platform.openLink(entry.packageName, entry.link)) return
         val videoId = entry.mediaId?.takeIf { entry.packageName == YOUTUBE && YOUTUBE_ID.matches(it) }
         when {
             videoId != null -> platform.openYouTubeVideo(videoId, startSeconds = ((entry.positionMillis ?: 0) / 1000).toInt())
@@ -105,12 +145,46 @@ class UpNextTray(private val platform: TvPlatform) {
         }
     }
 
+    private suspend fun entryOf(program: WatchNextProgram) = UpNextEntry(
+        key = listOf("watchnext", program.packageName, program.title, program.season, program.episode).joinToString("|"),
+        packageName = program.packageName,
+        appLabel = platform.appLabel(program.packageName),
+        title = program.title,
+        subtitle = episodeLine(program),
+        positionMillis = program.positionMillis?.takeIf { it > 0 },
+        durationMillis = program.durationMillis?.takeIf { it > 0 },
+        artwork = program.artwork,
+        lastWatched = program.lastEngagement,
+        link = program.link,
+    )
+
+    /** "T1:E42 Capítulo 42", as Google TV writes an episode; nothing for a movie. */
+    private fun episodeLine(program: WatchNextProgram): String? {
+        val number = when {
+            program.season != null && program.episode != null -> "T${program.season}:E${program.episode}"
+            program.episode != null -> "E${program.episode}"
+            else -> null
+        }
+        val name = program.episodeTitle?.trim()?.takeUnless { it.isEmpty() || it.sameName(program.title) }
+        return listOfNotNull(number, name).joinToString(" ").ifEmpty { null }
+    }
+
+    /** The Tray: Watch Next and what the Home saw play, together, within the Tray's limits. */
+    private fun publish() {
+        val oldest = platform.now().toInstant().minus(EXPIRES_AFTER)
+        val shown = (listed.filter { entry -> dismissed[entry.key]?.let { entry.lastWatched.isAfter(it) } ?: true } + history)
+            .filter { it.lastWatched.isAfter(oldest) }
+            .withinLimits()
+        _state.value = UpNextState(shown)
+    }
+
     private suspend fun record(media: PlayingMedia) {
+        // Watch Next already tells this app's story, better than its session can.
+        if (media.packageName in publishers) return
         val label = platform.appLabel(media.packageName)
         val title = media.title?.trim()?.takeUnless { it.isEmpty() || it.sameName(label) || it.sameName(media.packageName) }
         val key = if (title == null) media.packageName else "${media.packageName}|$title"
-        val entries = _state.value.entries
-        val existing = entries.firstOrNull { it.key == key }
+        val existing = history.firstOrNull { it.key == key }
         if (media.finished()) {
             if (existing != null) change { all -> all.filterNot { it.key == key } }
             return
@@ -149,23 +223,28 @@ class UpNextTray(private val platform: TvPlatform) {
 
     private fun PlayingMedia.isShort() = durationMillis != null && durationMillis in 1 until SHORT.toMillis()
 
-    /** Applies [edit], then the Tray's limits, and saves; artwork no entry uses any more is deleted. */
+    /**
+     * Applies [edit] to what the Home saw play, then the Tray's limits, saves it and shows the
+     * Tray again; artwork no entry uses any more is deleted.
+     */
     private suspend fun change(edit: (List<UpNextEntry>) -> List<UpNextEntry>) {
-        val before = _state.value.entries
+        val before = history
         val oldest = platform.now().toInstant().minus(EXPIRES_AFTER)
-        val after = edit(before)
-            .filter { it.lastWatched.isAfter(oldest) }
-            .sortedByDescending { it.lastWatched }
-            // One app doesn't crowd out the others: a binge keeps its latest few.
-            .groupBy { it.packageName }.values.flatMap { it.take(MAX_PER_APP) }
-            .sortedByDescending { it.lastWatched }
-            .take(MAX_ENTRIES)
-        if (after == before) return
-        _state.value = UpNextState(after)
-        platform.saveUpNext(after)
-        val kept = after.mapNotNull { it.artwork }.toSet()
-        before.mapNotNull { it.artwork }.filter { it !in kept }.distinct().forEach { platform.deleteArtwork(it) }
+        val after = edit(before).filter { it.lastWatched.isAfter(oldest) }.withinLimits()
+        if (after != before) {
+            history = after
+            platform.saveUpNext(after)
+            val kept = after.mapNotNull { it.artwork }.toSet()
+            before.mapNotNull { it.artwork }.filter { it !in kept }.distinct().forEach { platform.deleteArtwork(it) }
+        }
+        publish()
     }
+
+    /** Most recent first; one app doesn't crowd out the others: a binge keeps its latest few. */
+    private fun List<UpNextEntry>.withinLimits() = sortedByDescending { it.lastWatched }
+        .groupBy { it.packageName }.values.flatMap { it.take(MAX_PER_APP) }
+        .sortedByDescending { it.lastWatched }
+        .take(MAX_ENTRIES)
 
     private fun String.sameName(other: String) = normalized() == other.normalized()
 
