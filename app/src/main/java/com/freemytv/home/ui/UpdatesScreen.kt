@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -33,6 +36,8 @@ import androidx.tv.material3.Text
 import com.freemytv.home.R
 import com.freemytv.home.home.StatusClock
 import com.freemytv.home.ui.theme.Tokens
+import com.freemytv.home.updates.SideloadedApp
+import com.freemytv.home.updates.UpdateProblem
 import com.freemytv.home.updates.UpdatesState
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -44,7 +49,10 @@ fun UpdatesScreen(
     statusWidgets: @Composable () -> Unit,
     onCheckSystemUpdate: () -> Unit,
     onOpenPlayStoreApps: () -> Unit,
+    onSetSource: (packageName: String, input: String) -> Unit,
+    onUpdate: (packageName: String) -> Unit,
 ) {
+    var editingSource by remember { mutableStateOf<SideloadedApp?>(null) }
     val first = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
     Column(
@@ -95,12 +103,71 @@ fun UpdatesScreen(
                 Text(stringResource(R.string.no_apk_apps), color = Tokens.TextSecondary, fontSize = 11.sp)
             }
             state.sideloaded.forEach { app ->
-                Column(Modifier.padding(vertical = 3.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("${app.label}  ${app.version}", color = Tokens.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    Text(stringResource(R.string.installed_outside_play), color = Tokens.TextSecondary, fontSize = 10.sp)
-                }
+                SideloadedRow(app, onEditSource = { editingSource = app }, onUpdate = { onUpdate(app.packageName) })
             }
         }
+    }
+
+    editingSource?.let { app ->
+        TextInputDialog(
+            title = stringResource(R.string.update_source_title, app.label),
+            hint = stringResource(R.string.update_source_hint),
+            current = app.source.orEmpty(),
+            onDone = { onSetSource(app.packageName, it); editingSource = null },
+            onDismiss = { editingSource = null },
+        )
+    }
+}
+
+/** An app installed from an APK: its version, its Update Source, and what can be done about updates. */
+@Composable
+private fun SideloadedRow(app: SideloadedApp, onEditSource: () -> Unit, onUpdate: () -> Unit) {
+    Column {
+        Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("${app.label}  ${app.version}", color = Tokens.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Text(app.source?.let { "github.com/$it" } ?: stringResource(R.string.no_update_source), color = Tokens.TextSecondary, fontSize = 10.sp)
+                app.problem?.let { Text(problemText(it), color = Tokens.Attention, fontSize = 10.sp) }
+            }
+            val update = app.update
+            when {
+                app.updating -> Text(stringResource(R.string.updating), color = Tokens.TextSecondary, fontSize = 11.sp)
+                update != null -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    TextAction(stringResource(R.string.change_source), onEditSource)
+                    PillAction(stringResource(R.string.update_to, update.version), R.drawable.ic_download, onUpdate)
+                }
+                else -> TextAction(stringResource(if (app.source == null) R.string.set_source else R.string.change_source), onEditSource)
+            }
+        }
+        Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x14FFFFFF)))
+    }
+}
+
+@Composable
+private fun problemText(problem: UpdateProblem) = stringResource(
+    when (problem) {
+        UpdateProblem.NotFound -> R.string.source_not_found
+        UpdateProblem.NoApk -> R.string.source_no_apk
+        UpdateProblem.Offline -> R.string.source_offline
+        UpdateProblem.DownloadFailed -> R.string.update_download_failed
+        UpdateProblem.InstallFailed -> R.string.update_install_failed
+    },
+)
+
+/** A quiet action, as in the design's "Associar origem": plain text that turns into a pill when focused. */
+@Composable
+private fun TextAction(label: String, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = ClickableSurfaceDefaults.shape(CircleShape),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = Color.Transparent,
+            contentColor = Tokens.TextSecondary,
+            focusedContainerColor = Tokens.TextPrimary,
+            focusedContentColor = Color.Black,
+        ),
+    ) {
+        Text(label, fontSize = 11.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp))
     }
 }
 

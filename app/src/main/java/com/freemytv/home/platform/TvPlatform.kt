@@ -17,6 +17,8 @@ import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.updates.InstalledPackage
+import com.freemytv.home.updates.ReleaseAsset
+import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.upnext.PlayingMedia
 import com.freemytv.home.upnext.UpNextEntry
 import com.freemytv.home.weather.CachedForecast
@@ -210,6 +212,17 @@ interface TvPlatform {
     suspend fun installApk(path: String, silent: Boolean = false): InstallResult
 
     suspend fun deleteFile(path: String)
+
+    /** The latest release of a GitHub repository ("owner/name"). */
+    suspend fun latestRelease(repository: String): ReleaseLookup
+
+    /** Downloads a release's file; its path, or null when the download failed. */
+    suspend fun download(asset: ReleaseAsset): String?
+
+    /** Each sideloaded package's Update Source, "owner/name" on GitHub. */
+    suspend fun loadUpdateSources(): Map<String, String>
+
+    suspend fun saveUpdateSources(sources: Map<String, String>)
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

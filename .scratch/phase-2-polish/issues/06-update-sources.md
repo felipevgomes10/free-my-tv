@@ -13,8 +13,8 @@ Visual reference: `docs/design/updates.png` (the "Apps instalados por APK" block
 
 **Status:** ready-for-agent
 
-- [ ] Associating a repository with an APK release is accepted; one without is refused with a message
-- [ ] A newer release shows "Atualizar para X" and the Status Bar dot; selecting it leads to Android's confirmation
-- [ ] The daily check runs while the Home is up
-- [ ] Sources can be changed and removed, and persist
-- [ ] Tests cover source validation, version comparison, asset choice, the daily check, the dot and offline/download failures
+- [x] Associating a repository with an APK release is accepted; one without is refused with a message
+- [x] A newer release shows "Atualizar para X" and the Status Bar dot; selecting it leads to Android's confirmation (download and install proven end to end by ticket 07)
+- [x] The daily check runs while the Home is up
+- [x] Sources can be changed and removed, and persist
+- [x] Tests cover source validation, version comparison, asset choice, the daily check, the dot and offline/download failures

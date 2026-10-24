@@ -16,6 +16,8 @@ import com.freemytv.home.settings.DeviceInfo
 import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.updates.InstalledPackage
+import com.freemytv.home.updates.ReleaseAsset
+import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -118,6 +120,29 @@ class FakeTvPlatform(
 
     override suspend fun deleteFile(path: String) {
         deletedFiles += path
+    }
+
+    /** Latest release per repository; a missing repository is not found. Null simulates being offline. */
+    var releases: Map<String, ReleaseLookup>? = emptyMap()
+    val releaseChecks = mutableListOf<String>()
+    var downloadFails = false
+    val downloaded = mutableListOf<ReleaseAsset>()
+    var updateSources: Map<String, String> = emptyMap()
+
+    override suspend fun latestRelease(repository: String): ReleaseLookup {
+        releaseChecks += repository
+        return releases?.let { it[repository] ?: ReleaseLookup.NotFound } ?: ReleaseLookup.Offline
+    }
+
+    override suspend fun download(asset: ReleaseAsset): String? {
+        downloaded += asset
+        return if (downloadFails) null else "/cache/updates/${asset.name}"
+    }
+
+    override suspend fun loadUpdateSources() = updateSources
+
+    override suspend fun saveUpdateSources(sources: Map<String, String>) {
+        updateSources = sources
     }
 
     val deletedArtwork = mutableListOf<String>()
