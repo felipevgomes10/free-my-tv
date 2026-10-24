@@ -3,6 +3,10 @@ package com.freemytv.home.weather
 import com.freemytv.home.platform.FakeTvPlatform
 import com.freemytv.home.widgets.WidgetPreferences
 import com.freemytv.home.widgets.WidgetSettings
+import java.time.LocalDate
+import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -12,10 +16,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.LocalDate
-import java.time.LocalDateTime
-import kotlin.time.Duration.Companion.minutes
 
 class WeatherWidgetTest {
 
@@ -54,6 +56,41 @@ class WeatherWidgetTest {
         assertEquals(18, report.temperature)
         assertEquals(Condition.PartlyCloudy, report.condition)
         assertEquals(listOf("ip", "forecast:São Paulo"), platform.networkRequests)
+    }
+
+    @Test
+    fun `while the first forecast is on its way the widget is loading`() = runTest(UnconfinedTestDispatcher()) {
+        val platform = FakeTvPlatform(ipPlace = saoPaulo, forecasts = mapOf("São Paulo" to forecast())).apply { forecastTakes = 2.seconds }
+        val widget = widget(platform).widget
+
+        assertTrue(widget.state.value.loading)
+        advanceTimeBy(3.seconds)
+
+        assertFalse(widget.state.value.loading)
+        assertEquals("São Paulo", widget.state.value.report?.place)
+    }
+
+    @Test
+    fun `with nothing kept and no way to get a forecast, it stops loading so the screen can say so`() = runTest(UnconfinedTestDispatcher()) {
+        val platform = FakeTvPlatform(ipPlace = null)
+
+        val state = widget(platform).widget.state.value
+
+        assertFalse(state.loading)
+        assertNull(state.report)
+    }
+
+    @Test
+    fun `a forecast kept from before shows at once, without loading`() = runTest(UnconfinedTestDispatcher()) {
+        val platform = FakeTvPlatform(ipPlace = saoPaulo, forecasts = mapOf("São Paulo" to forecast())).apply {
+            cached = CachedForecast(saoPaulo, forecast(21.0))
+            forecastTakes = 2.seconds
+        }
+
+        val state = widget(platform).widget.state.value
+
+        assertFalse(state.loading)
+        assertEquals(21, state.report?.temperature)
     }
 
     @Test

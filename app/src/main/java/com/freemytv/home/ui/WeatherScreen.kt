@@ -1,7 +1,8 @@
 package com.freemytv.home.ui
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,35 +45,104 @@ import com.freemytv.home.weather.WeatherReport
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/** The Weather Widget's detail: now, the next 7 days, and the next 12 hours. */
+/**
+ * The Weather Widget's detail: now, the next 7 days, and the next 12 hours. Focus rests on the
+ * widget's own pill in the Status Bar, from where the other widgets are one press away. While the
+ * screen arrives, or the first forecast is on its way, a skeleton of the same layout stands in.
+ */
 @Composable
-fun WeatherScreen(report: WeatherReport?, clock: StatusClock, statusWidgets: @Composable () -> Unit) {
-    // Nothing on this screen is actionable; it holds focus so Back is the way out.
-    val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+fun WeatherScreen(report: WeatherReport?, loading: Boolean, clock: StatusClock, statusWidgets: @Composable () -> Unit) {
+    val pill = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { pill.requestFocus() } }
 
+    val settled = LocalScreenSettled.current
+    val page = when {
+        report != null && settled -> WeatherPage.Ready
+        report == null && !loading && settled -> WeatherPage.Unavailable
+        else -> WeatherPage.Loading
+    }
     val sky = if (report?.isDay == false) Color(0xFF0B1524) else Color(0xFF16304D)
     Box(
         Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(0f to sky, 0.85f to Tokens.Background))
-            .focusRequester(focus)
-            .focusable(),
+            .background(Brush.verticalGradient(0f to sky, 0.85f to Tokens.Background)),
     ) {
-        StatusBar(clock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
-        if (report == null) {
-            Text(
-                stringResource(R.string.weather_unavailable),
-                color = Tokens.TextSecondary,
-                fontSize = 14.sp,
-                modifier = Modifier.align(Alignment.Center).width(360.dp),
-                textAlign = TextAlign.Center,
-            )
-            return@Box
+        CompositionLocalProvider(LocalWeatherPillFocus provides pill) {
+            StatusBar(clock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
         }
-        Now(report, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
-        NextDays(report.days, Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
-        NextHours(report.hours, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
+        Crossfade(page, Modifier.fillMaxSize(), animationSpec = tween(REVEAL_MILLIS), label = "weather") { shown ->
+            Box(Modifier.fillMaxSize()) {
+                when (shown) {
+                    WeatherPage.Ready -> if (report != null) {
+                        Now(report, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
+                        NextDays(report.days, Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
+                        NextHours(report.hours, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
+                    }
+                    WeatherPage.Unavailable -> Text(
+                        stringResource(R.string.weather_unavailable),
+                        color = Tokens.TextSecondary,
+                        fontSize = 14.sp,
+                        modifier = Modifier.align(Alignment.Center).width(360.dp),
+                        textAlign = TextAlign.Center,
+                    )
+                    WeatherPage.Loading -> Skeleton {
+                        NowBones(Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
+                        NextDaysBones(Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
+                        NextHoursBones(Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
+                    }
+                }
+            }
+        }
+    }
+}
+
+private enum class WeatherPage { Loading, Ready, Unavailable }
+
+/** [Now]'s shape: the place, the big temperature, the sky, and four facts. */
+@Composable
+private fun NowBones(modifier: Modifier) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        TextBone(110.dp, 14)
+        Bone(170.dp, 96.dp, Modifier.padding(vertical = 12.dp), RoundedCornerShape(14.dp))
+        TextBone(150.dp, 18)
+        Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+            listOf(34.dp, 34.dp, 78.dp, 60.dp).forEach { TextBone(it, 12) }
+        }
+    }
+}
+
+/** [NextDays]' shape: seven rows of day, sky, low, range and high, with their hairlines. */
+@Composable
+private fun NextDaysBones(modifier: Modifier) {
+    Column(modifier) {
+        repeat(7) {
+            Row(
+                Modifier.fillMaxWidth().padding(vertical = 7.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextBone(if (it == 0) 36.dp else 52.dp, 12, Modifier.width(72.dp))
+                Bone(14.dp, 14.dp, shape = CircleShape)
+                TextBone(22.dp, 12, Modifier.width(28.dp), Alignment.CenterEnd)
+                Bone(null, 4.dp, Modifier.weight(1f), RoundedCornerShape(2.dp))
+                TextBone(22.dp, 12, Modifier.width(28.dp), Alignment.CenterEnd)
+            }
+            Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x1AFFFFFF)))
+        }
+    }
+}
+
+/** [NextHours]' shape: twelve columns of hour, sky and temperature. */
+@Composable
+private fun NextHoursBones(modifier: Modifier) {
+    Row(modifier, horizontalArrangement = Arrangement.SpaceBetween) {
+        repeat(12) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                TextBone(if (it == 0) 30.dp else 22.dp, 11)
+                Bone(16.dp, 16.dp, shape = CircleShape)
+                TextBone(24.dp, 13)
+            }
+        }
     }
 }
 
@@ -172,5 +244,6 @@ fun Condition.label(): Int = when (this) {
     Condition.Thunderstorm -> R.string.condition_thunderstorm
 }
 
+private const val REVEAL_MILLIS = 300
 private val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
 private val WEEKDAY: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE", PT_BR)

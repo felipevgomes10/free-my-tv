@@ -12,12 +12,14 @@ import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.EaseInCubic
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -58,6 +60,7 @@ import com.freemytv.home.ui.HomeActions
 import com.freemytv.home.ui.HomeScreen
 import com.freemytv.home.ui.HomeSection
 import com.freemytv.home.ui.InputActions
+import com.freemytv.home.ui.LocalScreenSettled
 import com.freemytv.home.ui.MonitorPill
 import com.freemytv.home.ui.MonitorScreen
 import com.freemytv.home.ui.NotificationBanner
@@ -193,181 +196,186 @@ class MainActivity : ComponentActivity() {
                 StatusIconButton(R.drawable.ic_settings, getString(R.string.settings)) { screen = Screen.Settings }
             }
             Box {
-            AnimatedContent(screen, transitionSpec = { screenTransition(initialState, targetState) }, label = "screen") { shown ->
-                when (shown) {
-                    Screen.Home -> HomeScreen(
-                        state = homeState,
-                        inputs = inputState,
-                        upNext = upNextState,
-                        topShelf = topShelfState,
-                        onUpNext = app.upNext::select,
-                        onRemoveUpNext = { scope.launch { app.upNext.remove(it) } },
-                        inputTrayFocusRequest = inputTrayFocusRequest,
-                        onSection = ::openSection,
-                        artwork = artwork,
-                        actions = HomeActions(
-                            onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
-                            onFocus = { item -> topShelf.focus((item as? AppTrayItem.App)?.let { ShelfApp(it.packageName, it.label) }) },
-                            onStartEdit = home::startEdit,
-                            onMove = home::move,
-                            onDrop = { scope.launch { home.drop() } },
-                            onUnpin = { scope.launch { home.unpinLifted() } },
-                            onUninstall = home::uninstallLifted,
-                        ),
-                        inputActions = InputActions(
-                            onSelect = inputs::select,
-                            onStartEdit = inputs::startEdit,
-                            onMove = inputs::move,
-                            onDrop = { scope.launch { inputs.drop() } },
-                            onRename = { name -> scope.launch { inputs.renameLifted(name) } },
-                            onHide = { scope.launch { inputs.hideLifted() } },
-                            onShowHidden = { scope.launch { inputs.showHidden() } },
-                            onCancel = inputs::cancelEdit,
-                        ),
-                        statusWidgets = statusWidgets,
-                    )
-                    Screen.AllApps -> {
-                        val allAppsState by allApps.state.collectAsStateWithLifecycle()
-                        AllAppsScreen(
-                            state = allAppsState,
-                            clock = homeState.statusClock,
-                            artwork = artwork,
-                            onOpen = { allApps.open(it.packageName) },
-                            onTogglePin = { scope.launch { allApps.togglePin(it.packageName) } },
-                            onUninstall = { allApps.uninstall(it.packageName) },
-                            onAppInfo = { allApps.openAppInfo(it.packageName) },
-                            onInstallApp = allApps::installApp,
-                            onSendApk = { screen = Screen.ApkDrop },
-                            statusWidgets = statusWidgets,
-                        )
-                    }
-                    Screen.Explorar -> {
-                        val explorarState by explorar.state.collectAsStateWithLifecycle()
-                        // Highlights load while Explorar is on screen; the hour's cache outlives it.
-                        LaunchedEffect(Unit) { explorar.run() }
-                        ExplorarScreen(
-                            state = explorarState,
-                            clock = homeState.statusClock,
-                            images = tmdbImages,
-                            actions = ExplorarActions(
-                                onWindow = explorar::choose,
-                                onFilter = explorar::choose,
-                                onFocus = explorar::focus,
-                                onDetails = { title ->
-                                    screen = Screen.TitleDetails
-                                    scope.launch { explorar.openDetails(title) }
-                                },
-                            ),
+            val screens = updateTransition(screen, label = "screen")
+            screens.AnimatedContent(transitionSpec = { screenTransition(initialState, targetState) }) { shown ->
+                // An arriving screen settles once the move ends; one uncovered by Back is already in place.
+                val settled = screens.currentState == shown || screens.currentState.depth > shown.depth
+                CompositionLocalProvider(LocalScreenSettled provides settled) {
+                    when (shown) {
+                        Screen.Home -> HomeScreen(
+                            state = homeState,
+                            inputs = inputState,
+                            upNext = upNextState,
+                            topShelf = topShelfState,
+                            onUpNext = app.upNext::select,
+                            onRemoveUpNext = { scope.launch { app.upNext.remove(it) } },
+                            inputTrayFocusRequest = inputTrayFocusRequest,
                             onSection = ::openSection,
+                            artwork = artwork,
+                            actions = HomeActions(
+                                onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
+                                onFocus = { item -> topShelf.focus((item as? AppTrayItem.App)?.let { ShelfApp(it.packageName, it.label) }) },
+                                onStartEdit = home::startEdit,
+                                onMove = home::move,
+                                onDrop = { scope.launch { home.drop() } },
+                                onUnpin = { scope.launch { home.unpinLifted() } },
+                                onUninstall = home::uninstallLifted,
+                            ),
+                            inputActions = InputActions(
+                                onSelect = inputs::select,
+                                onStartEdit = inputs::startEdit,
+                                onMove = inputs::move,
+                                onDrop = { scope.launch { inputs.drop() } },
+                                onRename = { name -> scope.launch { inputs.renameLifted(name) } },
+                                onHide = { scope.launch { inputs.hideLifted() } },
+                                onShowHidden = { scope.launch { inputs.showHidden() } },
+                                onCancel = inputs::cancelEdit,
+                            ),
                             statusWidgets = statusWidgets,
-                            returnToCard = explorarReturnsToCard.also { explorarReturnsToCard = false },
                         )
-                    }
-                    Screen.TitleDetails -> {
-                        val explorarState by explorar.state.collectAsStateWithLifecycle()
-                        explorarState.details?.let { details ->
-                            TitleDetailsScreen(
-                                state = details,
+                        Screen.AllApps -> {
+                            val allAppsState by allApps.state.collectAsStateWithLifecycle()
+                            AllAppsScreen(
+                                state = allAppsState,
                                 clock = homeState.statusClock,
-                                images = tmdbImages,
-                                onBack = ::closeDetails,
-                                onWatch = explorar::watch,
-                                onTrailer = { screen = Screen.Trailer },
+                                artwork = artwork,
+                                onOpen = { allApps.open(it.packageName) },
+                                onTogglePin = { scope.launch { allApps.togglePin(it.packageName) } },
+                                onUninstall = { allApps.uninstall(it.packageName) },
+                                onAppInfo = { allApps.openAppInfo(it.packageName) },
+                                onInstallApp = allApps::installApp,
+                                onSendApk = { screen = Screen.ApkDrop },
                                 statusWidgets = statusWidgets,
                             )
                         }
-                    }
-                    Screen.Trailer -> {
-                        val explorarState by explorar.state.collectAsStateWithLifecycle()
-                        val details = explorarState.details
-                        val video = details?.trailer
-                        if (details != null && video != null) {
-                            TrailerScreen(
-                                title = details.details?.name ?: details.summary.name,
-                                video = video,
-                                onBack = { screen = Screen.TitleDetails },
-                                onFailed = {
-                                    screen = Screen.TitleDetails
-                                    explorar.trailerFailed(video)
-                                },
+                        Screen.Explorar -> {
+                            val explorarState by explorar.state.collectAsStateWithLifecycle()
+                            // Highlights load while Explorar is on screen; the hour's cache outlives it.
+                            LaunchedEffect(Unit) { explorar.run() }
+                            ExplorarScreen(
+                                state = explorarState,
+                                clock = homeState.statusClock,
+                                images = tmdbImages,
+                                actions = ExplorarActions(
+                                    onWindow = explorar::choose,
+                                    onFilter = explorar::choose,
+                                    onFocus = explorar::focus,
+                                    onDetails = { title ->
+                                        screen = Screen.TitleDetails
+                                        scope.launch { explorar.openDetails(title) }
+                                    },
+                                ),
+                                onSection = ::openSection,
+                                statusWidgets = statusWidgets,
+                                returnToCard = explorarReturnsToCard.also { explorarReturnsToCard = false },
                             )
                         }
-                    }
-                    Screen.ApkDrop -> {
-                        val apkDropState by apkDrop.state.collectAsStateWithLifecycle()
-                        // The page is served only while this screen is on.
-                        LaunchedEffect(Unit) { apkDrop.open() }
-                        ApkDropScreen(
-                            state = apkDropState,
+                        Screen.TitleDetails -> {
+                            val explorarState by explorar.state.collectAsStateWithLifecycle()
+                            explorarState.details?.let { details ->
+                                TitleDetailsScreen(
+                                    state = details,
+                                    clock = homeState.statusClock,
+                                    images = tmdbImages,
+                                    onBack = ::closeDetails,
+                                    onWatch = explorar::watch,
+                                    onTrailer = { screen = Screen.Trailer },
+                                    statusWidgets = statusWidgets,
+                                )
+                            }
+                        }
+                        Screen.Trailer -> {
+                            val explorarState by explorar.state.collectAsStateWithLifecycle()
+                            val details = explorarState.details
+                            val video = details?.trailer
+                            if (details != null && video != null) {
+                                TrailerScreen(
+                                    title = details.details?.name ?: details.summary.name,
+                                    video = video,
+                                    onBack = { screen = Screen.TitleDetails },
+                                    onFailed = {
+                                        screen = Screen.TitleDetails
+                                        explorar.trailerFailed(video)
+                                    },
+                                )
+                            }
+                        }
+                        Screen.ApkDrop -> {
+                            val apkDropState by apkDrop.state.collectAsStateWithLifecycle()
+                            // The page is served only while this screen is on.
+                            LaunchedEffect(Unit) { apkDrop.open() }
+                            ApkDropScreen(
+                                state = apkDropState,
+                                clock = homeState.statusClock,
+                                onInstall = { scope.launch { apkDrop.install() } },
+                                onCancel = { scope.launch { apkDrop.cancel() } },
+                                statusWidgets = statusWidgets,
+                            )
+                        }
+                        Screen.Weather -> WeatherScreen(weatherState.report, weatherState.loading, homeState.statusClock, statusWidgets)
+                        Screen.Settings -> {
+                            val settingsState by settings.state.collectAsStateWithLifecycle()
+                            val assignments by app.shortcutButtons.assignments.collectAsStateWithLifecycle()
+                            val setupState by app.setupWatchdog.state.collectAsStateWithLifecycle()
+                            val allAppsState by allApps.state.collectAsStateWithLifecycle()
+                            SettingsScreen(
+                                state = settingsState,
+                                openAppLimit = openAppLimit,
+                                buttons = ButtonsPanelState(
+                                    assignments = assignments,
+                                    targetOf = app.shortcutButtons::targetOf,
+                                    apps = allAppsState.apps.map { InstalledApp(it.packageName, it.label, it.art == TileArt.Banner) },
+                                    inputs = inputState.inputs,
+                                ),
+                                setup = setupState,
+                                clock = homeState.statusClock,
+                                statusWidgets = statusWidgets,
+                                actions = SettingsActions(
+                                    onWeatherVisible = { scope.launch { settings.setWeatherVisible(it) } },
+                                    onMonitorVisible = { scope.launch { settings.setMonitorVisible(it) } },
+                                    onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },
+                                    onOpenAndroidSettings = settings::openAndroidSettings,
+                                    onOpenAppLimit = { scope.launch { multitasking.setLimit(it) } },
+                                    onAssignButton = { button, target ->
+                                        scope.launch {
+                                            if (target == null) app.shortcutButtons.restoreFactory(button) else app.shortcutButtons.assign(button, target)
+                                        }
+                                    },
+                                ),
+                            )
+                        }
+                        Screen.Switcher -> AppSwitcherScreen(
+                            state = switcherState,
+                            artwork = artwork,
+                            now = platform.now().toInstant(),
+                            onSwitch = { app ->
+                                screen = Screen.Home
+                                multitasking.switchTo(app)
+                            },
+                            onClose = multitasking::close,
+                        )
+                        Screen.Updates -> {
+                            LaunchedEffect(Unit) { updates.checkSources() }
+                            UpdatesScreen(
+                                state = updatesState,
+                                clock = homeState.statusClock,
+                                statusWidgets = statusWidgets,
+                                onCheckSystemUpdate = updates::checkSystemUpdate,
+                                onOpenPlayStoreApps = updates::openPlayStoreApps,
+                                onSetSource = { pkg, input -> scope.launch { updates.setSource(pkg, input) } },
+                                onUpdate = { pkg -> scope.launch { updates.update(pkg) } },
+                            )
+                        }
+                        Screen.Monitor -> MonitorScreen(
+                            state = monitorState,
                             clock = homeState.statusClock,
-                            onInstall = { scope.launch { apkDrop.install() } },
-                            onCancel = { scope.launch { apkDrop.cancel() } },
                             statusWidgets = statusWidgets,
+                            onOpen = monitor::openDetail,
+                            onClose = monitor::closeDetail,
+                            onUninstall = { library.requestUninstall(it.packageName) },
+                            onCloseApp = { scope.launch { monitor.close(it) } },
                         )
                     }
-                    Screen.Weather -> WeatherScreen(weatherState.report, homeState.statusClock, statusWidgets)
-                    Screen.Settings -> {
-                        val settingsState by settings.state.collectAsStateWithLifecycle()
-                        val assignments by app.shortcutButtons.assignments.collectAsStateWithLifecycle()
-                        val setupState by app.setupWatchdog.state.collectAsStateWithLifecycle()
-                        val allAppsState by allApps.state.collectAsStateWithLifecycle()
-                        SettingsScreen(
-                            state = settingsState,
-                            openAppLimit = openAppLimit,
-                            buttons = ButtonsPanelState(
-                                assignments = assignments,
-                                targetOf = app.shortcutButtons::targetOf,
-                                apps = allAppsState.apps.map { InstalledApp(it.packageName, it.label, it.art == TileArt.Banner) },
-                                inputs = inputState.inputs,
-                            ),
-                            setup = setupState,
-                            clock = homeState.statusClock,
-                            statusWidgets = statusWidgets,
-                            actions = SettingsActions(
-                                onWeatherVisible = { scope.launch { settings.setWeatherVisible(it) } },
-                                onMonitorVisible = { scope.launch { settings.setMonitorVisible(it) } },
-                                onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },
-                                onOpenAndroidSettings = settings::openAndroidSettings,
-                                onOpenAppLimit = { scope.launch { multitasking.setLimit(it) } },
-                                onAssignButton = { button, target ->
-                                    scope.launch {
-                                        if (target == null) app.shortcutButtons.restoreFactory(button) else app.shortcutButtons.assign(button, target)
-                                    }
-                                },
-                            ),
-                        )
-                    }
-                    Screen.Switcher -> AppSwitcherScreen(
-                        state = switcherState,
-                        artwork = artwork,
-                        now = platform.now().toInstant(),
-                        onSwitch = { app ->
-                            screen = Screen.Home
-                            multitasking.switchTo(app)
-                        },
-                        onClose = multitasking::close,
-                    )
-                    Screen.Updates -> {
-                        LaunchedEffect(Unit) { updates.checkSources() }
-                        UpdatesScreen(
-                            state = updatesState,
-                            clock = homeState.statusClock,
-                            statusWidgets = statusWidgets,
-                            onCheckSystemUpdate = updates::checkSystemUpdate,
-                            onOpenPlayStoreApps = updates::openPlayStoreApps,
-                            onSetSource = { pkg, input -> scope.launch { updates.setSource(pkg, input) } },
-                            onUpdate = { pkg -> scope.launch { updates.update(pkg) } },
-                        )
-                    }
-                    Screen.Monitor -> MonitorScreen(
-                        state = monitorState,
-                        clock = homeState.statusClock,
-                        statusWidgets = statusWidgets,
-                        onOpen = monitor::openDetail,
-                        onClose = monitor::closeDetail,
-                        onUninstall = { library.requestUninstall(it.packageName) },
-                        onCloseApp = { scope.launch { monitor.close(it) } },
-                    )
                 }
             }
             val now = platform.now().toInstant()

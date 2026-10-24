@@ -1,6 +1,9 @@
 package com.freemytv.home.ui
 
 import android.graphics.Bitmap
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +34,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,8 +89,10 @@ fun ExplorarScreen(
             runCatching { navigation.requestFocus() }
         }
     }
+    // Until the screen stands still, or while the first highlights load, a skeleton of the page stands in.
+    val skeleton = !LocalScreenSettled.current || (state.titles.isEmpty() && state.loading)
     Box(Modifier.fillMaxSize().background(Tokens.Background)) {
-        state.hero?.backdrop?.let { HeroBackdrop(it, images) }
+        if (!skeleton) state.hero?.backdrop?.let { HeroBackdrop(it, images) }
         Column(Modifier.fillMaxSize()) {
             StatusBar(clock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
             HomeNavigation(HomeSection.Explorar, onSection, Modifier.padding(top = NAVIGATION_TOP), currentFocus = navigation)
@@ -106,51 +114,110 @@ fun ExplorarScreen(
                     }
                 }
             }
-            Box(Modifier.fillMaxWidth().height(HERO_HEIGHT).padding(start = Tokens.SafeAreaHorizontal)) {
-                state.hero?.let { Hero(it, Modifier.align(Alignment.BottomStart)) { actions.onDetails(it) } }
-                    ?: ProblemText(state, Modifier.align(Alignment.CenterStart))
-            }
-            Spacer(Modifier.weight(1f))
-            if (state.titles.isNotEmpty()) {
-                state.problem?.let { ProblemText(state, Modifier.padding(start = Tokens.SafeAreaHorizontal, bottom = 6.dp)) }
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = Tokens.SafeAreaHorizontal),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom,
-                ) {
-                    Text(
-                        stringResource(if (state.window == TrendWindow.Today) R.string.highlights_today else R.string.highlights_week),
-                        color = Tokens.TextPrimary,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        stringResource(if (state.window == TrendWindow.Today) R.string.highlights_today_note else R.string.highlights_week_note),
-                        color = Tokens.TextSecondary,
-                        fontSize = 10.sp,
-                    )
-                }
-                LazyRow(
-                    state = row,
-                    contentPadding = PaddingValues(horizontal = Tokens.SafeAreaHorizontal, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    itemsIndexed(state.titles, key = { _, title -> title.key() }) { _, title ->
-                        TitleCard(
-                            title,
-                            images,
-                            onFocus = { actions.onFocus(title) },
-                            onClick = { actions.onDetails(title) },
-                            modifier = Modifier.focusRequester(cards.getOrPut(title.key()) { FocusRequester() }),
-                        )
+            Crossfade(skeleton, Modifier.fillMaxWidth().height(HERO_HEIGHT), animationSpec = tween(REVEAL_MILLIS), label = "hero") { bones ->
+                Box(Modifier.fillMaxSize().padding(start = Tokens.SafeAreaHorizontal)) {
+                    when {
+                        bones -> HeroBones(Modifier.align(Alignment.BottomStart))
+                        else -> state.hero?.let { Hero(it, Modifier.align(Alignment.BottomStart)) { actions.onDetails(it) } }
+                            ?: ProblemText(state, Modifier.align(Alignment.CenterStart))
                     }
                 }
-                Text(
-                    stringResource(R.string.explorar_hint),
-                    color = Tokens.TextSecondary,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(start = Tokens.SafeAreaHorizontal, bottom = 16.dp),
-                )
+            }
+            Spacer(Modifier.weight(1f))
+            Crossfade(skeleton, animationSpec = tween(REVEAL_MILLIS), label = "highlights") { bones ->
+                Column {
+                    if (bones) {
+                        HighlightsHeader(state.window)
+                        CardBones()
+                        ExplorarHint()
+                    } else if (state.titles.isNotEmpty()) {
+                        state.problem?.let { ProblemText(state, Modifier.padding(start = Tokens.SafeAreaHorizontal, bottom = 6.dp)) }
+                        HighlightsHeader(state.window)
+                        LazyRow(
+                            state = row,
+                            contentPadding = PaddingValues(horizontal = Tokens.SafeAreaHorizontal, vertical = 10.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            itemsIndexed(state.titles, key = { _, title -> title.key() }) { _, title ->
+                                TitleCard(
+                                    title,
+                                    images,
+                                    onFocus = { actions.onFocus(title) },
+                                    onClick = { actions.onDetails(title) },
+                                    modifier = Modifier.focusRequester(cards.getOrPut(title.key()) { FocusRequester() }),
+                                )
+                            }
+                        }
+                        ExplorarHint()
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** "Destaques de hoje" (or of the week) over the row of cards, with its note on the right. */
+@Composable
+private fun HighlightsHeader(window: TrendWindow) {
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = Tokens.SafeAreaHorizontal),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        Text(
+            stringResource(if (window == TrendWindow.Today) R.string.highlights_today else R.string.highlights_week),
+            color = Tokens.TextPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            stringResource(if (window == TrendWindow.Today) R.string.highlights_today_note else R.string.highlights_week_note),
+            color = Tokens.TextSecondary,
+            fontSize = 10.sp,
+        )
+    }
+}
+
+@Composable
+private fun ExplorarHint() {
+    Text(
+        stringResource(R.string.explorar_hint),
+        color = Tokens.TextSecondary,
+        fontSize = 10.sp,
+        modifier = Modifier.padding(start = Tokens.SafeAreaHorizontal, bottom = 16.dp),
+    )
+}
+
+/** [Hero]'s shape: the title, its facts, two lines of overview and "Ver detalhes". */
+@Composable
+private fun HeroBones(modifier: Modifier) {
+    Skeleton {
+        Column(modifier.width(460.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            TextBone(280.dp, 32)
+            TextBone(190.dp, 12)
+            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                TextBone(440.dp, 12)
+                TextBone(330.dp, 12)
+            }
+            Bone(124.dp, 33.dp, Modifier.padding(top = 6.dp), CircleShape)
+        }
+    }
+}
+
+/** The row of [TitleCard]s' shape: a picture and two lines under it, as many as fill the screen. */
+@Composable
+private fun CardBones() {
+    Skeleton {
+        Row(
+            Modifier.padding(horizontal = Tokens.SafeAreaHorizontal, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            repeat(CARD_BONES) {
+                Column(Modifier.width(CARD_WIDTH), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Bone(CARD_WIDTH, CARD_HEIGHT, shape = RoundedCornerShape(11.dp))
+                    TextBone(CARD_WIDTH * 0.6f, 13, Modifier.padding(top = 4.dp))
+                    TextBone(CARD_WIDTH * 0.45f, 10)
+                }
             }
         }
     }
@@ -161,7 +228,9 @@ private fun HeroBackdrop(path: String, images: TmdbImages) {
     val picture by produceState<Bitmap?>(null, path) {
         value = images.file(path, "w1280")?.let { bakeBackdrop(it, 1280, 720, fadeFrom = 0.55f) }
     }
-    picture?.let { Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize()) }
+    // The backdrop fades in once baked rather than appearing at once.
+    val shown = animateFloatAsState(if (picture != null) 1f else 0f, tween(REVEAL_MILLIS), label = "backdrop")
+    picture?.let { Image(it.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize().graphicsLayer { alpha = shown.value }) }
 }
 
 @Composable
@@ -181,7 +250,10 @@ private fun TitleCard(title: TitleSummary, images: TmdbImages, onFocus: () -> Un
     }
     Column(Modifier.width(CARD_WIDTH), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         TvTile(onClick = onClick, width = CARD_WIDTH, height = CARD_HEIGHT, focusedScale = 1.05f, modifier = modifier.onFocusChanged { if (it.isFocused) onFocus() }) {
-            picture?.let { Image(it.asImageBitmap(), contentDescription = title.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
+            // A pulsing stand-in until the picture arrives, then the picture fades in over it.
+            val shown = animateFloatAsState(if (picture != null) 1f else 0f, tween(REVEAL_MILLIS), label = "card")
+            if (shown.value < 1f) Skeleton { Bone(CARD_WIDTH, CARD_HEIGHT, shape = RectangleShape) }
+            picture?.let { Image(it.asImageBitmap(), contentDescription = title.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize().graphicsLayer { alpha = shown.value }) }
         }
         Text(title.name, color = Tokens.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
         Text(meta(title, ratingOutOfTen = false), color = Tokens.TextSecondary, fontSize = 10.sp, maxLines = 1)
@@ -267,5 +339,7 @@ internal val NAVIGATION_TOP = 16.dp
 private val HERO_HEIGHT = 150.dp
 private val CARD_WIDTH = 204.dp
 private val CARD_HEIGHT = 105.dp
+private const val CARD_BONES = 7
+private const val REVEAL_MILLIS = 300
 private const val CARD_DECODE_WIDTH = 420
 private val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
