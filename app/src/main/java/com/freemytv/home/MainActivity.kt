@@ -53,6 +53,8 @@ import com.freemytv.home.ui.WeatherScreen
 import com.freemytv.home.weather.WeatherWidget
 import com.freemytv.home.widgets.WidgetSettings
 import com.freemytv.home.ui.HomeScreen
+import com.freemytv.home.ui.ExplorarScreen
+import com.freemytv.home.ui.HomeSection
 import com.freemytv.home.apkdrop.ApkDrop
 import com.freemytv.home.ui.ApkDropScreen
 import com.freemytv.home.topshelf.ShelfApp
@@ -62,7 +64,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
+    private enum class Screen { Home, Explorar, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
 
     private var screen by mutableStateOf(Screen.Home)
     private var notificationsOpen by mutableStateOf(false)
@@ -178,6 +180,7 @@ class MainActivity : ComponentActivity() {
                     onUpNext = app.upNext::select,
                     onRemoveUpNext = { scope.launch { app.upNext.remove(it) } },
                     inputTrayFocusRequest = inputTrayFocusRequest,
+                    onSection = ::openSection,
                     artwork = artwork,
                     actions = HomeActions(
                         onSelect = { item -> if (item == AppTrayItem.AllApps) screen = Screen.AllApps else home.select(item) },
@@ -215,6 +218,7 @@ class MainActivity : ComponentActivity() {
                         statusWidgets = statusWidgets,
                     )
                 }
+                Screen.Explorar -> ExplorarScreen(clock = homeState.statusClock, onSection = ::openSection, statusWidgets = statusWidgets)
                 Screen.ApkDrop -> {
                     val apkDropState by apkDrop.state.collectAsStateWithLifecycle()
                     // The page is served only while this screen is on.
@@ -308,6 +312,14 @@ class MainActivity : ComponentActivity() {
     }
 
     /** Pressing Home while the Home is already in front always returns to the Home screen. */
+    private fun openSection(section: HomeSection) {
+        screen = when (section) {
+            HomeSection.Inicio -> Screen.Home
+            HomeSection.Explorar -> Screen.Explorar
+            HomeSection.TodosOsApps -> Screen.AllApps
+        }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         home.cancelEdit()

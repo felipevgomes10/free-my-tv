@@ -140,6 +140,8 @@
     <string name="check_install_apps">Instalação de apps</string>
     <string name="check_explorar">Explorar (chave do TMDB)</string>
     <string name="up_next">Continuar assistindo</string>
+    <string name="section_home">Início</string>
+    <string name="section_explorar">Explorar</string>
     <string name="send_apk">Enviar APK</string>
     <string name="no_update_source">Sem origem associada</string>
     <string name="set_source">Associar origem</string>
