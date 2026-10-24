@@ -151,6 +151,10 @@
     <string name="see_details">Ver detalhes</string>
     <string name="audience_rating">Avaliação do público</string>
     <string name="cast">Elenco</string>
+    <string name="where_to_watch">Onde assistir</string>
+    <string name="offer_subscription">Incluído na assinatura</string>
+    <string name="offer_rent_or_buy">Alugar ou comprar</string>
+    <string name="where_to_watch_note">Abre a obra no app do streaming. Pode exigir assinatura ou pagamento.</string>
     <string name="details_offline">Sem internet: não deu para trazer os detalhes desta obra.</string>
     <string name="highlights_today">Destaques de hoje</string>
     <string name="highlights_today_note">Filmes e séries para descobrir</string>

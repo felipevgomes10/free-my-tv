@@ -418,6 +418,10 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override fun openPlayStore() = launch(PLAY_STORE)
 
+    override fun openPlayStorePage(packageName: String) {
+        if (!tryStart(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")).setPackage(PLAY_STORE))) openPlayStore()
+    }
+
     override val nowPlaying = mediaSessions.nowPlaying
 
     override suspend fun localAddress(): String? = withContext(Dispatchers.IO) {

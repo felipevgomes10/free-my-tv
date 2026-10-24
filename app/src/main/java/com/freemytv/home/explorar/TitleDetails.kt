@@ -21,6 +21,8 @@ data class TitleDetails(
     val seasons: Int?,
     val cast: List<CastMember>,
     val backdrop: String?,
+    /** Brazil's watch offers, best first, as TMDB lists them. */
+    val offers: List<WatchOffer> = emptyList(),
 )
 
 sealed interface DetailsLookup {

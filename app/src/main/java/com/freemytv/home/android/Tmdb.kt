@@ -5,6 +5,8 @@ import android.util.Log
 import com.freemytv.home.explorar.CastMember
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.OfferKind
+import com.freemytv.home.explorar.WatchOffer
 import com.freemytv.home.explorar.TitleDetails
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TitleSummary
@@ -113,7 +115,20 @@ class Tmdb(private val context: Context) {
             seasons = if (movie) null else json.optInt("number_of_seasons").takeIf { it > 0 },
             cast = cast,
             backdrop = json.optString("backdrop_path").takeIf { it.startsWith("/") },
+            offers = brazilOffers(json),
         )
+    }
+
+    /** Brazil's offers: subscriptions (and free with ads), then rent and buy, each by TMDB's priority. */
+    private fun brazilOffers(json: JSONObject): List<WatchOffer> {
+        val brazil = json.optJSONObject("watch/providers")?.optJSONObject("results")?.optJSONObject(BRAZIL) ?: return emptyList()
+        return listOf("flatrate" to OfferKind.Subscription, "free" to OfferKind.Subscription, "ads" to OfferKind.Subscription, "rent" to OfferKind.RentOrBuy, "buy" to OfferKind.RentOrBuy)
+            .flatMap { (field, kind) ->
+                val list = brazil.optJSONArray(field) ?: return@flatMap emptyList()
+                List(list.length()) { list.getJSONObject(it) }
+                    .sortedBy { it.optInt("display_priority") }
+                    .map { WatchOffer(it.getInt("provider_id"), it.getString("provider_name"), kind) }
+            }
     }
 
     /** Brazil's rating from the movie's release dates: the theatrical one, else the first given. */

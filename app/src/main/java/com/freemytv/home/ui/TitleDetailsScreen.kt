@@ -31,7 +31,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.res.painterResource
+import androidx.tv.material3.ClickableSurfaceDefaults
+import androidx.tv.material3.Icon
+import androidx.tv.material3.LocalContentColor
+import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.freemytv.home.explorar.OfferKind
+import com.freemytv.home.explorar.WatchOption
 import com.freemytv.home.R
 import com.freemytv.home.android.TmdbImages
 import com.freemytv.home.explorar.AgeRating
@@ -52,6 +62,7 @@ fun TitleDetailsScreen(
     clock: StatusClock,
     images: TmdbImages,
     onBack: () -> Unit,
+    onWatch: (WatchOption) -> Unit,
     statusWidgets: @Composable () -> Unit,
 ) {
     val back = remember { FocusRequester() }
@@ -99,6 +110,16 @@ fun TitleDetailsScreen(
                 state.problem == ExplorarProblem.Offline -> Problem(stringResource(R.string.details_offline))
                 state.loading -> Text(stringResource(R.string.loading), color = Tokens.TextSecondary, fontSize = 12.sp, modifier = Modifier.padding(top = 16.dp))
             }
+            if (state.whereToWatch.isNotEmpty()) {
+                Text(stringResource(R.string.where_to_watch), color = Tokens.TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 18.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    items(state.whereToWatch, key = { it.name }) { option -> WatchCard(option) { onWatch(option) } }
+                }
+                Text(stringResource(R.string.where_to_watch_note), color = Tokens.TextSecondary, fontSize = 10.sp)
+            }
             val cast = details?.leadCast().orEmpty()
             if (cast.isNotEmpty()) {
                 Box(Modifier.weight(1f))
@@ -111,6 +132,40 @@ fun TitleDetailsScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+/** A service offering the Title: ▷ opens its app, ↗ its Play Store page; one without a TV app can't be selected. */
+@Composable
+private fun WatchCard(option: WatchOption, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        enabled = option.packageName != null,
+        modifier = Modifier.width(190.dp),
+        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(12.dp)),
+        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.03f),
+        colors = ClickableSurfaceDefaults.colors(
+            containerColor = Color(0x2EFFFFFF),
+            contentColor = Tokens.TextPrimary,
+            focusedContainerColor = Tokens.TextPrimary,
+            focusedContentColor = Color.Black,
+            disabledContainerColor = Color(0x14FFFFFF),
+            disabledContentColor = Tokens.TextSecondary,
+        ),
+    ) {
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (option.packageName != null) {
+                Icon(painterResource(if (option.installed) R.drawable.ic_play else R.drawable.ic_open_in_new), contentDescription = null, modifier = Modifier.size(14.dp))
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(option.name, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    stringResource(if (option.kind == OfferKind.Subscription) R.string.offer_subscription else R.string.offer_rent_or_buy),
+                    fontSize = 10.sp,
+                    color = LocalContentColor.current.copy(alpha = 0.7f),
+                )
             }
         }
     }
