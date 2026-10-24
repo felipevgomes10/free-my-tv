@@ -13,8 +13,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] A movie and a series show their details as in the designs
-- [ ] Brazil's rating comes from release dates for movies and content ratings for series; a missing one hides the badge
-- [ ] Unknown duration, episode length, seasons or cast are left out, never shown as 0 or empty
-- [ ] Back returns to Explorar with focus on the same card
-- [ ] Tests cover the rating rules, the duration and season texts, and missing fields
+- [x] A movie and a series show their details as in the designs
+- [x] Brazil's rating comes from release dates for movies and content ratings for series; a missing one hides the badge
+- [x] Unknown duration, episode length, seasons or cast are left out, never shown as 0 or empty
+- [x] Back returns to Explorar with focus on the same card
+- [x] Tests cover the rating rules, the duration and season texts, and missing fields

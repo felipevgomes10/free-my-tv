@@ -4,7 +4,9 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
 import com.freemytv.home.buttons.HomeDestination
@@ -229,6 +231,9 @@ interface TvPlatform {
 
     /** TMDB's trending Titles, in Portuguese, with genre names. */
     suspend fun trending(window: TrendWindow, filter: KindFilter): TrendingLookup
+
+    /** A Title's details for Brazil, in Portuguese, in one TMDB request. */
+    suspend fun titleDetails(kind: TitleKind, id: Int): DetailsLookup
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

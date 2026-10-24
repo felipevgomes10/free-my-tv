@@ -4,7 +4,9 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
 import com.freemytv.home.buttons.HomeDestination
@@ -156,6 +158,11 @@ class FakeTvPlatform(
         trendingCalls += window to filter
         return trending[window to filter] ?: TrendingLookup.Offline
     }
+
+    /** Details per Title id; a missing id is offline. */
+    var details: Map<Int, DetailsLookup> = emptyMap()
+
+    override suspend fun titleDetails(kind: TitleKind, id: Int) = details[id] ?: DetailsLookup.Offline
 
     val deletedArtwork = mutableListOf<String>()
 
