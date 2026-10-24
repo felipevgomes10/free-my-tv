@@ -24,6 +24,8 @@ data class PlayingMedia(
     val artwork: String? = null,
     /** The app is a music or audio app, by its own declaration. */
     val audioApp: Boolean = false,
+    /** The app's own id for what is playing, when it gives one (YouTube: the video's id). */
+    val mediaId: String? = null,
 )
 
 /** One movie or episode on the Up Next Tray, or one app when the app doesn't say what played. */
@@ -38,6 +40,8 @@ data class UpNextEntry(
     val durationMillis: Long?,
     val artwork: String?,
     val lastWatched: Instant,
+    /** The app's own id for the title, which lets YouTube reopen the very video. */
+    val mediaId: String? = null,
 ) {
     /** What is left to watch, when the app tells both its position and its duration. */
     val remainingMillis: Long?
@@ -85,8 +89,18 @@ class UpNextTray(private val platform: TvPlatform) {
     /** "Remover da lista". */
     suspend fun remove(entry: UpNextEntry) = change { entries -> entries.filterNot { it.key == entry.key } }
 
-    /** Back to the entry where the owner stopped when the app allows it, or else into its app. */
-    fun select(entry: UpNextEntry) = platform.resume(entry.packageName)
+    /**
+     * Back to the entry where the owner stopped when the app allows it: a YouTube video reopens
+     * at its position from its id; others resume through their live session, or else open the app.
+     */
+    fun select(entry: UpNextEntry) {
+        val videoId = entry.mediaId?.takeIf { entry.packageName == YOUTUBE && YOUTUBE_ID.matches(it) }
+        if (videoId != null) {
+            platform.openYouTubeVideo(videoId, startSeconds = ((entry.positionMillis ?: 0) / 1000).toInt())
+        } else {
+            platform.resume(entry.packageName, entry.title)
+        }
+    }
 
     private suspend fun record(media: PlayingMedia) {
         val label = platform.appLabel(media.packageName)
@@ -111,6 +125,7 @@ class UpNextTray(private val platform: TvPlatform) {
             durationMillis = media.durationMillis?.takeIf { it > 0 } ?: existing?.durationMillis,
             artwork = media.artwork ?: existing?.artwork,
             lastWatched = if (media.playing) now else existing?.lastWatched ?: now,
+            mediaId = media.mediaId?.takeIf { it.isNotBlank() } ?: existing?.mediaId,
         )
         if (entry == existing) return
         change { all ->
@@ -135,7 +150,13 @@ class UpNextTray(private val platform: TvPlatform) {
     private suspend fun change(edit: (List<UpNextEntry>) -> List<UpNextEntry>) {
         val before = _state.value.entries
         val oldest = platform.now().toInstant().minus(EXPIRES_AFTER)
-        val after = edit(before).filter { it.lastWatched.isAfter(oldest) }.sortedByDescending { it.lastWatched }.take(MAX_ENTRIES)
+        val after = edit(before)
+            .filter { it.lastWatched.isAfter(oldest) }
+            .sortedByDescending { it.lastWatched }
+            // One app doesn't crowd out the others: a binge keeps its latest few.
+            .groupBy { it.packageName }.values.flatMap { it.take(MAX_PER_APP) }
+            .sortedByDescending { it.lastWatched }
+            .take(MAX_ENTRIES)
         if (after == before) return
         _state.value = UpNextState(after)
         platform.saveUpNext(after)
@@ -154,6 +175,9 @@ class UpNextTray(private val platform: TvPlatform) {
         val EXPIRES_AFTER: Duration = Duration.ofDays(30)
         const val FINISHED_AT = 0.95
         const val MAX_ENTRIES = 20
+        const val MAX_PER_APP = 5
+        const val YOUTUBE = "com.google.android.youtube.tv"
+        val YOUTUBE_ID = Regex("""[A-Za-z0-9_-]{11}""")
         val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
     }
 }

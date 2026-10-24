@@ -79,7 +79,7 @@ class FakeTvPlatform(
     val resumed = mutableListOf<String>()
     var upNext: List<UpNextEntry> = emptyList()
 
-    override fun resume(packageName: String) {
+    override fun resume(packageName: String, title: String?) {
         resumed += packageName
     }
 
@@ -167,8 +167,11 @@ class FakeTvPlatform(
     val playStorePages = mutableListOf<String>()
     val youTubeVideos = mutableListOf<String>()
 
-    override fun openYouTubeVideo(key: String) {
+    val youTubeStarts = mutableListOf<Int>()
+
+    override fun openYouTubeVideo(key: String, startSeconds: Int) {
         youTubeVideos += key
+        youTubeStarts += startSeconds
     }
 
     override fun openPlayStorePage(packageName: String) {
