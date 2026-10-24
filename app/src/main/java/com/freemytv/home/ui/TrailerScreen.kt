@@ -228,7 +228,10 @@ private fun clock(seconds: Float): String {
 /** The page the WebView loads: YouTube's IFrame Player API, its controls off, reporting to the Home. */
 private fun playerPage(key: String) = """
     <!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>html,body,#player{margin:0;width:100%;height:100%;background:#000;overflow:hidden}</style></head>
+    <style>
+      html,body{margin:0;background:#000;overflow:hidden}
+      #player{position:fixed;top:0;left:0;border:0}
+    </style></head>
     <body><div id="player"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
@@ -238,12 +241,18 @@ private fun playerPage(key: String) = """
           width: '100%', height: '100%', videoId: '$key',
           playerVars: { autoplay: 1, controls: 0, disablekb: 1, fs: 0, rel: 0, iv_load_policy: 3, playsinline: 1, modestbranding: 1, origin: '$PAGE_ORIGIN', widget_referrer: '$PAGE_ORIGIN' },
           events: {
-            onReady: function (e) { e.target.playVideo(); },
+            onReady: function (e) { fit(); e.target.playVideo(); },
             onStateChange: function (e) { Bridge.onState(e.data); },
             onError: function (e) { Bridge.onError(e.data); }
           }
         });
       }
+      // The WebView starts at zero size, and "100%" or "100vh" keep that zero: the player is sized
+      // in pixels once the page has its real size, and again whenever it changes.
+      function fit() {
+        if (player && player.setSize) player.setSize(window.innerWidth, window.innerHeight);
+      }
+      window.addEventListener('resize', fit);
       function progress() {
         if (!player || !player.getCurrentTime) return JSON.stringify({ t: 0, d: 0 });
         return JSON.stringify({ t: player.getCurrentTime(), d: player.getDuration() });
