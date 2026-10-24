@@ -26,11 +26,11 @@ sealed interface ButtonTarget {
     data class TvInput(val inputId: String) : ButtonTarget
     data object AppSwitcher : ButtonTarget
     data object InputTray : ButtonTarget
-    data object AndroidSettings : ButtonTarget
+    data object HomeSettings : ButtonTarget
 }
 
 /** Where the Home should open when a button asks for it. */
-enum class HomeDestination { InputTray, AppSwitcher, NotificationPanel }
+enum class HomeDestination { InputTray, AppSwitcher, NotificationPanel, Settings }
 
 /** What the key filter does with a key event. */
 sealed interface KeyDecision {
@@ -72,8 +72,8 @@ class ShortcutButtons(private val platform: TvPlatform) {
      * doesn't), by being released after [LONG_PRESS_MILLIS].
      */
     fun onKey(scanCode: Int, keyCode: Int, down: Boolean, repeatCount: Int, heldMillis: Long = 0): KeyDecision {
-        // The remote's settings button sends KEYCODE_NOTIFICATION, which only the Stock Launcher answered.
-        if (keyCode == KEYCODE_NOTIFICATION || scanCode == SETTINGS_SCAN_CODE) return KeyDecision.Consume(ButtonTarget.AndroidSettings.takeIf { down && repeatCount == 0 })
+        // The remote's settings button sends KEYCODE_NOTIFICATION, which only the Stock Launcher answered; it opens the Home's Settings.
+        if (keyCode == KEYCODE_NOTIFICATION || scanCode == SETTINGS_SCAN_CODE) return KeyDecision.Consume(ButtonTarget.HomeSettings.takeIf { down && repeatCount == 0 })
         if (keyCode == KEYCODE_HOME) {
             val held = if (down) repeatCount == 1 else heldMillis >= LONG_PRESS_MILLIS
             if (down && repeatCount == 0) homeHoldHandled = false
@@ -93,7 +93,7 @@ class ShortcutButtons(private val platform: TvPlatform) {
         is ButtonTarget.TvInput -> platform.switchToInputById(target.inputId)
         ButtonTarget.AppSwitcher -> platform.openHome(HomeDestination.AppSwitcher)
         ButtonTarget.InputTray -> platform.openHome(HomeDestination.InputTray)
-        ButtonTarget.AndroidSettings -> platform.openAndroidSettings()
+        ButtonTarget.HomeSettings -> platform.openHome(HomeDestination.Settings)
     }
 
     /** Turns the key filter back on if the system turned it off; false if the Home lacks the permission Setup grants. */

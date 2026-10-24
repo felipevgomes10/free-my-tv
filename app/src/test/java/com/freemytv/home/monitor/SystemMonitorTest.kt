@@ -116,7 +116,7 @@ class SystemMonitorTest {
     }
 
     @Test
-    fun `closing an app ends it and refreshes the ranking`() = runTest(UnconfinedTestDispatcher()) {
+    fun `closing an app force stops it and refreshes the ranking`() = runTest(UnconfinedTestDispatcher()) {
         val platform = platform()
         val monitor = monitor(platform).monitor
         monitor.openDetail()
@@ -124,7 +124,7 @@ class SystemMonitorTest {
 
         monitor.close(monitor.state.value.detail!!.topMemory!!.first())
 
-        assertEquals(listOf(globoplay.packageName), platform.closed)
+        assertEquals(listOf(globoplay.packageName), platform.forceStopped)
         assertFalse(monitor.state.value.detail!!.topMemory!!.any { it.packageName == globoplay.packageName })
     }
 
@@ -155,7 +155,7 @@ class SystemMonitorTest {
 
         monitor.close(monitor.state.value.detail!!.topMemory!!.first { it.label == "Spotify" })
 
-        assertEquals(emptyList<String>(), platform.closed)
+        assertEquals(emptyList<String>(), platform.forceStopped)
     }
 
     @Test

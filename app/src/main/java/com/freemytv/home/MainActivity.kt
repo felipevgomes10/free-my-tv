@@ -404,7 +404,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Where a Shortcut Button, long-press Home or a double Home press sends the owner. */
+    /** Where a Shortcut Button, the settings button, long-press Home or a double Home press sends the owner. */
     private fun open(destination: HomeDestination) {
         when (destination) {
             HomeDestination.NotificationPanel -> notificationsOpen = true
@@ -416,6 +416,10 @@ class MainActivity : ComponentActivity() {
             HomeDestination.AppSwitcher -> lifecycleScope.launch {
                 multitasking.openSwitcher()
                 screen = Screen.Switcher
+            }
+            HomeDestination.Settings -> {
+                multitasking.closeSwitcher()
+                screen = Screen.Settings
             }
         }
     }

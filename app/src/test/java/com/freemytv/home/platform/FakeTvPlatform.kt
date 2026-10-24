@@ -234,6 +234,13 @@ class FakeTvPlatform(
         processes = processes?.filterNot { it.packageName == packageName }
     }
 
+    val forceStopped = mutableListOf<String>()
+
+    override fun forceStop(packageName: String) {
+        forceStopped += packageName
+        processes = processes?.filterNot { it.packageName == packageName }
+    }
+
     /** Emit a reading per second; [MutableSharedFlow.subscriptionCount] tells whether the Home is measuring. */
     override val homeFrameRate = MutableSharedFlow<Int>()
 

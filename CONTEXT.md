@@ -139,7 +139,7 @@ An app the owner has used that is still alive in the background and resumes wher
 _Avoid_: Running app, recent app, task
 
 **App Switcher** (Alternador de apps):
-The row of Open Apps, most recent first, opened by pressing Home twice; where the owner switches to or closes an Open App.
+The row of Open Apps, most recent first, opened by pressing Home twice; where the owner switches to or closes an Open App. Closing force stops the app; apps playing media can't be closed.
 _Avoid_: Recents, multitasking view, task manager
 
 **Open App Limit** (Limite de apps abertos):
@@ -151,6 +151,8 @@ _Avoid_: Memory cleaner, task killer
 **Shortcut Button** (Botão de atalho):
 A remote button printed with a service's name (Netflix, Globoplay, Prime Video, Disney+, YouTube); the owner can assign it any app, Input or the App Switcher.
 _Avoid_: Hotkey, partner button, app button
+
+The remote's settings button (the gear) isn't a Shortcut Button: it always opens the Home's Settings.
 
 ### Widgets
 

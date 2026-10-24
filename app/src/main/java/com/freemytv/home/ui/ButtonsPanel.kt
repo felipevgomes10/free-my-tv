@@ -175,5 +175,5 @@ private fun targetLabel(target: ButtonTarget, state: ButtonsPanelState): String 
     is ButtonTarget.TvInput -> state.inputs.firstOrNull { it.id == target.inputId }?.displayName() ?: stringResource(R.string.inputs)
     ButtonTarget.AppSwitcher -> stringResource(R.string.app_switcher)
     ButtonTarget.InputTray -> stringResource(R.string.input_tray)
-    ButtonTarget.AndroidSettings -> stringResource(R.string.section_android_settings)
+    ButtonTarget.HomeSettings -> stringResource(R.string.settings)
 }

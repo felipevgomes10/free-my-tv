@@ -87,9 +87,10 @@ class Multitasking(private val platform: TvPlatform) {
         platform.launch(app.packageName)
     }
 
-    /** Closes an Open App from the App Switcher: it leaves the row and its process ends. */
+    /** Closes an Open App from the App Switcher: it leaves the row and is force stopped. Media playing stays open. */
     fun close(app: OpenApp) {
-        platform.closeApp(app.packageName)
+        if (app.playing) return
+        platform.forceStop(app.packageName)
         _switcher.update { state ->
             val apps = state.apps?.filterNot { it.packageName == app.packageName }
             state.copy(apps = apps, counted = apps?.count { !it.playing } ?: 0)

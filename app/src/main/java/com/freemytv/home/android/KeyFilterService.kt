@@ -15,7 +15,8 @@ import java.util.concurrent.Executor
 /**
  * Sees remote keys before the system does (ADR 0005): keeps every Shortcut Button working
  * after Setup, applies the owner's reassignments, and turns long-press Home into the
- * Notification Panel. Every decision is ShortcutButtons'; this only relays.
+ * Notification Panel. Every decision is ShortcutButtons'; this only relays. Its accessibility
+ * access also lets the Home force stop apps through Settings ([ForceStopper]).
  *
  * Every key on the TV waits for this filter's answer, so it answers on a thread of its own:
  * on the Home's main thread a slow frame delayed the answer for a key's release past the
@@ -27,6 +28,8 @@ class KeyFilterService : AccessibilityService() {
     private val keysExecutor = Handler(keys.looper).let { handler -> Executor { handler.post(it) } }
 
     private val home get() = application as HomeApplication
+
+    private lateinit var forceStopper: ForceStopper
 
     // AccessibilityService delivers its callbacks on the "main" looper (Android 12) or executor (later).
     override fun getMainLooper(): Looper = keys.looper
@@ -54,12 +57,31 @@ class KeyFilterService : AccessibilityService() {
         }
     }
 
+    override fun onServiceConnected() {
+        forceStopper = ForceStopper(this)
+        running = this
+    }
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
     override fun onInterrupt() = Unit
 
     override fun onDestroy() {
+        if (running === this) running = null
+        if (::forceStopper.isInitialized) forceStopper.quit()
         super.onDestroy()
         keys.quitSafely()
+    }
+
+    companion object {
+        @Volatile
+        private var running: KeyFilterService? = null
+
+        /** Force stops an app through Settings; false when the key filter isn't running to do it. */
+        fun forceStop(packageName: String): Boolean {
+            val service = running ?: return false
+            service.forceStopper.forceStop(packageName)
+            return true
+        }
     }
 }
