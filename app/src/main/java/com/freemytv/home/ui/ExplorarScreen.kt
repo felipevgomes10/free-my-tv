@@ -206,27 +206,38 @@ private fun meta(title: TitleSummary, ratingOutOfTen: Boolean): String {
     return listOfNotNull(kind, title.genres.firstOrNull(), rating).joinToString("  •  ")
 }
 
-/** Two or three choices in a glass capsule, the chosen one on a white pill that slides when the choice changes. */
+/**
+ * Two or three choices in a glass capsule: the chosen one on a white pill that slides when the
+ * choice changes, and focus on a lighter glass pill that slides beneath it.
+ */
 @Composable
-private fun <T> Segmented(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
-    val highlight = rememberSlidingHighlight(selected = selected)
-    SlidingHighlightGroup(highlight, CircleShape) { group ->
-        Row(Modifier.background(Tokens.Glass, CircleShape).padding(4.dp).then(group), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            options.forEach { (value, label) ->
-                Surface(
-                    onClick = { onSelect(value) },
-                    modifier = Modifier.slidingHighlightItem(key = value),
-                    shape = ClickableSurfaceDefaults.shape(CircleShape),
-                    // The pill marks the choice; focus is a lighter glass of its own.
-                    colors = ClickableSurfaceDefaults.colors(
-                        containerColor = Color.Transparent,
-                        contentColor = Tokens.TextPrimary,
-                        focusedContainerColor = Color(0x59FFFFFF),
-                        focusedContentColor = Tokens.TextPrimary,
-                    ),
-                ) {
-                    Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp))
-                }
+private fun <T : Any> Segmented(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
+    val choice = rememberSlidingHighlight(selected = selected)
+    val focus = rememberSlidingHighlight(inks = false)
+    Row(
+        Modifier
+            .background(Tokens.Glass, CircleShape)
+            .padding(4.dp)
+            .then(focus.group(CircleShape, Color(0x59FFFFFF)))
+            .then(choice.group(CircleShape)),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        options.forEach { (value, label) ->
+            Surface(
+                onClick = { onSelect(value) },
+                modifier = focus.item(value).then(choice.item(value)),
+                shape = ClickableSurfaceDefaults.shape(CircleShape),
+                scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
+                colors = ClickableSurfaceDefaults.colors(
+                    containerColor = Color.Transparent,
+                    contentColor = Tokens.TextPrimary,
+                    focusedContainerColor = Color.Transparent,
+                    focusedContentColor = Tokens.TextPrimary,
+                    pressedContainerColor = Color.Transparent,
+                    pressedContentColor = Tokens.TextPrimary,
+                ),
+            ) {
+                Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp))
             }
         }
     }
