@@ -159,37 +159,35 @@ private fun AppList(
     takesFirstFocus: Boolean,
 ) {
     val first = remember { FocusRequester() }
-    Column(Modifier.padding(top = 6.dp)) {
-        if (apps == null) {
-            Text(stringResource(R.string.needs_setup), color = Tokens.TextSecondary, fontSize = 11.sp, modifier = Modifier.padding(top = 10.dp))
-            return@Column
-        }
-        apps.forEachIndexed { index, app ->
-            var focused by remember { mutableStateOf(false) }
-            Surface(
-                onClick = { if (allowed(app)) onAction(app) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .then(if (index == 0) Modifier.focusRequester(first) else Modifier)
-                    .onFocusChanged { focused = it.isFocused },
-                shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(8.dp)),
-                scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = Color.Transparent,
-                    contentColor = Tokens.TextPrimary,
-                    focusedContainerColor = Tokens.TextPrimary,
-                    focusedContentColor = Color.Black,
-                ),
-            ) {
-                Row(
-                    Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+    SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(8.dp)) { group ->
+        Column(Modifier.padding(top = 6.dp).then(group)) {
+            if (apps == null) {
+                Text(stringResource(R.string.needs_setup), color = Tokens.TextSecondary, fontSize = 11.sp, modifier = Modifier.padding(top = 10.dp))
+                return@Column
+            }
+            apps.forEachIndexed { index, app ->
+                var focused by remember { mutableStateOf(false) }
+                Surface(
+                    onClick = { if (allowed(app)) onAction(app) },
+                    modifier = Modifier
+                        .slidingHighlightItem()
+                        .fillMaxWidth()
+                        .then(if (index == 0) Modifier.focusRequester(first) else Modifier)
+                        .onFocusChanged { focused = it.isFocused },
+                    shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(8.dp)),
+                    scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
+                    colors = highlightColors(),
                 ) {
-                    Text(app.label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, modifier = Modifier.weight(1f))
-                    Text(formatBytes(app.bytes), fontSize = 11.sp, color = LocalContentColor.current.copy(alpha = 0.6f))
-                    if (focused && allowed(app)) {
-                        Text(actionLabel, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = actionColor)
+                    Row(
+                        Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(app.label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, modifier = Modifier.weight(1f))
+                        Text(formatBytes(app.bytes), fontSize = 11.sp, color = LocalContentColor.current.copy(alpha = 0.6f))
+                        if (focused && allowed(app)) {
+                            Text(actionLabel, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = actionColor, modifier = Modifier.keepColorsUnderHighlight())
+                        }
                     }
                 }
             }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,14 +24,10 @@ import com.freemytv.home.weather.WeatherState
 fun WidgetPill(onClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
     Surface(
         onClick = onClick,
+        modifier = Modifier.slidingHighlightItem(),
         shape = ClickableSurfaceDefaults.shape(CircleShape),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Tokens.Glass,
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        scale = highlightScale(1.05f),
+        colors = highlightColors(container = Tokens.Glass),
     ) {
         Row(
             Modifier.padding(horizontal = 12.dp, vertical = 7.dp),

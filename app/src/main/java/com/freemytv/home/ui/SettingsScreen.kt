@@ -94,33 +94,37 @@ fun SettingsScreen(
     ) {
         StatusBar(clock, trailing = statusWidgets)
         Row(Modifier.padding(top = 24.dp), horizontalArrangement = Arrangement.spacedBy(48.dp)) {
-            Column(Modifier.width(260.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(stringResource(R.string.settings), color = Tokens.TextPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp)
-                Box(Modifier.height(12.dp))
-                SettingsSection.entries.forEachIndexed { index, entry ->
-                    SectionItem(
-                        entry,
-                        selected = entry == section,
-                        onFocus = { section = entry },
-                        onClick = { if (entry == SettingsSection.AndroidSettings) actions.onOpenAndroidSettings() },
-                        modifier = if (index == 0) Modifier.focusRequester(first) else Modifier,
-                    )
+            SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(9.dp)) { group ->
+                Column(Modifier.width(260.dp).then(group), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.settings), color = Tokens.TextPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp)
+                    Box(Modifier.height(12.dp))
+                    SettingsSection.entries.forEachIndexed { index, entry ->
+                        SectionItem(
+                            entry,
+                            selected = entry == section,
+                            onFocus = { section = entry },
+                            onClick = { if (entry == SettingsSection.AndroidSettings) actions.onOpenAndroidSettings() },
+                            modifier = if (index == 0) Modifier.focusRequester(first) else Modifier,
+                        )
+                    }
                 }
             }
-            Column(Modifier.weight(1f).padding(top = 48.dp)) {
-                when (section) {
-                    SettingsSection.Widgets -> WidgetsPanel(state, actions)
-                    SettingsSection.OpenApps -> {
-                        ValueRow(stringResource(R.string.open_app_limit), stringResource(R.string.open_app_limit_detail), stringResource(R.string.open_app_limit_value, openAppLimit)) {
-                            actions.onOpenAppLimit(if (openAppLimit >= OpenAppLimit.RANGE.last) OpenAppLimit.RANGE.first else openAppLimit + 1)
+            SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(9.dp)) { group ->
+                Column(Modifier.weight(1f).padding(top = 48.dp).then(group)) {
+                    when (section) {
+                        SettingsSection.Widgets -> WidgetsPanel(state, actions)
+                        SettingsSection.OpenApps -> {
+                            ValueRow(stringResource(R.string.open_app_limit), stringResource(R.string.open_app_limit_detail), stringResource(R.string.open_app_limit_value, openAppLimit)) {
+                                actions.onOpenAppLimit(if (openAppLimit >= OpenAppLimit.RANGE.last) OpenAppLimit.RANGE.first else openAppLimit + 1)
+                            }
+                            Note(stringResource(R.string.open_app_limit_note))
                         }
-                        Note(stringResource(R.string.open_app_limit_note))
+                        SettingsSection.Buttons -> ButtonsPanel(buttons, actions.onAssignButton)
+                        SettingsSection.Cast -> CastPanel(state)
+                        SettingsSection.Setup -> SetupPanel(setup)
+                        SettingsSection.About -> AboutPanel(state)
+                        SettingsSection.AndroidSettings -> Note(stringResource(R.string.android_settings_note))
                     }
-                    SettingsSection.Buttons -> ButtonsPanel(buttons, actions.onAssignButton)
-                    SettingsSection.Cast -> CastPanel(state)
-                    SettingsSection.Setup -> SetupPanel(setup)
-                    SettingsSection.About -> AboutPanel(state)
-                    SettingsSection.AndroidSettings -> Note(stringResource(R.string.android_settings_note))
                 }
             }
         }
@@ -131,15 +135,10 @@ fun SettingsScreen(
 private fun SectionItem(entry: SettingsSection, selected: Boolean, onFocus: () -> Unit, onClick: () -> Unit, modifier: Modifier) {
     Surface(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth().onFocusChanged { if (it.isFocused) onFocus() },
+        modifier = Modifier.slidingHighlightItem().then(modifier).fillMaxWidth().onFocusChanged { if (it.isFocused) onFocus() },
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(9.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) Tokens.Glass else Color.Transparent,
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        colors = highlightColors(container = if (selected) Tokens.Glass else Color.Transparent),
     ) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(entry.icon), contentDescription = null, modifier = Modifier.size(13.dp))
@@ -249,15 +248,10 @@ private fun ValueRow(title: String, detail: String?, value: String, onClick: () 
 private fun SettingRow(title: String, detail: String?, onClick: () -> Unit, trailing: @Composable () -> Unit) {
     Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.slidingHighlightItem().fillMaxWidth(),
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(9.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color.Transparent,
-            contentColor = Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        colors = highlightColors(),
     ) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
@@ -291,13 +285,16 @@ private fun Note(text: String) {
 
 @Composable
 private fun Toggle(on: Boolean) {
+    // On, it stays green under the focus pill; off, its track darkens with the row and the knob stays white.
     Box(
         Modifier
+            .then(if (on) Modifier.keepColorsUnderHighlight() else Modifier)
             .size(34.dp, 20.dp)
             .background(if (on) Color(0xFF30D158) else LocalContentColor.current.copy(alpha = 0.25f), CircleShape),
     ) {
         Box(
             Modifier
+                .then(if (on) Modifier else Modifier.keepColorsUnderHighlight())
                 .offset(x = if (on) 16.dp else 2.dp, y = 2.dp)
                 .size(16.dp)
                 .background(Color.White, CircleShape),
@@ -310,14 +307,10 @@ private fun Toggle(on: Boolean) {
 fun StatusIconButton(icon: Int, contentDescription: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
+        modifier = Modifier.slidingHighlightItem(),
         shape = ClickableSurfaceDefaults.shape(CircleShape),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.1f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color.Transparent,
-            contentColor = Tokens.TextSecondary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
-        ),
+        scale = highlightScale(1.1f),
+        colors = highlightColors(content = Tokens.TextSecondary),
     ) {
         Icon(painterResource(icon), contentDescription = contentDescription, modifier = Modifier.padding(7.dp).size(14.dp))
     }

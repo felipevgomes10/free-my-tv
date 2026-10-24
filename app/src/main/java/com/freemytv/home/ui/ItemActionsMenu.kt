@@ -11,12 +11,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -32,6 +36,7 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.Icon
+import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.freemytv.home.ui.theme.Tokens
@@ -64,19 +69,22 @@ fun ItemActionsMenu(
         onDismissRequest = onDismiss,
         properties = PopupProperties(focusable = true),
     ) {
-        Column(
-            Modifier
-                .width(MENU_WIDTH)
-                .shadow(30.dp, RoundedCornerShape(12.dp))
-                .background(Tokens.Menu, RoundedCornerShape(12.dp))
-                .padding(5.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            if (title != null) {
-                Text(title, color = Tokens.TextSecondary, fontSize = 10.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 4.dp))
-            }
-            items.forEachIndexed { index, item ->
-                MenuRow(item, if (index == 0) Modifier.focusRequester(first) else Modifier)
+        SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(8.dp)) { group ->
+            Column(
+                Modifier
+                    .width(MENU_WIDTH)
+                    .shadow(30.dp, RoundedCornerShape(12.dp))
+                    .background(Tokens.Menu, RoundedCornerShape(12.dp))
+                    .padding(5.dp)
+                    .then(group),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                if (title != null) {
+                    Text(title, color = Tokens.TextSecondary, fontSize = 10.sp, modifier = Modifier.padding(start = 10.dp, top = 6.dp, bottom = 4.dp))
+                }
+                items.forEachIndexed { index, item ->
+                    MenuRow(item, if (index == 0) Modifier.focusRequester(first) else Modifier)
+                }
             }
         }
         LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
@@ -85,21 +93,23 @@ fun ItemActionsMenu(
 
 @Composable
 private fun MenuRow(item: MenuItem, modifier: Modifier) {
+    var focused by remember { mutableStateOf(false) }
     Surface(
         onClick = item.onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.slidingHighlightItem().then(modifier).fillMaxWidth().onFocusChanged { focused = it.isFocused },
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(8.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Color.Transparent,
-            contentColor = if (item.destructive) Tokens.Destructive else Tokens.TextPrimary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = if (item.destructive) Tokens.DestructiveOnLight else Color.Black,
-        ),
+        colors = highlightColors(),
     ) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(item.icon), contentDescription = null, modifier = Modifier.size(12.dp))
-            Text(item.label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        // A destructive action stays red on the pill, a deeper red as on any light background.
+        val red = if (focused) Tokens.DestructiveOnLight else Tokens.Destructive
+        Row(
+            Modifier.then(if (item.destructive) Modifier.keepColorsUnderHighlight() else Modifier).padding(horizontal = 10.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(painterResource(item.icon), contentDescription = null, modifier = Modifier.size(12.dp), tint = if (item.destructive) red else LocalContentColor.current)
+            Text(item.label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = if (item.destructive) red else Color.Unspecified)
         }
     }
 }

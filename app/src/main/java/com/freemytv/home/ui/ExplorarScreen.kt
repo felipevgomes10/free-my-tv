@@ -98,9 +98,11 @@ fun ExplorarScreen(
                     selected = state.window,
                     onSelect = actions.onWindow,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf(KindFilter.All to R.string.filter_all, KindFilter.Movies to R.string.filter_movies, KindFilter.Series to R.string.filter_series).forEach { (filter, label) ->
-                        FilterPill(stringResource(label), filter == state.filter) { actions.onFilter(filter) }
+                SlidingHighlightGroup(rememberSlidingHighlight(), CircleShape) { group ->
+                    Row(group, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        listOf(KindFilter.All to R.string.filter_all, KindFilter.Movies to R.string.filter_movies, KindFilter.Series to R.string.filter_series).forEach { (filter, label) ->
+                            FilterPill(stringResource(label), filter == state.filter) { actions.onFilter(filter) }
+                        }
                     }
                 }
             }
@@ -204,23 +206,27 @@ private fun meta(title: TitleSummary, ratingOutOfTen: Boolean): String {
     return listOfNotNull(kind, title.genres.firstOrNull(), rating).joinToString("  •  ")
 }
 
-/** Two or three choices in a glass capsule, the chosen one in white. */
+/** Two or three choices in a glass capsule, the chosen one on a white pill that slides when the choice changes. */
 @Composable
 private fun <T> Segmented(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit) {
-    Row(Modifier.background(Tokens.Glass, CircleShape).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        options.forEach { (value, label) ->
-            val isSelected = value == selected
-            Surface(
-                onClick = { onSelect(value) },
-                shape = ClickableSurfaceDefaults.shape(CircleShape),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = if (isSelected) Tokens.TextPrimary else Color.Transparent,
-                    contentColor = if (isSelected) Color.Black else Tokens.TextPrimary,
-                    focusedContainerColor = if (isSelected) Tokens.TextPrimary else Color(0x59FFFFFF),
-                    focusedContentColor = if (isSelected) Color.Black else Tokens.TextPrimary,
-                ),
-            ) {
-                Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp))
+    val highlight = rememberSlidingHighlight(selected = selected)
+    SlidingHighlightGroup(highlight, CircleShape) { group ->
+        Row(Modifier.background(Tokens.Glass, CircleShape).padding(4.dp).then(group), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            options.forEach { (value, label) ->
+                Surface(
+                    onClick = { onSelect(value) },
+                    modifier = Modifier.slidingHighlightItem(key = value),
+                    shape = ClickableSurfaceDefaults.shape(CircleShape),
+                    // The pill marks the choice; focus is a lighter glass of its own.
+                    colors = ClickableSurfaceDefaults.colors(
+                        containerColor = Color.Transparent,
+                        contentColor = Tokens.TextPrimary,
+                        focusedContainerColor = Color(0x59FFFFFF),
+                        focusedContentColor = Tokens.TextPrimary,
+                    ),
+                ) {
+                    Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp))
+                }
             }
         }
     }
@@ -230,12 +236,12 @@ private fun <T> Segmented(options: List<Pair<T, String>>, selected: T, onSelect:
 private fun FilterPill(label: String, selected: Boolean, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
+        modifier = Modifier.slidingHighlightItem(),
         shape = ClickableSurfaceDefaults.shape(CircleShape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) Color(0x33FFFFFF) else Color.Transparent,
-            contentColor = if (selected) Tokens.TextPrimary else Tokens.TextSecondary,
-            focusedContainerColor = Tokens.TextPrimary,
-            focusedContentColor = Color.Black,
+        scale = highlightScale(1.1f),
+        colors = highlightColors(
+            content = if (selected) Tokens.TextPrimary else Tokens.TextSecondary,
+            container = if (selected) Color(0x33FFFFFF) else Color.Transparent,
         ),
     ) {
         Text(label, fontSize = 12.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp))

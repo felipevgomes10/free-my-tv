@@ -90,9 +90,11 @@ fun AllAppsScreen(
                     fontSize = 11.sp,
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                PillButton(stringResource(R.string.install_app), R.drawable.ic_add, onInstallApp)
-                PillButton(stringResource(R.string.send_apk), R.drawable.ic_phone, onSendApk)
+            SlidingHighlightGroup(rememberSlidingHighlight(), CircleShape) { group ->
+                Row(group, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    PillButton(stringResource(R.string.install_app), R.drawable.ic_add, onInstallApp)
+                    PillButton(stringResource(R.string.send_apk), R.drawable.ic_phone, onSendApk)
+                }
             }
         }
         LazyVerticalGrid(
