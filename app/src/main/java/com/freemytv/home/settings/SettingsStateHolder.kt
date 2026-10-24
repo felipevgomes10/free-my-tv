@@ -1,7 +1,6 @@
 package com.freemytv.home.settings
 
 import com.freemytv.home.platform.TvPlatform
-import com.freemytv.home.upnext.WatchNextRow
 import com.freemytv.home.widgets.WidgetPreferences
 import com.freemytv.home.widgets.WidgetSettings
 import kotlinx.coroutines.CoroutineScope
@@ -35,9 +34,6 @@ data class DeviceInfo(
     val homeVersion: String,
 )
 
-/** One app's programs in Watch Next, counted: how many, and how many carry a link, progress and a picture. */
-data class WatchNextPublisher(val label: String, val entries: Int, val withLink: Int, val withProgress: Int, val withPicture: Int)
-
 data class SettingsState(
     val widgets: WidgetPreferences = WidgetPreferences(),
     /** The name other devices see when they Cast to this TV. */
@@ -45,11 +41,6 @@ data class SettingsState(
     val cast: List<CastReceiverStatus> = emptyList(),
     val device: DeviceInfo? = null,
     val screensaver: ScreensaverState = ScreensaverState(),
-    /**
-     * The Watch Next probe: which apps list what the owner is watching, to decide whether
-     * Continuar assistindo should read it. Null without the access Setup grants.
-     */
-    val watchNext: List<WatchNextPublisher>? = null,
 )
 
 class SettingsStateHolder(
@@ -70,22 +61,8 @@ class SettingsStateHolder(
             tvName = platform.tvName(),
             cast = CastReceiver.entries.map { CastReceiverStatus(it, stateOf(it)) },
             device = platform.deviceInfo(),
-            watchNext = platform.watchNextRows()?.let { summarize(it) },
         )
     }
-
-    private suspend fun summarize(rows: List<WatchNextRow>): List<WatchNextPublisher> =
-        rows.groupBy { it.packageName }
-            .map { (pkg, own) ->
-                WatchNextPublisher(
-                    label = platform.appLabel(pkg),
-                    entries = own.size,
-                    withLink = own.count { it.hasLink },
-                    withProgress = own.count { it.hasProgress },
-                    withPicture = own.count { it.hasPicture },
-                )
-            }
-            .sortedByDescending { it.entries }
 
     suspend fun setWeatherVisible(visible: Boolean) = widgetSettings.setWeatherVisible(visible)
 

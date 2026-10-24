@@ -26,7 +26,7 @@ import com.freemytv.home.updates.ReleaseAsset
 import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.upnext.PlayingMedia
 import com.freemytv.home.upnext.UpNextEntry
-import com.freemytv.home.upnext.WatchNextRow
+import com.freemytv.home.upnext.WatchNextProgram
 import com.freemytv.home.weather.CachedForecast
 import com.freemytv.home.weather.Forecast
 import com.freemytv.home.weather.Place
@@ -375,9 +375,28 @@ class FakeTvPlatform(
     }
 
     /** Android TV's Watch Next programs; null without the access Setup grants. */
-    var watchNext: List<WatchNextRow>? = emptyList()
+    var watchNextPrograms: List<WatchNextProgram>? = null
 
-    override suspend fun watchNextRows() = watchNext
+    override suspend fun watchNext() = watchNextPrograms
+
+    val openedLinks = mutableListOf<String>()
+
+    /** Whether apps' links open. */
+    var linksOpen = true
+
+    override fun openLink(packageName: String, link: String): Boolean {
+        if (!linksOpen) return false
+        openedLinks += link
+        return true
+    }
+
+    var dismissedUpNext: Map<String, Instant> = emptyMap()
+
+    override suspend fun loadDismissedUpNext() = dismissedUpNext
+
+    override suspend fun saveDismissedUpNext(dismissed: Map<String, Instant>) {
+        dismissedUpNext = dismissed
+    }
 
     /** How long a forecast takes to arrive. */
     var forecastTakes: kotlin.time.Duration = kotlin.time.Duration.ZERO

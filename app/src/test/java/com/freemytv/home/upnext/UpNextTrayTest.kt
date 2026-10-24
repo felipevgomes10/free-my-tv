@@ -2,6 +2,7 @@ package com.freemytv.home.upnext
 
 import com.freemytv.home.platform.FakeTvPlatform
 import com.freemytv.home.platform.PackageEvent
+import com.freemytv.home.platform.app
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -15,7 +16,8 @@ import org.junit.Test
 class UpNextTrayTest {
 
     private val platform = FakeTvPlatform(
-        labels = mapOf(DISNEY to "Disney+", NETFLIX to "Netflix", PRIME to "Prime Video", YOUTUBE to "YouTube"),
+        apps = listOf(DISNEY, NETFLIX, PRIME, YOUTUBE, GLOBOPLAY).map { app(it, it) },
+        labels = mapOf(DISNEY to "Disney+", NETFLIX to "Netflix", PRIME to "Prime Video", YOUTUBE to "YouTube", GLOBOPLAY to "Globoplay"),
     )
 
     private fun TestScope.following(): UpNextTray = UpNextTray(platform).also { tray ->
@@ -217,11 +219,11 @@ class UpNextTrayTest {
         val tray = following()
         play(PlayingMedia(DISNEY, playing = true, title = "Moana", artwork = "moana.jpg"))
         later(60L * 24 * 30 - 1)
-        tray.prune()
+        tray.refresh()
         assertEquals(1, tray.state.value.entries.size)
 
         later(1)
-        tray.prune()
+        tray.refresh()
 
         assertEquals(emptyList<UpNextEntry>(), tray.state.value.entries)
         assertEquals(listOf("moana.jpg"), platform.deletedArtwork)
@@ -324,11 +326,141 @@ class UpNextTrayTest {
         assertEquals(listOf("moana-1.jpg"), platform.deletedArtwork)
     }
 
+    private fun listed(
+        packageName: String,
+        title: String,
+        minutesAgo: Long = 0,
+        kind: WatchNextKind = WatchNextKind.Continue,
+        season: String? = null,
+        episode: String? = null,
+        episodeTitle: String? = null,
+        positionMillis: Long? = null,
+        durationMillis: Long? = null,
+        artwork: String? = null,
+        link: String? = null,
+    ) = WatchNextProgram(
+        packageName, kind, title, season, episode, episodeTitle, positionMillis, durationMillis, artwork, link,
+        lastEngagement = platform.clock.toInstant().minusSeconds(minutesAgo * 60),
+    )
+
+    @Test
+    fun `what apps list in Watch Next becomes entries, with the episode, the time left and the picture`() = runTest {
+        platform.watchNextPrograms = listOf(
+            listed(GLOBOPLAY, "Vale Tudo", season = "1", episode = "42", episodeTitle = "Capítulo 42", positionMillis = 600_000, durationMillis = 2_400_000, artwork = "vale-tudo.jpg"),
+        )
+
+        val entry = UpNextTray(platform).also { it.load() }.state.value.entries.single()
+
+        assertEquals("Vale Tudo", entry.title)
+        assertEquals("T1:E42 Capítulo 42", entry.subtitle)
+        assertEquals("Globoplay", entry.appLabel)
+        assertEquals(1_800_000L, entry.remainingMillis)
+        assertEquals("vale-tudo.jpg", entry.artwork)
+    }
+
+    @Test
+    fun `a movie in Watch Next has no episode line`() = runTest {
+        platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2"))
+
+        assertNull(UpNextTray(platform).also { it.load() }.state.value.entries.single().subtitle)
+    }
+
+    @Test
+    fun `what is being watched and the next episode count, not the watchlist nor new episodes`() = runTest {
+        platform.watchNextPrograms = listOf(
+            listed(DISNEY, "Andor", kind = WatchNextKind.Next),
+            listed(DISNEY, "Moana 2", kind = WatchNextKind.Continue),
+            listed(DISNEY, "Percy Jackson", kind = WatchNextKind.Watchlist),
+            listed(DISNEY, "Bluey", kind = WatchNextKind.New),
+        )
+
+        val titles = UpNextTray(platform).also { it.load() }.state.value.entries.map { it.title }
+
+        assertEquals(setOf("Andor", "Moana 2"), titles.toSet())
+    }
+
+    @Test
+    fun `selecting a Watch Next entry opens it through the app's own link`() = runTest {
+        platform.watchNextPrograms = listOf(listed(NETFLIX, "Wandinha", link = "intent://watch/81231974#Intent;package=com.netflix.ninja;end"))
+        val tray = UpNextTray(platform).also { it.load() }
+
+        tray.select(tray.state.value.entries.single())
+
+        assertEquals(listOf("intent://watch/81231974#Intent;package=com.netflix.ninja;end"), platform.openedLinks)
+        assertEquals(emptyList<String>(), platform.launched)
+    }
+
+    @Test
+    fun `a Watch Next entry whose link doesn't open, or that has none, opens its app`() = runTest {
+        platform.watchNextPrograms = listOf(listed(NETFLIX, "Wandinha", link = "broken"), listed(DISNEY, "Moana 2"))
+        platform.linksOpen = false
+        val tray = UpNextTray(platform).also { it.load() }
+
+        tray.state.value.entries.forEach { tray.select(it) }
+
+        assertEquals(setOf(NETFLIX, DISNEY), platform.launched.toSet())
+    }
+
+    @Test
+    fun `an app listing in Watch Next takes over from what the Home saw it play`() = runTest {
+        val tray = following()
+        play(PlayingMedia(NETFLIX, playing = true))
+        play(PlayingMedia(YOUTUBE, playing = true, title = "Lofi", positionMillis = 60_000, durationMillis = 3_600_000))
+        platform.watchNextPrograms = listOf(listed(NETFLIX, "Wandinha"))
+
+        tray.refresh()
+
+        assertEquals(listOf("Wandinha" to NETFLIX, "Lofi" to YOUTUBE).toSet(), tray.state.value.entries.map { it.title to it.packageName }.toSet())
+        assertEquals(listOf(YOUTUBE), platform.upNext.map { it.packageName })
+    }
+
+    @Test
+    fun `Watch Next and what the Home saw play mix by when they were watched`() = runTest {
+        val tray = following()
+        play(PlayingMedia(YOUTUBE, playing = true, title = "Lofi"))
+        platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2", minutesAgo = 10), listed(NETFLIX, "Wandinha", minutesAgo = -1))
+
+        tray.refresh()
+
+        assertEquals(listOf("Wandinha", "Lofi", "Moana 2"), tray.state.value.entries.map { it.title })
+    }
+
+    @Test
+    fun `a removed Watch Next entry stays hidden until the app updates it`() = runTest {
+        platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2", minutesAgo = 30))
+        val tray = UpNextTray(platform).also { it.load() }
+
+        tray.remove(tray.state.value.entries.single())
+        UpNextTray(platform).also { it.load() }.state.value.entries.let { assertEquals(emptyList<UpNextEntry>(), it) }
+
+        platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2", minutesAgo = 0))
+        tray.refresh()
+        assertEquals(listOf("Moana 2"), tray.state.value.entries.map { it.title })
+    }
+
+    @Test
+    fun `Watch Next is read again whenever the Home shows`() = runTest {
+        val tray = UpNextTray(platform).also { it.load() }
+        platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2"))
+
+        tray.refresh()
+
+        assertEquals(listOf("Moana 2"), tray.state.value.entries.map { it.title })
+    }
+
+    @Test
+    fun `Watch Next entries of an app that isn't installed any more don't show`() = runTest {
+        platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2"), listed("com.gone.app", "Old show"))
+
+        assertEquals(listOf("Moana 2"), UpNextTray(platform).also { it.load() }.state.value.entries.map { it.title })
+    }
+
     private companion object {
         const val DISNEY = "com.disney.disneyplus"
         const val NETFLIX = "com.netflix.ninja"
         const val PRIME = "com.amazon.amazonvideo.livingroom"
         const val YOUTUBE = "com.google.android.youtube.tv"
         const val SPOTIFY = "com.spotify.tv.android"
+        const val GLOBOPLAY = "com.globo.globotv"
     }
 }

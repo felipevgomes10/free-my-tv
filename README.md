@@ -66,7 +66,7 @@ Screenshots come from the Google TV emulator; the designs live in [`design.pen`]
 **On the Home**
 - **Top Shelf** — what you last watched in the app you're on, with its picture; several entries take turns, sliding.
 - **App Tray** — only the apps you pinned, in your order. Hold OK to move, unpin or uninstall.
-- **Continuar assistindo** — what was playing in any app, read from Android's media sessions, with how much is left; selecting it takes you back to it, YouTube videos included.
+- **Continuar assistindo** — what you're in the middle of, as Netflix, Globoplay, Disney+, Max or Crunchyroll list it in Android TV's Watch Next, with the episode, how much is left and a link straight back to it; for apps that don't list it, such as YouTube, what the Home saw playing.
 - **Entradas** — HDMI inputs and the antenna, renameable and hideable.
 - **Status Bar widgets** — weather and a system monitor (storage, memory, frame rate), each opening its own detail screen. Weather's detail has full-screen weather footage and quiet ambient noise, with a mute button that remembers your choice; both stop when you leave.
 
@@ -102,8 +102,8 @@ Everything is in Brazilian Portuguese and tuned for a 2 GB TCL set: the Home sta
 
 - **A Home, not a ROM** ([ADR 0001](docs/adr/0001-launcher-not-rom.md)). With Google TV's launcher disabled ([ADR 0003](docs/adr/0003-disable-google-tv-launcher.md)), Android hands the Home button to the only Home left.
 - **An accessibility key filter** ([ADR 0005](docs/adr/0005-accessibility-key-filter-for-shortcut-buttons.md)) sees remote keys first, so shortcut buttons keep working and can be reassigned.
-- **ADB grants instead of root**: `DUMP`, `PACKAGE_USAGE_STATS` and `WRITE_SECURE_SETTINGS` let the Home read memory per app ([ADR 0006](docs/adr/0006-process-memory-through-dumpsys-activity.md)), recent usage and keep its key filter on.
-- **Media sessions** feed *Continuar assistindo* ([ADR 0007](docs/adr/0007-up-next-from-media-sessions.md)).
+- **ADB grants instead of root**: `DUMP`, `PACKAGE_USAGE_STATS`, `WRITE_SECURE_SETTINGS` and `READ_TV_LISTINGS` let the Home read memory per app ([ADR 0006](docs/adr/0006-process-memory-through-dumpsys-activity.md)), recent usage and other apps' Watch Next, and keep its key filter on.
+- **Watch Next**, with media sessions as the fallback, feeds *Continuar assistindo* ([ADR 0011](docs/adr/0011-up-next-from-watch-next.md)).
 - **TMDB's token never ships in the APK** ([ADR 0008](docs/adr/0008-tmdb-token-delivered-by-setup.md)): it stays in a git-ignored file on your computer, and Setup hands it to the TV.
 
 The language of the project — *Top Shelf*, *App Tray*, *Open App*, *Title*… — is defined in [`CONTEXT.md`](CONTEXT.md); every decision with a trade-off is an [ADR](docs/adr).
@@ -161,7 +161,7 @@ scripts/setup.sh --serial 192.168.100.18:5555 --apply    # run it (type "sim")
 
 Setup reads the TV's state over ADB and plans **only what isn't in place yet**:
 
-- grants the Home `DUMP`, `PACKAGE_USAGE_STATS` and `WRITE_SECURE_SETTINGS`, and allows usage history and installing apps;
+- grants the Home `DUMP`, `PACKAGE_USAGE_STATS`, `WRITE_SECURE_SETTINGS` and `READ_TV_LISTINGS`, and allows usage history and installing apps;
 - allows the Home to read notifications;
 - prepares the optional Weather screensaver: saves the original screensaver and power timers, disables the default screensaver, selects Weather, and allows the Home to set its delay. Turn it on in *Configurações → Descanso de tela* after Setup;
 - hands Explorar its TMDB token from `config/tmdb-token.local`, if there is one. The token is shown as `[token]` in the plan and never written to the journal;
