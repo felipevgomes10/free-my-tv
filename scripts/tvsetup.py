@@ -56,6 +56,8 @@ GRANTED_PERMISSIONS = [
     "android.permission.DUMP",
     "android.permission.PACKAGE_USAGE_STATS",
     "android.permission.WRITE_SECURE_SETTINGS",
+    # What streaming apps list in Android TV's Watch Next, for Continuar assistindo.
+    "android.permission.READ_TV_LISTINGS",
 ]
 # App-ops Setup allows, with what each is for.
 ALLOWED_APP_OPS = {

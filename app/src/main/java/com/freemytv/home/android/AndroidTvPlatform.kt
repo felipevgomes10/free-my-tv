@@ -1,23 +1,23 @@
 package com.freemytv.home.android
 
 import android.app.NotificationManager
+import android.app.usage.UsageEvents
+import android.app.usage.UsageStatsManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.app.usage.UsageEvents
-import android.app.usage.UsageStatsManager
 import android.content.pm.ApplicationInfo
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
+import android.media.tv.TvContract
+import android.media.tv.TvInputInfo
+import android.media.tv.TvInputManager
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.UserHandle
-import android.media.tv.TvContract
-import android.media.tv.TvInputInfo
-import android.media.tv.TvInputManager
 import android.provider.Settings
 import android.util.Log
 import com.freemytv.home.MainActivity
@@ -25,13 +25,13 @@ import com.freemytv.home.apkdrop.ApkInfo
 import com.freemytv.home.apkdrop.InstallResult
 import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
+import com.freemytv.home.buttons.HomeDestination
+import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
-import com.freemytv.home.buttons.HomeDestination
-import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.inputs.InputKind
 import com.freemytv.home.inputs.InputPreferences
 import com.freemytv.home.inputs.Signal
@@ -48,8 +48,12 @@ import com.freemytv.home.updates.InstalledPackage
 import com.freemytv.home.updates.ReleaseAsset
 import com.freemytv.home.updates.ReleaseLookup
 import com.freemytv.home.upnext.UpNextEntry
+import com.freemytv.home.upnext.WatchNextRow
 import com.freemytv.home.weather.Place
 import com.freemytv.home.widgets.WidgetPreferences
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZonedDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -57,9 +61,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZonedDateTime
 
 class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
@@ -492,6 +493,40 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         if (!tryStart(search)) openPlayStorePage(YOUTUBE)
     }
 
+    override suspend fun watchNextRows(): List<WatchNextRow>? = withContext(Dispatchers.IO) {
+        if (context.checkSelfPermission(READ_TV_LISTINGS) != PackageManager.PERMISSION_GRANTED) return@withContext null
+        val columns = arrayOf(
+            TvContract.WatchNextPrograms.COLUMN_PACKAGE_NAME,
+            TvContract.WatchNextPrograms.COLUMN_INTENT_URI,
+            TvContract.WatchNextPrograms.COLUMN_LAST_PLAYBACK_POSITION_MILLIS,
+            TvContract.WatchNextPrograms.COLUMN_POSTER_ART_URI,
+            TvContract.WatchNextPrograms.COLUMN_THUMBNAIL_URI,
+        )
+        // With READ_TV_LISTINGS the TV provider answers with every app's searchable programs, which Watch Next's are by default.
+        val rows = try {
+            context.contentResolver.query(TvContract.WatchNextPrograms.CONTENT_URI, columns, null, null, null)?.use { c ->
+                buildList {
+                    while (c.moveToNext()) {
+                        add(
+                            WatchNextRow(
+                                packageName = c.getString(0).orEmpty(),
+                                hasLink = !c.isNull(1),
+                                hasProgress = !c.isNull(2) && c.getLong(2) > 0,
+                                hasPicture = !c.isNull(3) || !c.isNull(4),
+                            ),
+                        )
+                    }
+                }
+            }.orEmpty()
+        } catch (e: RuntimeException) {
+            Log.w(TAG, "Watch Next can't be read", e)
+            return@withContext null
+        }
+        // Counts per app only, for reading the probe's result from logcat.
+        Log.i(TAG, "Watch Next: ${rows.groupingBy { it.packageName }.eachCount()}")
+        rows
+    }
+
     override suspend fun loadUpNext(): List<UpNextEntry> = withContext(Dispatchers.IO) {
         val json = prefs.getString(UP_NEXT, null)?.let(::JSONArray) ?: return@withContext emptyList()
         List(json.length()) { json.getJSONObject(it) }.map { o ->
@@ -554,6 +589,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     private companion object {
         const val TAG = "AndroidTvPlatform"
+        const val READ_TV_LISTINGS = "android.permission.READ_TV_LISTINGS"
         const val PINNED_APPS = "pinned_apps"
         const val INPUT_PREFERENCES = "input_preferences"
         const val WEATHER_VISIBLE = "weather_visible"

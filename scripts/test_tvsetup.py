@@ -139,6 +139,15 @@ class SetupTest(unittest.TestCase):
         self.assertEqual("com.freemytv.home/.MainActivity", tv.home())
         self.assertIn(SETUP_WRAITH, tv.disabled)
 
+    def test_setup_lets_the_home_read_what_apps_list_in_watch_next_and_restore_takes_it_back(self):
+        tv = FakeTv()
+        setup = setup_plan(tv)
+        tvsetup.apply(tv, setup, out=lambda _: None)
+
+        self.assertIn("android.permission.READ_TV_LISTINGS", tv.granted)
+        tvsetup.apply(tv, tvsetup.plan_restore(setup, tvsetup.read_state(tv)), out=lambda _: None)
+        self.assertNotIn("android.permission.READ_TV_LISTINGS", tv.granted)
+
     def test_every_package_change_is_disable_user_and_nothing_is_ever_uninstalled(self):
         tv = FakeTv()
         setup = setup_plan(tv)
