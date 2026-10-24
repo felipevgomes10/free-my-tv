@@ -1,7 +1,6 @@
 package com.freemytv.home.ui
 
 import android.graphics.Bitmap
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -29,35 +30,41 @@ import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Text
 import com.freemytv.home.R
 import com.freemytv.home.topshelf.TopShelfState
+import com.freemytv.home.upnext.UpNextEntry
 import com.freemytv.home.ui.theme.Tokens
 
 /**
- * The Top Shelf's picture, behind the top of the Home, shown only for something the owner
- * watched. It is baked once per picture, darkened and faded, so a frame draws one image
- * (ADR 0004); moving down to the lower Trays covers it with black instead of fading a layer.
+ * The Top Shelf: what the owner last watched in the focused app, its words beside its picture in
+ * a card. The picture keeps its own size: the apps' artwork is small (YouTube's is 640 × 360),
+ * and stretched across the top of the Home it went soft.
  */
 @Composable
-fun TopShelfBackdrop(state: TopShelfState, lowered: Boolean, modifier: Modifier = Modifier) {
-    val path = state.current?.artwork
-    val picture by produceState<Bitmap?>(null, path) { value = path?.let { bakeBackdrop(it, BACKDROP_WIDTH, BACKDROP_HEIGHT) } }
-    val cover by animateColorAsState(if (lowered) Color(0xD9000000) else Color.Transparent, label = "top shelf")
-    val bitmap = picture ?: return
-    Box(modifier) {
-        Image(bitmap.asImageBitmap(), contentDescription = null, contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize())
-        Box(Modifier.fillMaxSize().background(cover))
+fun TopShelf(state: TopShelfState, modifier: Modifier = Modifier) {
+    val app = state.app ?: return
+    // Nothing watched in this app: the top of the Home stays dark and quiet.
+    val entry = state.current ?: return
+    val path = entry.artwork
+    val picture by produceState<Bitmap?>(null, path) { value = path?.let { decodeNear(it, CARD_DECODE_WIDTH) } }
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(28.dp), verticalAlignment = Alignment.Bottom) {
+        picture?.let {
+            Image(
+                it.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.width(CARD_WIDTH).height(CARD_HEIGHT).clip(RoundedCornerShape(12.dp)),
+            )
+        }
+        TopShelfText(state, app.label, entry)
     }
 }
 
 /** The Top Shelf's words: the app, the title, how much is left, and dots when several take turns. */
 @Composable
-fun TopShelfText(state: TopShelfState, modifier: Modifier = Modifier) {
-    val app = state.app ?: return
-    // Nothing watched in this app: the top of the Home stays dark and quiet.
-    val entry = state.current ?: return
-    Column(modifier.width(440.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(app.label, color = Tokens.TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+private fun TopShelfText(state: TopShelfState, appLabel: String, entry: UpNextEntry) {
+    Column(Modifier.width(440.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(appLabel, color = Tokens.TextSecondary, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
         Text(
-            entry.title ?: stringResource(R.string.up_next_app, app.label),
+            entry.title ?: stringResource(R.string.up_next_app, appLabel),
             color = Tokens.TextPrimary,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
@@ -81,6 +88,7 @@ fun TopShelfText(state: TopShelfState, modifier: Modifier = Modifier) {
     }
 }
 
-// The Top Shelf's shape (960 × 300 dp), at two thirds of the 1080p panel's pixels.
-private const val BACKDROP_WIDTH = 1280
-private const val BACKDROP_HEIGHT = 400
+private val CARD_WIDTH = 240.dp
+private val CARD_HEIGHT = 135.dp
+// The card's pixels on the 1080p panel.
+private const val CARD_DECODE_WIDTH = 480
