@@ -90,6 +90,9 @@ CANDIDATES = {
     "com.tcl.hotelmenu": "hotel mode menu",
     "com.tcl.logkit": "TCL log collection",
     "com.tcl.interactive": "interactive TV overlays",
+    "com.tcl.dashboard": "TCL Home, TCL's own home screen, unused with the Home",
+    "com.google.android.videos": "Google Play Filmes (renting and buying still work in the Play Store app)",
+    "com.google.android.play.games": "Google Play Games",
 }
 
 

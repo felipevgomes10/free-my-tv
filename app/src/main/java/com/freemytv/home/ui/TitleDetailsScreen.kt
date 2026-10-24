@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -142,8 +143,10 @@ fun TitleDetailsScreen(
             }
             if (state.whereToWatch.isNotEmpty()) {
                 Text(stringResource(R.string.where_to_watch), color = Tokens.TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 18.dp))
+                // Room on the sides for a focused card to grow into, shifted back so the cards line up with the text.
                 LazyRow(
-                    contentPadding = PaddingValues(vertical = 8.dp),
+                    modifier = Modifier.offset(x = -GROW_ROOM),
+                    contentPadding = PaddingValues(horizontal = GROW_ROOM, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     itemsIndexed(state.whereToWatch, key = { _, option -> option.name }) { index, option ->
@@ -228,4 +231,5 @@ private fun Problem(text: String) {
     Text(text, color = Tokens.Attention, fontSize = 12.sp, modifier = Modifier.width(520.dp).padding(top = 16.dp))
 }
 
+private val GROW_ROOM = 10.dp
 private val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
