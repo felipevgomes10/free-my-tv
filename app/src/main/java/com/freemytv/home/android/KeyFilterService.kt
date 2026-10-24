@@ -36,7 +36,15 @@ class KeyFilterService : AccessibilityService() {
 
     override fun getMainExecutor(): Executor = keysExecutor
 
+    /** Keys pressed while Settings works under the cover, held back down and up so none lands in Settings. */
+    private val heldBack = mutableSetOf<Int>()
+
     override fun onKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN && ::forceStopper.isInitialized && forceStopper.busy) {
+            heldBack += event.keyCode
+            return true
+        }
+        if (event.action == KeyEvent.ACTION_UP && heldBack.remove(event.keyCode)) return true
         val decision = home.shortcutButtons.onKey(
             scanCode = event.scanCode,
             keyCode = event.keyCode,

@@ -46,6 +46,7 @@
     <string name="hz">%1$d Hz</string>
     <string name="frame_rate_window">tela a %1$d Hz, últimos 60 segundos</string>
     <string name="close_app">Fechar</string>
+    <string name="closing_app">Fechando %1$s…</string>
     <string name="needs_setup">Para ver os apps aqui, rode a Preparação no computador.</string>
 
     <string name="settings">Configurações</string>
