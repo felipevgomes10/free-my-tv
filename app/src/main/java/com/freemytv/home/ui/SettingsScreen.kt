@@ -1,6 +1,7 @@
 package com.freemytv.home.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,8 +22,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -37,11 +41,11 @@ import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import com.freemytv.home.R
-import com.freemytv.home.home.StatusClock
+import com.freemytv.home.android.SetupNotifications
 import com.freemytv.home.buttons.ButtonTarget
 import com.freemytv.home.buttons.ShortcutButton
+import com.freemytv.home.home.StatusClock
 import com.freemytv.home.multitasking.OpenAppLimit
-import com.freemytv.home.android.SetupNotifications
 import com.freemytv.home.settings.CastReceiver
 import com.freemytv.home.settings.PackageState
 import com.freemytv.home.settings.SettingsState
@@ -71,6 +75,7 @@ class SettingsActions(
     val onAssignButton: (ShortcutButton, ButtonTarget?) -> Unit,
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SettingsScreen(
     state: SettingsState,
@@ -82,8 +87,8 @@ fun SettingsScreen(
     actions: SettingsActions,
 ) {
     var section by remember { mutableStateOf(SettingsSection.Widgets) }
-    val first = remember { FocusRequester() }
-    LaunchedEffect(Unit) { runCatching { first.requestFocus() } }
+    val sectionFocus = remember { SettingsSection.entries.associateWith { FocusRequester() } }
+    LaunchedEffect(Unit) { runCatching { sectionFocus.getValue(SettingsSection.Widgets).requestFocus() } }
 
     Column(
         Modifier
@@ -98,19 +103,32 @@ fun SettingsScreen(
                 Column(Modifier.width(260.dp).then(group), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(stringResource(R.string.settings), color = Tokens.TextPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp)
                     Box(Modifier.height(12.dp))
-                    SettingsSection.entries.forEachIndexed { index, entry ->
+                    SettingsSection.entries.forEach { entry ->
                         SectionItem(
                             entry,
                             selected = entry == section,
                             onFocus = { section = entry },
                             onClick = { if (entry == SettingsSection.AndroidSettings) actions.onOpenAndroidSettings() },
-                            modifier = if (index == 0) Modifier.focusRequester(first) else Modifier,
+                            modifier = Modifier.focusRequester(sectionFocus.getValue(entry)),
                         )
                     }
                 }
             }
             SlidingHighlightGroup(rememberSlidingHighlight(), RoundedCornerShape(9.dp)) { group ->
-                Column(Modifier.weight(1f).padding(top = 48.dp).then(group)) {
+                // Focus stays in the section's panel: Left goes back to its own entry in the menu,
+                // and the panel's ends lead nowhere, rather than to whichever entry sits nearest.
+                val panelExit = Modifier
+                    .focusProperties {
+                        exit = { direction ->
+                            when (direction) {
+                                FocusDirection.Left -> sectionFocus.getValue(section)
+                                FocusDirection.Up -> FocusRequester.Default
+                                else -> FocusRequester.Cancel
+                            }
+                        }
+                    }
+                    .focusGroup()
+                Column(Modifier.weight(1f).padding(top = 48.dp).then(group).then(panelExit)) {
                     when (section) {
                         SettingsSection.Widgets -> WidgetsPanel(state, actions)
                         SettingsSection.OpenApps -> {
