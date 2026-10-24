@@ -36,6 +36,8 @@ data class WeatherReport(
     val hours: List<HourSlot>,
     /** The next 7 days, starting today. */
     val days: List<DaySlot>,
+    /** Keep the service's exact code: a mainly clear sky (1) differs from partial cloud (2). */
+    val weatherCode: Int,
 )
 
 data class HourSlot(val time: LocalDateTime, val isNow: Boolean, val temperature: Int, val condition: Condition, val isDay: Boolean)
@@ -105,6 +107,7 @@ class WeatherWidget(private val platform: TvPlatform, private val settings: Widg
                 days = forecast.daily.filter { !it.date.isBefore(today) }.take(7).map {
                     DaySlot(it.date, it.date == today, Condition.fromWmo(it.weatherCode), it.min.roundToInt(), it.max.roundToInt())
                 },
+                weatherCode = current.weatherCode,
             )
         }
     }

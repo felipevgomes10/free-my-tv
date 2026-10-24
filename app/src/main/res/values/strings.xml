@@ -222,4 +222,6 @@
         <item quantity="one">%d na bandeja</item>
         <item quantity="other">%d na bandeja</item>
     </plurals>
+    <string name="weather_mute">Silenciar ambiente</string>
+    <string name="weather_unmute">Ativar som ambiente</string>
 </resources>

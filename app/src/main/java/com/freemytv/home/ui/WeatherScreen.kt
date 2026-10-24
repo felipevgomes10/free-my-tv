@@ -42,6 +42,7 @@ import com.freemytv.home.weather.Condition
 import com.freemytv.home.weather.DaySlot
 import com.freemytv.home.weather.HourSlot
 import com.freemytv.home.weather.WeatherReport
+import com.freemytv.home.weather.WeatherAtmosphere
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -51,7 +52,15 @@ import java.util.Locale
  * screen arrives, or the first forecast is on its way, a skeleton of the same layout stands in.
  */
 @Composable
-fun WeatherScreen(report: WeatherReport?, loading: Boolean, clock: StatusClock, statusWidgets: @Composable () -> Unit) {
+fun WeatherScreen(
+    report: WeatherReport?,
+    loading: Boolean,
+    clock: StatusClock,
+    soundMuted: Boolean,
+    onToggleSound: () -> Unit,
+    active: Boolean,
+    statusWidgets: @Composable () -> Unit,
+) {
     val pill = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { pill.requestFocus() } }
 
@@ -67,6 +76,8 @@ fun WeatherScreen(report: WeatherReport?, loading: Boolean, clock: StatusClock, 
             .fillMaxSize()
             .background(Brush.verticalGradient(0f to sky, 0.85f to Tokens.Background)),
     ) {
+        val atmosphere = report?.let { WeatherAtmosphere.fromWmo(it.weatherCode, it.isDay) }
+        WeatherAtmosphereBackground(atmosphere, active && settled && report != null, soundMuted)
         CompositionLocalProvider(LocalWeatherPillFocus provides pill) {
             StatusBar(clock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
         }
@@ -77,10 +88,16 @@ fun WeatherScreen(report: WeatherReport?, loading: Boolean, clock: StatusClock, 
                         Now(report, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
                         NextDays(report.days, Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
                         NextHours(report.hours, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
+                        if (atmosphere != null) PillButton(
+                            label = stringResource(if (soundMuted) R.string.weather_unmute else R.string.weather_mute),
+                            icon = if (soundMuted) R.drawable.ic_volume_off else R.drawable.ic_volume_on,
+                            onClick = onToggleSound,
+                            modifier = Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 350.dp),
+                        )
                     }
                     WeatherPage.Unavailable -> Text(
                         stringResource(R.string.weather_unavailable),
-                        color = Tokens.TextSecondary,
+                        color = WeatherSecondary,
                         fontSize = 14.sp,
                         modifier = Modifier.align(Alignment.Center).width(360.dp),
                         textAlign = TextAlign.Center,
@@ -149,7 +166,7 @@ private fun NextHoursBones(modifier: Modifier) {
 @Composable
 private fun Now(report: WeatherReport, modifier: Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(report.place, color = Tokens.TextSecondary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+        Text(report.place, color = WeatherSecondary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         Text("${report.temperature}°", color = Tokens.TextPrimary, fontSize = 120.sp, fontWeight = FontWeight.Light, letterSpacing = (-5).sp, lineHeight = 120.sp)
         Text(stringResource(report.condition.label()), color = Tokens.TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(18.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -157,7 +174,7 @@ private fun Now(report: WeatherReport, modifier: Modifier) {
             Fact(R.drawable.ic_arrow_down, "${report.todayMin}°")
             Fact(R.drawable.ic_water_drop, stringResource(R.string.humidity, report.humidity))
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                WeatherIcon(Condition.Rain, true, 12.dp, Tokens.TextSecondary)
+                WeatherIcon(Condition.Rain, true, 12.dp, WeatherSecondary)
                 Text(stringResource(R.string.rain_chance, report.rainChance), color = Tokens.TextPrimary, fontSize = 12.sp)
             }
         }
@@ -167,7 +184,7 @@ private fun Now(report: WeatherReport, modifier: Modifier) {
 @Composable
 private fun Fact(icon: Int, text: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Icon(painterResource(icon), contentDescription = null, tint = Tokens.TextSecondary, modifier = Modifier.size(12.dp))
+        Icon(painterResource(icon), contentDescription = null, tint = WeatherSecondary, modifier = Modifier.size(12.dp))
         Text(text, color = Tokens.TextPrimary, fontSize = 12.sp)
     }
 }
@@ -185,7 +202,7 @@ private fun NextDays(days: List<DaySlot>, modifier: Modifier) {
             ) {
                 Text(dayLabel(day), color = Tokens.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(72.dp))
                 WeatherIcon(day.condition, true, 14.dp, Tokens.TextPrimary)
-                Text("${day.min}°", color = Tokens.TextSecondary, fontSize = 12.sp, textAlign = TextAlign.End, modifier = Modifier.width(28.dp))
+                Text("${day.min}°", color = WeatherSecondary, fontSize = 12.sp, textAlign = TextAlign.End, modifier = Modifier.width(28.dp))
                 RangeBar(day.min, day.max, low, high, Modifier.weight(1f))
                 Text("${day.max}°", color = Tokens.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.width(28.dp))
             }
@@ -218,7 +235,7 @@ private fun NextHours(hours: List<HourSlot>, modifier: Modifier) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Text(
                     if (hour.isNow) stringResource(R.string.now) else "${hour.time.hour}h",
-                    color = if (hour.isNow) Tokens.TextPrimary else Tokens.TextSecondary,
+                    color = if (hour.isNow) Tokens.TextPrimary else WeatherSecondary,
                     fontSize = 11.sp,
                     fontWeight = if (hour.isNow) FontWeight.Bold else FontWeight.Medium,
                 )
@@ -247,3 +264,6 @@ fun Condition.label(): Int = when (this) {
 private const val REVEAL_MILLIS = 300
 private val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
 private val WEEKDAY: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE", PT_BR)
+
+// Brighter than the Home's usual secondary text, to stay readable over moving footage.
+private val WeatherSecondary = Color(0xD9FFFFFF)

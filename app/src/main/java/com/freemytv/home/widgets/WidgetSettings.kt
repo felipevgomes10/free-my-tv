@@ -11,6 +11,8 @@ data class WidgetPreferences(
     val monitorVisible: Boolean = true,
     /** The city the Weather Widget reports on, or null for "Automático" (located by the TV's public IP). */
     val weatherCity: String? = null,
+    /** Only the Weather Widget's detail makes sound; remember the owner's mute choice. */
+    val weatherSoundMuted: Boolean = false,
 )
 
 class WidgetSettings(private val platform: TvPlatform) {
@@ -25,6 +27,8 @@ class WidgetSettings(private val platform: TvPlatform) {
     suspend fun setWeatherVisible(visible: Boolean) = change { it.copy(weatherVisible = visible) }
 
     suspend fun setMonitorVisible(visible: Boolean) = change { it.copy(monitorVisible = visible) }
+
+    suspend fun setWeatherSoundMuted(muted: Boolean) = change { it.copy(weatherSoundMuted = muted) }
 
     /** A blank city means "Automático". */
     suspend fun setWeatherCity(city: String?) = change { it.copy(weatherCity = city?.trim()?.takeIf { name -> name.isNotEmpty() }) }

@@ -183,6 +183,7 @@ class MainActivity : ComponentActivity() {
             val topShelfState by topShelf.state.collectAsStateWithLifecycle()
             val inputState by inputs.state.collectAsStateWithLifecycle()
             val weatherState by weather.state.collectAsStateWithLifecycle()
+            val widgetPreferences by widgetSettings.preferences.collectAsStateWithLifecycle()
             val monitorState by monitor.state.collectAsStateWithLifecycle()
             val updatesState by updates.state.collectAsStateWithLifecycle()
             val notificationsState by notifications.state.collectAsStateWithLifecycle()
@@ -312,7 +313,15 @@ class MainActivity : ComponentActivity() {
                                 statusWidgets = statusWidgets,
                             )
                         }
-                        Screen.Weather -> WeatherScreen(weatherState.report, weatherState.loading, homeState.statusClock, statusWidgets)
+                        Screen.Weather -> WeatherScreen(
+                            report = weatherState.report,
+                            loading = weatherState.loading,
+                            clock = homeState.statusClock,
+                            soundMuted = widgetPreferences.weatherSoundMuted,
+                            onToggleSound = { scope.launch { widgetSettings.setWeatherSoundMuted(!widgetPreferences.weatherSoundMuted) } },
+                            active = screen == Screen.Weather,
+                            statusWidgets = statusWidgets,
+                        )
                         Screen.Settings -> {
                             val settingsState by settings.state.collectAsStateWithLifecycle()
                             val assignments by app.shortcutButtons.assignments.collectAsStateWithLifecycle()

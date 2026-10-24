@@ -68,7 +68,7 @@ Screenshots come from the Google TV emulator; the designs live in [`design.pen`]
 - **App Tray** — only the apps you pinned, in your order. Hold OK to move, unpin or uninstall.
 - **Continuar assistindo** — what was playing in any app, read from Android's media sessions, with how much is left; selecting it takes you back to it, YouTube videos included.
 - **Entradas** — HDMI inputs and the antenna, renameable and hideable.
-- **Status Bar widgets** — weather and a system monitor (storage, memory, frame rate), each opening its own detail screen.
+- **Status Bar widgets** — weather and a system monitor (storage, memory, frame rate), each opening its own detail screen. Weather's detail has full-screen weather footage and quiet ambient noise, with a mute button that remembers your choice; both stop when you leave.
 
 **Explorar**
 - Trending movies and series of the day or the week from [TMDB](https://www.themoviedb.org), filtered by movies or series.
@@ -237,4 +237,4 @@ docs/design/       design exports of design.pen
 
 ## Credits
 
-This product uses the TMDB API but is not endorsed or certified by TMDB. Forecasts and city search come from [Open-Meteo](https://open-meteo.com); the city from the TV's IP, from [ipinfo.io](https://ipinfo.io) or [GeoJS](https://www.geojs.io). Free My TV is a personal project, not affiliated with TCL, Google or Apple.
+This product uses the TMDB API but is not endorsed or certified by TMDB. Forecasts and city search come from [Open-Meteo](https://open-meteo.com); the city from the TV's IP, from [ipinfo.io](https://ipinfo.io) or [GeoJS](https://www.geojs.io). Weather footage comes from [Mixkit](https://mixkit.co), under its Stock Video Free License; the ambient noise beds are generated for this project. The [weather media guide](docs/weather-media.md) maps every API condition and credits each clip. Free My TV is a personal project, not affiliated with TCL, Google or Apple.

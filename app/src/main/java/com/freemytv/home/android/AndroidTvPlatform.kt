@@ -142,6 +142,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
             weatherVisible = prefs.getBoolean(WEATHER_VISIBLE, true),
             monitorVisible = prefs.getBoolean(MONITOR_VISIBLE, true),
             weatherCity = prefs.getString(WEATHER_CITY, null),
+            weatherSoundMuted = prefs.getBoolean("weather_sound_muted", false),
         )
     }
 
@@ -150,6 +151,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
             .putBoolean(WEATHER_VISIBLE, preferences.weatherVisible)
             .putBoolean(MONITOR_VISIBLE, preferences.monitorVisible)
             .putString(WEATHER_CITY, preferences.weatherCity)
+            .putBoolean("weather_sound_muted", preferences.weatherSoundMuted)
             .apply()
     }
 
