@@ -94,7 +94,11 @@ class SlidingHighlight internal constructor(private val followsSelection: Boolea
 
     /** Put on each item, outermost: it tracks the item and inks it black under the pill. */
     fun item(key: Any): Modifier = Modifier
-        .onGloballyPositioned { bounds[key] = Rect(it.positionInRoot(), it.size.toSize()) }
+        .onGloballyPositioned {
+            // Written only when it moved: every write redraws the group's items.
+            val now = Rect(it.positionInRoot(), it.size.toSize())
+            if (bounds[key] != now) bounds[key] = now
+        }
         .onFocusChanged {
             if (it.isFocused) focused = key else if (focused == key) focused = null
         }

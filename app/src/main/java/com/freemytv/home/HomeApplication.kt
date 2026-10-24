@@ -2,6 +2,7 @@ package com.freemytv.home
 
 import android.app.Application
 import com.freemytv.home.android.AndroidTvPlatform
+import com.freemytv.home.android.StallWatch
 import com.freemytv.home.buttons.ShortcutButtons
 import com.freemytv.home.setup.SetupWatchdog
 import com.freemytv.home.upnext.UpNextTray
@@ -27,6 +28,7 @@ class HomeApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        StallWatch.start()
         scope.launch { shortcutButtons.load() }
         // Checked from boot (the Home starts with the TV) and every 15 minutes, whichever app is in front.
         scope.launch { setupWatchdog.keepWatching() }

@@ -448,13 +448,6 @@ class UpNextTrayTest {
         assertEquals(listOf("Moana 2"), tray.state.value.entries.map { it.title })
     }
 
-    @Test
-    fun `Watch Next entries of an app that isn't installed any more don't show`() = runTest {
-        platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2"), listed("com.gone.app", "Old show"))
-
-        assertEquals(listOf("Moana 2"), UpNextTray(platform).also { it.load() }.state.value.entries.map { it.title })
-    }
-
     private companion object {
         const val DISNEY = "com.disney.disneyplus"
         const val NETFLIX = "com.netflix.ninja"

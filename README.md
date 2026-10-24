@@ -103,7 +103,7 @@ Everything is in Brazilian Portuguese and tuned for a 2 GB TCL set: the Home sta
 - **A Home, not a ROM** ([ADR 0001](docs/adr/0001-launcher-not-rom.md)). With Google TV's launcher disabled ([ADR 0003](docs/adr/0003-disable-google-tv-launcher.md)), Android hands the Home button to the only Home left.
 - **An accessibility key filter** ([ADR 0005](docs/adr/0005-accessibility-key-filter-for-shortcut-buttons.md)) sees remote keys first, so shortcut buttons keep working and can be reassigned.
 - **ADB grants instead of root**: `DUMP`, `PACKAGE_USAGE_STATS`, `WRITE_SECURE_SETTINGS` and `READ_TV_LISTINGS` let the Home read memory per app ([ADR 0006](docs/adr/0006-process-memory-through-dumpsys-activity.md)), recent usage and other apps' Watch Next, and keep its key filter on.
-- **Watch Next**, with media sessions as the fallback, feeds *Continuar assistindo* ([ADR 0011](docs/adr/0011-up-next-from-watch-next.md)).
+- **Watch Next**, with media sessions as the fallback, feeds *Continuar assistindo* ([ADR 0012](docs/adr/0012-up-next-from-watch-next.md)).
 - **TMDB's token never ships in the APK** ([ADR 0008](docs/adr/0008-tmdb-token-delivered-by-setup.md)): it stays in a git-ignored file on your computer, and Setup hands it to the TV.
 
 The language of the project — *Top Shelf*, *App Tray*, *Open App*, *Title*… — is defined in [`CONTEXT.md`](CONTEXT.md); every decision with a trade-off is an [ADR](docs/adr).

@@ -60,7 +60,7 @@ data class UpNextState(
 )
 
 /**
- * The Up Next Tray (ADR 0011). Apps that list what the owner is watching in Android TV's Watch
+ * The Up Next Tray (ADR 0012). Apps that list what the owner is watching in Android TV's Watch
  * Next are read from there, with their own episode, progress, picture and link, even while
  * closed. Apps that don't (YouTube, Prime Video) come from what the Home sees playing: one entry
  * per title, or one per app for apps that don't name what is playing. Entries leave once
@@ -104,7 +104,7 @@ class UpNextTray(private val platform: TvPlatform) {
         val programs = platform.watchNext().orEmpty()
         publishers = programs.map { it.packageName }.toSet()
         listed = programs
-            .filter { (it.kind == WatchNextKind.Continue || it.kind == WatchNextKind.Next) && platform.isLaunchable(it.packageName) }
+            .filter { it.kind == WatchNextKind.Continue || it.kind == WatchNextKind.Next }
             .map { entryOf(it) }
         // A removal lasts until the app lists the title as watched since, or stops listing it.
         val stillDismissed = dismissed.filter { (key, at) -> listed.any { it.key == key && !it.lastWatched.isAfter(at) } }

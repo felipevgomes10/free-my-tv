@@ -18,7 +18,7 @@ enum class WatchNextKind {
 }
 
 /**
- * A program a streaming app lists in Android TV's Watch Next (ADR 0011): what the owner is in
+ * A program a streaming app lists in Android TV's Watch Next (ADR 0012): what the owner is in
  * the middle of, as the app itself keeps it, even while the app is closed.
  */
 data class WatchNextProgram(

@@ -18,7 +18,7 @@ import java.security.MessageDigest
 import java.time.Instant
 
 /**
- * Reads what apps list in Android TV's Watch Next (ADR 0011). With READ_TV_LISTINGS, which Setup
+ * Reads what apps list in Android TV's Watch Next (ADR 0012). With READ_TV_LISTINGS, which Setup
  * grants, the TV provider answers with every app's searchable programs, which Watch Next's are by
  * default. Each picture is stored once, downscaled, so the Up Next Tray shows it without fetching
  * it again; pictures no program uses any more are deleted.
@@ -38,10 +38,16 @@ internal class WatchNextReader(private val context: Context) {
             Log.w(TAG, "Watch Next can't be read", e)
             return null
         }
-        val programs = rows.map { (program, picture) -> program.copy(artwork = picture?.let(::store)) }
+        // Disabled and uninstalled apps keep their rows; asked here, off the main thread, once per app.
+        val openable = rows.map { it.first.packageName }.distinct().filter(::canOpen).toSet()
+        val programs = rows.filter { it.first.packageName in openable }.map { (program, picture) -> program.copy(artwork = picture?.let(::store)) }
         val kept = programs.mapNotNull { it.artwork }.toSet()
         artworkDir.listFiles()?.filter { it.path !in kept }?.forEach { it.delete() }
         return programs
+    }
+
+    private fun canOpen(packageName: String) = context.packageManager.run {
+        getLeanbackLaunchIntentForPackage(packageName) != null || getLaunchIntentForPackage(packageName) != null
     }
 
     /** A program and its picture's address, thumbnail (a frame, 16:9) before poster. */

@@ -1,6 +1,6 @@
 # Up Next and the Top Shelf come from media sessions, not the TV provider
 
-Superseded by ADR 0011: the TV provider's Watch Next turned out to be readable with `READ_TV_LISTINGS`. Media sessions remain the fallback for apps that list nothing there.
+Superseded by ADR 0012: the TV provider's Watch Next turned out to be readable with `READ_TV_LISTINGS`. Media sessions remain the fallback for apps that list nothing there.
 
 The apps on this TV do publish "continue watching" rows and home-screen channels to Android's TV provider: Netflix, Prime Video, Disney+, Globoplay and YouTube all hold `WRITE_EPG_DATA`. Reading rows written by other apps, though, takes `ACCESS_ALL_EPG_DATA` and `ACCESS_WATCHED_PROGRAMS`, which are `signature|privileged` (on the owner's TV only the TV provider, `launcherx`, Katniss, Gboard and TCL's system apps hold them). ADB can't grant them, and the shell can't read the rows either (`content query` returns nothing). Google TV's own "continue watching" also comes through the Engage SDK, which only Google's surfaces can read.
 

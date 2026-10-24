@@ -78,7 +78,7 @@ A physical signal source the TV can switch to: an HDMI port or the antenna. Live
 _Avoid_: Source, port, channel
 
 **Up Next Tray** (Continuar assistindo):
-The Tray holding movies and episodes the owner has started in other apps and not finished: as the apps list them in Android TV's Watch Next, or, for apps that list nothing there, as the Home saw them play (ADR 0011); an app that doesn't say what is playing gets one entry for the app instead.
+The Tray holding movies and episodes the owner has started in other apps and not finished: as the apps list them in Android TV's Watch Next, or, for apps that list nothing there, as the Home saw them play (ADR 0012); an app that doesn't say what is playing gets one entry for the app instead.
 _Avoid_: Continue watching, recents
 
 ### App lifecycle
