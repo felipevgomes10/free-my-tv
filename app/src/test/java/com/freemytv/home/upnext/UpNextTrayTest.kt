@@ -359,6 +359,22 @@ class UpNextTrayTest {
     }
 
     @Test
+    fun `the Tray's apps come in the order they were last watched, each once, to filter by`() = runTest {
+        platform.watchNextPrograms = listOf(
+            listed(DISNEY, "Andor", minutesAgo = 30),
+            listed(GLOBOPLAY, "Vale Tudo", minutesAgo = 5),
+            listed(DISNEY, "Moana 2", minutesAgo = 1),
+            listed(NETFLIX, "Wandinha", minutesAgo = 60),
+        )
+
+        val state = UpNextTray(platform).also { it.load() }.state.value
+
+        assertEquals(listOf(DISNEY to "Disney+", GLOBOPLAY to "Globoplay", NETFLIX to "Netflix"), state.apps)
+        assertEquals(listOf("Moana 2", "Andor"), state.entriesOf(DISNEY).map { it.title })
+        assertEquals(4, state.entriesOf(null).size)
+    }
+
+    @Test
     fun `a movie in Watch Next has no episode line`() = runTest {
         platform.watchNextPrograms = listOf(listed(DISNEY, "Moana 2"))
 

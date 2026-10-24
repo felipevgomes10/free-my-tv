@@ -4,10 +4,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,16 +17,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -44,7 +54,12 @@ import com.freemytv.home.upnext.UpNextState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/** "Continuar assistindo": what the owner started in other apps; hidden while empty. */
+/**
+ * "Continuar assistindo": what the owner started in other apps; hidden while empty. With two
+ * apps or more, pills beside the title narrow it to one app. Down from the App Tray still lands
+ * on the tiles, so resuming stays one press away; the pills are Up from them.
+ */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun UpNextTrayRow(
     state: UpNextState,
@@ -55,24 +70,53 @@ fun UpNextTrayRow(
     modifier: Modifier = Modifier,
 ) {
     if (state.entries.isEmpty()) return
-    val trayFocus = rememberTrayFocus(state.entries.map { it.key })
+    val apps = state.apps
+    var chosen by rememberSaveable { mutableStateOf<String?>(null) }
+    // An app whose entries are all gone is no filter any more.
+    val app = chosen?.takeIf { pkg -> apps.any { it.first == pkg } }
+    val shown = state.entriesOf(app)
+    val trayFocus = rememberTrayFocus(shown.map { it.key })
+    val row = rememberLazyListState()
+    LaunchedEffect(app) { row.scrollToItem(0) }
     // Edit Mode on this Tray has a single action, so holding OK opens it straight away.
     var menuFor by remember { mutableStateOf<String?>(null) }
 
     Column(modifier.alpha(if (dimmed) DIMMED else 1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(
-            stringResource(R.string.up_next),
-            color = Tokens.TextSecondary,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(start = Tokens.SafeAreaHorizontal),
-        )
+        Row(
+            Modifier.padding(start = Tokens.SafeAreaHorizontal),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(stringResource(R.string.up_next), color = Tokens.TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            if (apps.size > 1) {
+                // Coming down from the App Tray, focus passes the pills for the tiles it was on.
+                val toTiles = Modifier
+                    .focusProperties {
+                        enter = { direction ->
+                            if (direction == FocusDirection.Down) {
+                                val key = trayFocus.focusedKey?.takeIf { k -> shown.any { it.key == k } } ?: shown.first().key
+                                trayFocus.requester(key)
+                            } else {
+                                FocusRequester.Default
+                            }
+                        }
+                    }
+                    .focusGroup()
+                SlidingHighlightGroup(rememberSlidingHighlight(), CircleShape) { group ->
+                    Row(group.then(toTiles), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        FilterPill(stringResource(R.string.filter_all), app == null) { chosen = null }
+                        apps.forEach { (pkg, label) -> FilterPill(label, app == pkg) { chosen = pkg } }
+                    }
+                }
+            }
+        }
         LazyRow(
             Modifier.fillMaxWidth().then(trayFocus.trayModifier()),
+            state = row,
             contentPadding = PaddingValues(horizontal = Tokens.SafeAreaHorizontal, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            itemsIndexed(state.entries, key = { _, entry -> entry.key }) { index, entry ->
+            itemsIndexed(shown, key = { _, entry -> entry.key }) { index, entry ->
                 TvTile(
                     onClick = { onSelect(entry) },
                     onLongClick = { menuFor = entry.key },
