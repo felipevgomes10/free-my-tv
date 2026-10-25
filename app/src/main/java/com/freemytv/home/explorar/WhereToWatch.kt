@@ -17,6 +17,10 @@ data class WatchOption(
     /** The service's TV app; null when it has none, and then it can't be selected. */
     val packageName: String?,
     val installed: Boolean = false,
+    /** The app's own link to the Title, when its id there is known. */
+    val link: String? = null,
+    /** The app's search for the Title, for apps that open one from a link. */
+    val search: String? = null,
 )
 
 /**
