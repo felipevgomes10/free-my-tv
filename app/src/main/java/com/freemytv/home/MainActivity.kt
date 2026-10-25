@@ -3,12 +3,14 @@ package com.freemytv.home
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.EaseInCubic
 import androidx.compose.animation.core.EaseOutCubic
@@ -172,6 +174,14 @@ class MainActivity : ComponentActivity() {
                         awaitCancellation()
                     }
                 }
+            }
+        }
+        lifecycleScope.launch {
+            app.screensaverActive.collectLatest { dreaming ->
+                // Let Compose first pause Weather/audio, then release the covered Home window's
+                // full-HD buffers. This collector also restores a stopped Activity after the dream.
+                if (dreaming) delay(300)
+                window.decorView.visibility = if (dreaming) View.INVISIBLE else View.VISIBLE
             }
         }
         lifecycleScope.launch {
@@ -429,6 +439,11 @@ class MainActivity : ComponentActivity() {
      * underneath while the new one fades in, so the Status Bar they share never dims.
      */
     private fun screenTransition(from: Screen, to: Screen): ContentTransform {
+        // SurfaceView already owns its own animation. Full-screen alpha/scale transitions here
+        // allocate multiple 1080p render targets that the TV keeps cached after navigation.
+        if (from == Screen.Weather || to == Screen.Weather) {
+            return ContentTransform(EnterTransition.None, ExitTransition.None, sizeTransform = SizeTransform(clip = false))
+        }
         val grow = scaleIn(tween(ENTER_MILLIS, easing = EaseOutCubic), initialScale = DEPTH_SCALE)
         val shrink = scaleOut(tween(EXIT_MILLIS, easing = EaseInCubic), targetScale = DEPTH_SCALE)
         val noResize = SizeTransform(clip = false)

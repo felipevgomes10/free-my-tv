@@ -1,125 +1,244 @@
-# Weather footage and ambient sound
+# Weather animation and ambient sound
 
-Weather's detail screen plays local footage behind the existing current conditions, 12 hours and
-7 days. The compact Weather Widget stays silent. There is no streaming, API key or new service.
+Weather and the native Screensaver render their atmosphere locally in real time. There are no
+video files, runtime media downloads or external 3D model files. The scene library is bundled in the APK. The compact
+Weather Widget stays still and silent. Forecast polling remains every 30 minutes while collected;
+this visual change does not turn Open-Meteo into a real-time feed.
 
 ## All API conditions
 
-Source: [Open-Meteo's WMO interpretation table](https://open-meteo.com/en/docs), checked 2026-10-24.
-The current API documents **29 codes**, including heavy thunderstorm (97). `WeatherReport` keeps
-the original code, independently of the eight `Condition` families used for icons and labels.
+The mapping retains all 29 codes in [Open-Meteo's WMO table](https://open-meteo.com/en/docs).
+Unknown conditions and unavailable forecasts use the static, silent sky.
 
-| WMO codes | Meaning | Scene / noise bed |
+| WMO codes | Scene | Ambient sound |
 | --- | --- | --- |
-| 0 | Clear sky | Sunlit trees / gentle breeze; starry sky / softer air at night |
-| 1 | Mainly clear | Same clear-sky scenes, respecting `is_day` |
-| 2 | Partly cloudy | Blue sky with clouds / breeze; clouds over the moon / softer wind at night |
-| 3 | Overcast | Thick grey clouds / stronger wind |
-| 45, 48 | Fog; depositing rime fog | Mist over a forest / soft, low wind |
-| 51, 53, 55 | Light, moderate, dense drizzle | Ripples on a lake / fine, bright rain noise |
-| 56, 57 | Light, dense freezing drizzle | Same drizzle scene and noise |
-| 61, 63, 65 | Slight, moderate, heavy rain | Raindrops on a window / fuller rain noise |
-| 66, 67 | Light, heavy freezing rain | Same rain scene and noise |
-| 71, 73, 75 | Slight, moderate, heavy snowfall | Snow falling in pines / soft wind |
-| 77 | Snow grains | Same snow scene and noise |
-| 80, 81, 82 | Slight, moderate, violent rain showers | Rain scene and noise |
-| 85, 86 | Slight, heavy snow showers | Snow scene and noise |
-| 95, 97 | Thunderstorm; heavy thunderstorm | Storm clouds and distant lightning / low, swelling noise |
-| 96, 99 | Thunderstorm with slight, heavy hail | Same thunderstorm scene and noise |
-| Other / unavailable | Unknown conditions / no forecast | Static sky, silent |
+| 0, 1 | Clear day: sun; clear night: moon and stars | Recorded birds and a light breeze; crickets at night |
+| 2 | Shaded drifting clouds, with sun or moon according to `is_day` | More distant birds and wind; crickets with light gusts at night |
+| 3 | Dense, layered overcast clouds | Wind gusts and rustling leaves |
+| 45, 48 | Layered drifting fog | Very quiet wind and distant birds |
+| 51, 53, 55, 56, 57 | Cloudy sky and fine rain particles | Individual water drops, with light rain underneath |
+| 61, 63, 65, 66, 67, 80, 81, 82 | Cloudy sky and fuller rain particles | Recorded steady rain and water splashes |
+| 71, 73, 75, 77, 85, 86 | Snowflakes drifting at different depths | Quiet, muffled wind without summer birds/insects |
+| 95, 96, 97, 99 | Storm clouds, rain and restrained sheet lightning | Recorded rain and distant thunder, with controlled peaks |
 
-Intensity and freezing/hail variants deliberately share a scene within their weather family;
-there is no claim that generic rain footage shows freezing rain, or storm footage shows hail.
-Day/night comes from the API's `is_day`, not the computer's clock. Precipitation and fog use
-their own scene both day and night. Code 1 retains the existing partly-cloudy compact icon,
-while the detail's footage uses its more precise “mainly clear” interpretation.
+Intensity, freezing and hail variants still share a family scene. Precipitation/overcast/fog keep
+their own palette regardless of day/night; clear and partly cloudy follow the API's `is_day`.
+These are stylized atmospheric scenes, not a physical simulation of every WMO variation.
 
-## Sources and licensing
+## Rendering and contrast
 
-All ten source pages explicitly offered the **Mixkit Stock Video Free License** when selected.
-Restricted-license alternatives were excluded. These are modified clips incorporated into the
-Home, not a stock-footage library. See [license](https://mixkit.co/license/#videoFree) and
-[terms](https://mixkit.co/terms/). Original authors retain ownership of their footage.
+`WeatherBackdrop` owns a native OpenGL ES 2.0 surface. `WeatherSceneRenderer` adapts the MIT
+[Weather Animations](https://github.com/g3sthousen/weather-animations) 1.1.1 core, pinned to
+`01a0ea7417593802e6a48ecd09aedef8f06539bf`. Its source remains under `third_party/weather-animations/`
+for provenance; the complete notice ships in `assets/weather/LICENSE.txt`, with About attribution.
 
-| Asset | Source |
-| --- | --- |
-| `clear_day.mp4` | [Sun flares seen under two trees, 51110](https://mixkit.co/free-stock-video/sun-flares-seen-under-two-trees-51110/) |
-| `clear_night.mp4` | [Many stars in the night sky, 4124](https://mixkit.co/free-stock-video/many-stars-in-the-night-sky-4124/) |
-| `partly_cloudy_day.mp4` | [White clouds moving across a clear blue sky, 51102](https://mixkit.co/free-stock-video/white-clouds-moving-across-a-clear-blue-sky-51102/) |
-| `partly_cloudy_night.mp4` | [Clouds passing over the moon, 3147](https://mixkit.co/free-stock-video/clouds-passing-over-the-moon-3147/) |
-| `cloudy.mp4` | [Thick clouds speeding in the sky with the wind, 21585](https://mixkit.co/free-stock-video/thick-clouds-speeding-in-the-sky-with-the-wind-21585/) |
-| `fog.mp4` | [Aerial tour above a cloud forest, 28341](https://mixkit.co/free-stock-video/aerial-tour-above-a-cloud-forest-28341/) |
-| `drizzle.mp4` | [Rain falling on the water of a lake seen up close, 18312](https://mixkit.co/free-stock-video/rain-falling-on-the-water-of-a-lake-seen-up-18312/) |
-| `rain.mp4` | [Window on a rainy day, 2846](https://mixkit.co/free-stock-video/window-on-a-rainy-day-2846/) |
-| `snow.mp4` | [Snow falling in a pine forest, 3352](https://mixkit.co/free-stock-video/snow-falling-in-a-pine-forest-3352/) |
-| `thunderstorm.mp4` | [Thunderstorm at night, 4422](https://mixkit.co/free-stock-video/thunderstorm-at-night-4422/) |
+The port retains the atmospheric art direction: the same sky palettes and three cloud layers/lobes,
+soft cloud silhouettes with warm tops/darker bases, proportioned sun/moon, twinkling stars, layered
+fog, distinct fine drizzle/rain, depth-varying snow and branched lightning. It is a native adaptation
+of 2D effects rather than real 3D or a claim of pixel-identical Canvas rendering. Unused weather
+conditions, fidelity presets and moon phases/celestial events are not ported.
 
-Every noise bed is generated for this project from seeded white noise with scene-specific
-high/low-pass filters and a gentle swell; there are no recordings, music, voices or sharp
-thunderclaps. These are atmospheric approximations, not field recordings. The source clips'
-original audio is discarded. The catalog and filter parameters live in `config/weather-media.json`.
+Cloud silhouettes are generated only when creating a scene, softened with a bounded separable
+alpha blur on a half-size software bitmap,
+uploaded directly as GLES2 single-channel alpha textures and immediately recycled on the CPU. Frames use shaders and
+cached sprites/points/lines; there is no per-frame bitmap allocation or blur. Only the current and
+incoming scene retain GPU textures. Old textures are deleted when the crossfade completes.
 
-## Playback and contrast
+The native surface is capped at 640×360 with its aspect ratio preserved, behind full-resolution
+Compose text. Choreographer requests at most 30 fps. A 1.2-second crossfade keeps the GPU context
+and continuous timeline. Rapid forecast updates retain the latest queued scene until the current
+crossfade finishes. There is no short movie boundary. Audio remains a separate native player.
 
-- Ten 7-second H.264 Baseline 3.1, 1280×720, 24 fps loops with mono AAC sound, about **11.6 MiB total**.
-- The preparation script cross-fades the last second into the first for both picture and noise.
-- One Media3 ExoPlayer with native decoders and a non-focusable `TextureView`, filling the screen
-  with center crop. Repeat mode prebuffers the next repetition without reopening the decoders or
-  the audio output. AAC encoder delay/padding is trimmed for gapless sound. Compressed buffering
-  is capped at 4 MiB, rather than the library's default video buffer (ADR 0004).
-  Codec queueing is synchronous: the Android 12 emulator's asynchronous AAC adapter failed after
-  repeated loops in extended testing. This still uses native decoding, with one video decoder.
-  No WebView, live blur, media session, image cache or dependency on a remote media host.
-- A uniform 62% black overlay limits even white video frames to 38% white. Weather's secondary
-  text is 85% white, providing over 5:1 contrast against that worst case; top/bottom scrims add shade.
-- The player is created only with a known forecast on the visible, settled Weather screen.
-  Navigation, activity pause/sleep and surface destruction release decoder, sound, audio focus
-  and `Surface`. Returning recreates it. A decoder failure leaves the static sky readable.
-- “Silenciar ambiente” / “Ativar som ambiente” is a D-pad button below the current conditions.
-  Muting preserves the video, releases audio focus and persists in the existing widget preferences.
-  Audio stays quiet and yields to Assistant or other audio focus owners.
+The existing 62% black overlay limits even a white rendered pixel to 38% white; secondary text
+is 85% white, giving over 5:1 worst-case contrast before the extra top/bottom scrims. A graphics
+initialization failure leaves a static dark sky beneath the data.
 
-## Rebuilding and checking
+The weather path uses no WebView, browser process, JavaScript, remote texture/video or model file.
+Activity pause, sleep, navigation and disposal stop callbacks, pause the GL thread, discard its
+context/buffers and release audio/focus. A lifecycle observer applies ON_PAUSE directly to the native
+view, without waiting for the stopped window to recompose; window visibility is a second guard.
+The native Screensaver shares this component and suspends
+the Weather screen underneath it. After the pause is applied, the covered Home decor is hidden
+so its full-HD buffers are released; a lifecycle-scope observer restores it when the dream ends.
+Weather entry/exit and forecast data use direct UI layers instead of full-screen alpha/scale
+snapshots; weather-family crossfades remain inside the small native surface. The surface owns no D-pad/touch focus or media session.
 
-Requires Python 3 and ffmpeg; it does not affect a TV:
+The WebView prototype rendered smoothly on the physical TV (~29.5 presented fps) but consumed
+~283 MiB PSS including its separate renderer, exceeding ADR 0004. The owner selected this native
+adaptation to preserve the memory budget. Native measurements below supersede prototype results.
+
+## Sound and rebuilding
+
+The former filtered-white-noise beds are replaced by ten mixes of **real nature recordings**:
+clear day has birds, clear night has crickets, partly cloudy mixes those with wind, overcast adds
+rustling leaves, drizzle emphasizes individual drops, rain has rain/splashes, and storms include
+actual thunder. Fog and snow use quieter outdoor atmospheres; fog/snow themselves do not have a
+universal audible sound. These are illustrative environments, not recordings of the owner's city.
+
+Loops last 32–72 seconds. Each layer uses a continuous excerpt (no short clip repeated internally).
+A three-second equal-power tail/head crossfade makes the loop; filtering, per-layer leveling and
+peak compression happen **before** that join. A measured, fixed final gain preserves the seam and
+keeps the strongest peaks below -4 dBTP before AAC encoding. Five-millisecond edge smoothing
+handles the AAC startup window without inserting a silence interval or changing the loop duration. Thunder stays behind the rain instead
+of producing abrupt loud claps. The rain excerpts omit the original recording's later train horn.
+
+Output is local stereo AAC-LC at 44.1 kHz / 96 kbps, played by the existing Media3 player. Repeat
+keeps its decoder/audio output open and honors AAC delay/padding. The compressed buffer stays
+capped at 256 KiB; the TV streams from its APK instead of decoding entire recordings into RAM.
+A family change selects its corresponding sound; only the graphics interpolate between families.
+
+Sources, immutable download URLs, SHA-256 checksums, exact excerpts, mix levels and filters are in
+`config/weather-audio.json`. Credits and license links ship as `assets/weather/CREDITS.txt`, in
+file metadata and in this document. The two CC BY recordings are also credited in Settings → Sobre.
+No Blanket/Noisekun application code is incorporated; the recordings have their own licenses.
+
+“Silenciar ambiente” / “Ativar som ambiente” persists the owner's choice. Muting leaves graphics
+running, sets the player volume to zero and abandons audio focus. A muted initial scene needs no
+audio player. Ambient sound yields to Assistant and other audio-focus owners.
+
+Rebuild with Python 3 and ffmpeg. Downloads are opt-in and originals stay outside the repository:
 
 ```bash
-python3 scripts/prepare-weather-media.py --sources-dir /tmp/weather-originals --download
+python3 scripts/prepare-weather-audio.py --sources-dir /tmp/weather-recordings --download
+python3 scripts/check-weather-audio.py
 ```
 
-Without `--download`, supply the ten source MP4 files named as in the catalog. Originals are
-kept outside the repository. The generated, bundled MP4s are already present in the app's assets.
+Without `--download`, supply the catalog's exact source files in that directory. The preparation
+script checks every SHA-256 digest before mixing, refuses excerpts that overrun a source recording,
+and keeps the work offline when the files are present. The audio check decodes all outputs and
+checks their duration, format, level, embedded attribution, uniqueness and loop seam.
 
-Debug builds expose a preview of the real Weather screen, with a fixture forecast, so all
-conditions can be checked without changing the saved city or waiting for weather:
+### Recording credits
+
+| Recording | Author | License | Distributed edit |
+| --- | --- | --- | --- |
+| [WoodThrushinMorningShawneeForestMay272012.wav](https://freesound.org/people/kvgarlic/sounds/156826/) | kvgarlic / Kevin Boucher | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Porrumentzio / Blanket |
+| [Crickets Chirping At Night](https://soundbible.com/2083-Crickets-Chirping-At-Night.html) | Lisa Redfern | Public Domain | Blanket |
+| [Wind blowing in a field in Texas, USA](https://freesound.org/people/felix.blume/sounds/217506/) | Félix Blume | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Mateus Felipe / Noisekun |
+| [Autumn wind and dry leaves.wav](https://freesound.org/people/Stek59/sounds/457318/) | Stek59 | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Mateus Felipe / Noisekun |
+| [rain ambience](https://freesound.org/people/alex36917/sounds/524605/) | alex36917 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Porrumentzio / Blanket |
+| [Pitter Patter](https://freesound.org/people/iainmccurdy/sounds/786919/) | iainmccurdy | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Original public high-quality preview |
+| [Thunder-H2-without-windstoper.mp3](https://freesound.org/people/Borys_Kozielski/sounds/316831/) | Borysław Kozielski | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | Noisekun |
+
+Free My TV adapts these recordings through excerpts, filtering, mixing, level/peak control, looping
+and AAC encoding. All original authors retain their applicable rights; no endorsement is implied.
+The upstream [Blanket credits](https://github.com/rafaelmardojai/blanket/blob/775f2a767230a9681850d1b1e085be58656f1382/SOUNDS_LICENSING.md)
+and [Noisekun credits](https://github.com/mateusfg7/Noisekun/blob/d32024c67aba7c0577e1609944af00b9df1b7775/README.md#sounds)
+record the original edits. SHA-pinned download URLs are in the catalog.
+
+## Checking on the existing emulator
+
+Debug builds and the separate optimized `weatherBenchmark` variant expose the real Weather screen
+with fixture conditions. Published release builds exclude it. For performance measurements, build
+`./gradlew :app:assembleWeatherBenchmark` and install `app/build/outputs/apk/weatherBenchmark/app-weatherBenchmark.apk`
+on the existing emulator. It uses the same package/signing key and replaces the emulator APK only.
+Do not publish this diagnostic APK. No Gradle/R8 compilation should run during cadence measurements.
+
+Open the fixture:
 
 ```bash
-adb -s emulator-5554 shell am start -S \
+adb -s emulator-5554 shell am start -W -S \
   -n com.freemytv.home/.debug.WeatherPreviewActivity \
   --ei weather_code 61 --ez is_day true
 ```
 
-Try 0 (day and night), 2 (day and night), 3, 45, 51, 61, 71 and 97. Preview is absent from the
-release APK. JVM tests cover all 29 codes, day/night, unknown codes and mute persistence.
-
-### Continuous-loop regression check
-
-After installing a debug APK on an existing emulator:
+Try 0 and 2 by day/night, then 3, 45, 51, 61, 71 and 97. To model a live forecast without any
+Activity pause, use the debug-only receiver after opening the fixture:
 
 ```bash
-python3 scripts/check-weather-loop.py --serial emulator-5554 --seconds 35
-python3 scripts/check-weather-loop.py --serial emulator-5554 --weather-code 97 --night --seconds 35
+adb -s emulator-5554 shell am broadcast \
+  -a com.freemytv.home.debug.WEATHER_FORECAST -p com.freemytv.home \
+  --ei weather_code 71 --ez is_day true
 ```
 
-This drives the actual Weather preview, measures delivered video frames across loop boundaries,
-and fails on a hold above 125 ms, decoder reinitialization, audio output restart or an audio underrun. It requires at
-least two repetitions. It refuses a physical TV and never starts an emulator. The probe exists
-only in debug builds; release builds perform no per-frame position/clock queries or logging.
+`--activity-single-top` remains useful for manual navigation, but Android pauses/resumes a
+resumed Activity around `onNewIntent`; that must legitimately release EGL/audio. It therefore
+cannot test a live forecast's continuous context. Optional `--ez sound_muted false` overrides the saved
+mute value for this debug session without changing preferences.
 
-On the existing headless emulator (2026-10-24), the original `MediaPlayer` failed two runs with
-99–138 ms boundary holds. With the same files and synchronous codec queueing, the rain regression
-run measured 33–65 ms across three loops, one audio decoder, one video decoder, one audio output
-start and no audio underruns. The thunderstorm run measured 65–78 ms with the same decoder/output
-counts and no underruns. Both debug and optimized release builds pass, as do all 203 JVM tests.
-The emulator has no audible output, so these
-are frame timing and audio pipeline checks, not a listening test on the TCL.
+After installing a debug or optimized weatherBenchmark APK, with no Gradle/R8 build competing for CPU:
+
+```bash
+python3 scripts/check-weather-animation.py --serial emulator-5554
+```
+
+This refuses a physical TV and never starts an emulator. It checks GLES errors,
+native submission cadence, a real 60-second audio repetition without decoder/output restart, and a live
+rain → snow change without rebuilding the GPU context; screenshots capture the composited screen.
+Debug timing measures CPU submission, not GPU completion/display presentation. Diagnostics
+are disabled in the optimized release. The headless emulator cannot validate audible sound level.
+
+The sections below record earlier implementations and validation; the current renderer is the
+native Weather Animations adaptation described above.
+
+## Historical validation: style restored — 2026-10-24
+
+The atmospheric renderer predating the plastic/pastel experiment is restored. The recorded nature
+ambience, mute behavior, native Screensaver and fixed Mín./Máx. daily columns are preserved.
+The removed geometry-only unit test is no longer applicable; the remaining suite has 228 tests.
+
+## Historical validation: recorded-audio update — 2026-10-24
+
+All ten recorded mixes decode as stereo AAC-LC at 44.1 kHz, last 32–72 seconds and contain their
+source credits in metadata. The bundled audio totals 6,389,782 bytes; the optimized APK is 9.38 MiB.
+The decoded sample peaks range from -16.5 to -3.4 dBFS before the app's 0.45 playback volume.
+Every decoded loop seam passes the local sample-difference check; the low-frequency snow seam
+was corrected from 21.8× to 2.37× by the five-millisecond AAC edge treatment.
+
+The source recordings are used under CC0, public-domain dedication or CC BY 4.0 as individually
+credited above. Debug/release builds and all 228 remaining JVM tests pass. This headless emulator has no
+audible output: decoder/loop continuity and the decoded files are checked technically; final sound
+level on the TCL remains a listening check. Short previews live in ignored
+`build/weather-audio-validation/` for listening on the computer.
+
+The final native-player check runs through a complete 60-second rain repetition: one audio decoder,
+no output restart at the repeat, zero underruns, and the expected new sound when changing to snow.
+The same graphics surface survives throughout, with approximately 30 fps after warm-up.
+
+The restored atmospheric renderer passes debug/release compilation, release lint-vital and all
+228 remaining JVM tests. All ten restored scenes were checked on emulator-5554, with the
+recorded audio and fixed Mín./Máx. layout preserved byte-for-byte.
+
+## Native adapter regression
+
+The JVM suite exercises the WMO mapping and native transition state: duplicate forecasts do not
+restart the fade; a second/third forecast queues the latest target without jumping the visible
+scene. Android validation uses `scripts/check-weather-animation.py` for native submission cadence,
+GLES errors, one context across rain → snow, and a full audio repeat without a decoder restart.
+Actual presentation and total memory are measured separately on the physical TV.
+For a scene-only PSS comparison, first prime Home, then launch the optimized preview with
+`-f 0x10008000` (new/clear task), followed by `--activity-single-top` for subsequent conditions.
+This removes the extra diagnostic Home Activity/window beneath the preview; normal Weather
+replaces its screen within one Activity. Confirm `ViewRootImpl: 1` once destruction settles.
+The ordinary preview without this flag deliberately keeps its back stack and can exceed
+the production memory footprint. Reinstall the release APK after hardware fixture checks.
+
+### Physical TV validation — 2026-10-24
+
+The optimized release is installed on the owner-authorized TCL, Android 12 / armeabi-v7a.
+With recorded ambience enabled, Weather presents 29.18 fps (33.33 ms median frame interval) at 131.50 MiB total
+app PSS, with no WebView or Chromium renderer. The native Screensaver uses 133.25 MiB;
+the covered Home window is hidden, the first remote key dismisses it, and Home becomes
+visible again. Both samples meet ADR 0004's 150 MB budget. These are measured samples,
+not a universal memory ceiling for every app/system state.
+
+To avoid cached full-HD render targets, Weather entry/exit and forecast-data replacement
+do not animate whole-screen alpha/scale. The small GPU surface still blends weather families.
+Debug/release compilation, release lint-vital and all 227 JVM tests pass. The existing
+google_tv_31 headless emulator passes the native DreamService/key-dismissal check, with
+its original screensaver settings and preferences restored afterward.
+
+All ten optimized scene fixtures were also presented on the physical GPU, after priming Home
+and clearing its extra diagnostic window: 29.19–29.53 fps and 126.72–134.18 MiB app PSS,
+with no GLES errors. The first sample still reports a second root pending destruction; subsequent
+samples confirm one root. Keeping both diagnostic Activities alive had reached 151.32 MiB;
+that back-stack configuration differs from normal Weather. The final cloud masks use direct
+single-channel uploads, avoiding unused RGB data and Skia mask-filter conversion. After the synchronous lifecycle/window pause fix, a complete
+60-second rain repetition plus rain → snow passes again with one context, one decoder,
+no underruns and no GLES errors on the existing emulator.
+
+Ignored measurement evidence: `build/weather-tv-native-validation/result.json`,
+`build/weather-tv-native-validation/dream/result.json` and
+`build/weather-library-validation/dream/result.json`. Ten-scene GPU/PSS evidence is in
+`build/weather-tv-native-validation/single-window-scenes/`; the final loop check is in
+`build/weather-native-validation/final-continuity/`.

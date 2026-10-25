@@ -1,12 +1,19 @@
 package com.freemytv.home.weather
 
-/** Local, looping footage with a quiet, purpose-made noise bed; never fetched by the TV. */
-enum class WeatherAtmosphere(val file: String) {
-    ClearDay("clear_day"), ClearNight("clear_night"),
-    PartlyCloudyDay("partly_cloudy_day"), PartlyCloudyNight("partly_cloudy_night"),
-    Cloudy("cloudy"), Fog("fog"), Drizzle("drizzle"), Rain("rain"), Snow("snow"), Thunderstorm("thunderstorm");
+/** Offline Weather Animations configuration and the corresponding local nature recording. */
+enum class WeatherAtmosphere(
+    val file: String,
+    val animationCondition: String,
+    val animationTime: String = "day",
+    val animationIntensity: String = "medium",
+) {
+    ClearDay("clear_day", "clear"), ClearNight("clear_night", "clear", "night"),
+    PartlyCloudyDay("partly_cloudy_day", "cloudy", animationIntensity = "light"),
+    PartlyCloudyNight("partly_cloudy_night", "cloudy", "night", "light"),
+    Cloudy("cloudy", "overcast"), Fog("fog", "fog"), Drizzle("drizzle", "drizzle"),
+    Rain("rain", "rain"), Snow("snow", "snow"), Thunderstorm("thunderstorm", "storm");
 
-    val asset: String get() = "weather/$file.mp4"
+    val audioAsset: String get() = "weather/$file.m4a"
 
     companion object {
         /** Every code in Open-Meteo's WMO table, including 97. Unknown codes keep the quiet static sky. */

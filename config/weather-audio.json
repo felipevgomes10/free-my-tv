@@ -1,0 +1,283 @@
+{
+  "schema": 2,
+  "sample_rate": 44100,
+  "bitrate": "96k",
+  "crossfade_seconds": 3,
+  "sources": {
+    "birds": {
+      "file": "birds.ogg",
+      "title": "WoodThrushinMorningShawneeForestMay272012.wav",
+      "author": "kvgarlic (Kevin Boucher)",
+      "page": "https://freesound.org/people/kvgarlic/sounds/156826/",
+      "download": "https://raw.githubusercontent.com/rafaelmardojai/blanket/775f2a767230a9681850d1b1e085be58656f1382/data/resources/sounds/birds.ogg",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "upstream_editor": "Porrumentzio / Blanket",
+      "sha256": "e59b19c2a377d5835d07e7ec8f8c876b9f40ae7f703738b55d616ef96a1638b2"
+    },
+    "night": {
+      "file": "summer-night.ogg",
+      "title": "Crickets Chirping At Night",
+      "author": "Lisa Redfern",
+      "page": "https://soundbible.com/2083-Crickets-Chirping-At-Night.html",
+      "download": "https://raw.githubusercontent.com/rafaelmardojai/blanket/775f2a767230a9681850d1b1e085be58656f1382/data/resources/sounds/summer-night.ogg",
+      "license": "Public Domain",
+      "license_url": "https://soundbible.com/2083-Crickets-Chirping-At-Night.html",
+      "upstream_editor": "Blanket",
+      "sha256": "2eb2efb8f5c6733e74dc8546f2ecfac40407e8242a9eed96a72e0fc68790ac6f"
+    },
+    "wind": {
+      "file": "wind-noisekun.ogg",
+      "title": "Wind blowing in a field in Texas, USA",
+      "author": "Félix Blume",
+      "page": "https://freesound.org/people/felix.blume/sounds/217506/",
+      "download": "https://raw.githubusercontent.com/mateusfg7/Noisekun/d32024c67aba7c0577e1609944af00b9df1b7775/.github/assets/sounds/wind.ogg",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "upstream_editor": "Mateus Felipe / Noisekun",
+      "sha256": "384fb3abe7773c37a95549b11a7463e2ffb0396fd82fc7b6c25f975939d06db9"
+    },
+    "leaves": {
+      "file": "leaves-noisekun.ogg",
+      "title": "Autumn wind and dry leaves.wav",
+      "author": "Stek59",
+      "page": "https://freesound.org/people/Stek59/sounds/457318/",
+      "download": "https://raw.githubusercontent.com/mateusfg7/Noisekun/d32024c67aba7c0577e1609944af00b9df1b7775/.github/assets/sounds/leaves.ogg",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "upstream_editor": "Mateus Felipe / Noisekun",
+      "sha256": "22550a60c18595ec91662434ee5563a6c5c71195fd872a6581e02f541ad5eaca"
+    },
+    "rain": {
+      "file": "rain.ogg",
+      "title": "rain ambience",
+      "author": "alex36917",
+      "page": "https://freesound.org/people/alex36917/sounds/524605/",
+      "download": "https://raw.githubusercontent.com/rafaelmardojai/blanket/775f2a767230a9681850d1b1e085be58656f1382/data/resources/sounds/rain.ogg",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "upstream_editor": "Porrumentzio / Blanket",
+      "sha256": "b84c1daf259a24283be40b7663656d17676df4eb60c1e0332820570db891848a"
+    },
+    "drops": {
+      "file": "drops.mp3",
+      "title": "Pitter Patter",
+      "author": "iainmccurdy",
+      "page": "https://freesound.org/people/iainmccurdy/sounds/786919/",
+      "download": "https://cdn.freesound.org/previews/786/786919_3655844-hq.mp3",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "upstream_editor": null,
+      "sha256": "4b328090357ded9ca1dd89ede2f4989fd20f7b178498ba1f5fee6e3afc1433e9"
+    },
+    "storm": {
+      "file": "storm-noisekun.ogg",
+      "title": "Thunder-H2-without-windstoper.mp3",
+      "author": "Borysław Kozielski (Borys_Kozielski)",
+      "page": "https://freesound.org/people/Borys_Kozielski/sounds/316831/",
+      "download": "https://raw.githubusercontent.com/mateusfg7/Noisekun/d32024c67aba7c0577e1609944af00b9df1b7775/.github/assets/sounds/storm.ogg",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "upstream_editor": "Noisekun",
+      "sha256": "cd18b1824ab55c82112e63526d4ceee668ddcad85335d1006694b6e8dce6b191"
+    }
+  },
+  "scenes": {
+    "clear_day": {
+      "description": "Pássaros pela manhã e uma brisa discreta",
+      "duration_seconds": 60,
+      "loudness_lufs": -24,
+      "layers": [
+        {
+          "source": "birds",
+          "start_seconds": 12,
+          "gain_db": 0,
+          "highpass_hz": 160,
+          "lowpass_hz": 12000
+        },
+        {
+          "source": "wind",
+          "start_seconds": 12,
+          "gain_db": -19,
+          "highpass_hz": 80,
+          "lowpass_hz": 5500
+        }
+      ]
+    },
+    "clear_night": {
+      "description": "Grilos e insetos noturnos",
+      "duration_seconds": 40,
+      "loudness_lufs": -27,
+      "layers": [
+        {
+          "source": "night",
+          "start_seconds": 3,
+          "gain_db": 0,
+          "highpass_hz": 250,
+          "lowpass_hz": 11000
+        }
+      ]
+    },
+    "partly_cloudy_day": {
+      "description": "Pássaros mais distantes e vento entre as árvores",
+      "duration_seconds": 60,
+      "loudness_lufs": -25,
+      "layers": [
+        {
+          "source": "birds",
+          "start_seconds": 58,
+          "gain_db": -8,
+          "highpass_hz": 220,
+          "lowpass_hz": 8500
+        },
+        {
+          "source": "wind",
+          "start_seconds": 28,
+          "gain_db": -2,
+          "highpass_hz": 100,
+          "lowpass_hz": 6500
+        }
+      ]
+    },
+    "partly_cloudy_night": {
+      "description": "Grilos ao fundo e rajadas leves de vento",
+      "duration_seconds": 40,
+      "loudness_lufs": -27,
+      "layers": [
+        {
+          "source": "night",
+          "start_seconds": 5,
+          "gain_db": -6,
+          "highpass_hz": 250,
+          "lowpass_hz": 10000
+        },
+        {
+          "source": "wind",
+          "start_seconds": 42,
+          "gain_db": -9,
+          "highpass_hz": 100,
+          "lowpass_hz": 4500
+        }
+      ]
+    },
+    "cloudy": {
+      "description": "Rajadas de vento e folhas se movimentando",
+      "duration_seconds": 32,
+      "loudness_lufs": -25,
+      "layers": [
+        {
+          "source": "wind",
+          "start_seconds": 24,
+          "gain_db": -2,
+          "highpass_hz": 90,
+          "lowpass_hz": 6500
+        },
+        {
+          "source": "leaves",
+          "start_seconds": 2,
+          "gain_db": -5,
+          "highpass_hz": 160,
+          "lowpass_hz": 10000
+        }
+      ]
+    },
+    "fog": {
+      "description": "Ar suave e pássaros bem distantes",
+      "duration_seconds": 48,
+      "loudness_lufs": -29,
+      "layers": [
+        {
+          "source": "wind",
+          "start_seconds": 8,
+          "gain_db": 0,
+          "highpass_hz": 110,
+          "lowpass_hz": 1800
+        },
+        {
+          "source": "birds",
+          "start_seconds": 42,
+          "gain_db": -14,
+          "highpass_hz": 400,
+          "lowpass_hz": 3800
+        }
+      ]
+    },
+    "drizzle": {
+      "description": "Pingos individuais com chuva leve ao fundo",
+      "duration_seconds": 60,
+      "loudness_lufs": -24,
+      "layers": [
+        {
+          "source": "drops",
+          "start_seconds": 8,
+          "gain_db": 0,
+          "highpass_hz": 180,
+          "lowpass_hz": 11500
+        },
+        {
+          "source": "rain",
+          "start_seconds": 14,
+          "gain_db": -15,
+          "highpass_hz": 250,
+          "lowpass_hz": 7000
+        }
+      ]
+    },
+    "rain": {
+      "description": "Chuva contínua com respingos de água",
+      "duration_seconds": 60,
+      "loudness_lufs": -23,
+      "layers": [
+        {
+          "source": "rain",
+          "start_seconds": 18,
+          "gain_db": 0,
+          "highpass_hz": 100,
+          "lowpass_hz": 12000
+        },
+        {
+          "source": "drops",
+          "start_seconds": 30,
+          "gain_db": -12,
+          "highpass_hz": 220,
+          "lowpass_hz": 10000
+        }
+      ]
+    },
+    "snow": {
+      "description": "Vento frio, baixo e abafado, sem pássaros ou insetos",
+      "duration_seconds": 48,
+      "loudness_lufs": -29,
+      "layers": [
+        {
+          "source": "wind",
+          "start_seconds": 39,
+          "gain_db": 0,
+          "highpass_hz": 100,
+          "lowpass_hz": 2800
+        }
+      ]
+    },
+    "thunderstorm": {
+      "description": "Chuva e trovões distantes com picos suavizados",
+      "duration_seconds": 72,
+      "loudness_lufs": -25,
+      "layers": [
+        {
+          "source": "rain",
+          "start_seconds": 8,
+          "gain_db": -3,
+          "highpass_hz": 120,
+          "lowpass_hz": 10000
+        },
+        {
+          "source": "storm",
+          "start_seconds": 35,
+          "gain_db": -4,
+          "highpass_hz": 50,
+          "lowpass_hz": 5000
+        }
+      ]
+    }
+  }
+}

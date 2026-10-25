@@ -262,6 +262,8 @@ private fun AboutPanel(state: SettingsState) {
     // TMDB's terms ask for this credit wherever its data shows.
     InfoRow(stringResource(R.string.tmdb_credit), "TMDB")
     Note(stringResource(R.string.tmdb_notice))
+    Note(stringResource(R.string.weather_audio_notice))
+    Note(stringResource(R.string.weather_animation_notice))
 }
 
 /** A setting the owner turns on and off. */

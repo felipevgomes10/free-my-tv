@@ -1,17 +1,14 @@
 package com.freemytv.home.ui
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -82,32 +79,32 @@ fun WeatherScreen(
         CompositionLocalProvider(LocalWeatherPillFocus provides pill) {
             StatusBar(clock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
         }
-        Crossfade(page, Modifier.fillMaxSize(), animationSpec = tween(REVEAL_MILLIS), label = "weather") { shown ->
-            Box(Modifier.fillMaxSize()) {
-                when (shown) {
-                    WeatherPage.Ready -> if (report != null) {
-                        Now(report, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
-                        NextDays(report.days, Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
-                        NextHours(report.hours, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
-                        if (atmosphere != null && showSoundControl) PillButton(
-                            label = stringResource(if (soundMuted) R.string.weather_unmute else R.string.weather_mute),
-                            icon = if (soundMuted) R.drawable.ic_volume_off else R.drawable.ic_volume_on,
-                            onClick = onToggleSound,
-                            modifier = Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 350.dp),
-                        )
-                    }
-                    WeatherPage.Unavailable -> Text(
-                        stringResource(R.string.weather_unavailable),
-                        color = WeatherSecondary,
-                        fontSize = 14.sp,
-                        modifier = Modifier.align(Alignment.Center).width(360.dp),
-                        textAlign = TextAlign.Center,
+        // Keep data on a direct layer; whole-page opacity fades retain large GPU snapshots.
+        // The native backdrop still crossfades weather families on its small GPU surface.
+        Box(Modifier.fillMaxSize()) {
+            when (page) {
+                WeatherPage.Ready -> if (report != null) {
+                    Now(report, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
+                    NextDays(report.days, Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
+                    NextHours(report.hours, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
+                    if (atmosphere != null && showSoundControl) PillButton(
+                        label = stringResource(if (soundMuted) R.string.weather_unmute else R.string.weather_mute),
+                        icon = if (soundMuted) R.drawable.ic_volume_off else R.drawable.ic_volume_on,
+                        onClick = onToggleSound,
+                        modifier = Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 350.dp),
                     )
-                    WeatherPage.Loading -> Skeleton {
-                        NowBones(Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
-                        NextDaysBones(Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
-                        NextHoursBones(Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
-                    }
+                }
+                WeatherPage.Unavailable -> Text(
+                    stringResource(R.string.weather_unavailable),
+                    color = WeatherSecondary,
+                    fontSize = 14.sp,
+                    modifier = Modifier.align(Alignment.Center).width(360.dp),
+                    textAlign = TextAlign.Center,
+                )
+                WeatherPage.Loading -> Skeleton {
+                    NowBones(Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 95.dp))
+                    NextDaysBones(Modifier.align(Alignment.TopEnd).padding(end = Tokens.SafeAreaHorizontal, top = 100.dp).width(330.dp))
+                    NextHoursBones(Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, bottom = 48.dp).fillMaxWidth())
                 }
             }
         }
@@ -129,10 +126,15 @@ private fun NowBones(modifier: Modifier) {
     }
 }
 
-/** [NextDays]' shape: seven rows of day, sky, low, range and high, with their hairlines. */
+/** [NextDays]' shape: column headings and seven rows of day, sky, low and high. */
 @Composable
 private fun NextDaysBones(modifier: Modifier) {
     Column(modifier) {
+        Row(Modifier.fillMaxWidth().padding(bottom = 5.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Spacer(Modifier.weight(1f))
+            TextBone(22.dp, 10, Modifier.width(DayTemperatureWidth), Alignment.CenterEnd)
+            TextBone(22.dp, 10, Modifier.width(DayTemperatureWidth), Alignment.CenterEnd)
+        }
         repeat(7) {
             Row(
                 Modifier.fillMaxWidth().padding(vertical = 7.dp),
@@ -141,9 +143,9 @@ private fun NextDaysBones(modifier: Modifier) {
             ) {
                 TextBone(if (it == 0) 36.dp else 52.dp, 12, Modifier.width(72.dp))
                 Bone(14.dp, 14.dp, shape = CircleShape)
-                TextBone(22.dp, 12, Modifier.width(28.dp), Alignment.CenterEnd)
-                Bone(null, 4.dp, Modifier.weight(1f), RoundedCornerShape(2.dp))
-                TextBone(22.dp, 12, Modifier.width(28.dp), Alignment.CenterEnd)
+                Spacer(Modifier.weight(1f))
+                TextBone(22.dp, 12, Modifier.width(DayTemperatureWidth), Alignment.CenterEnd)
+                TextBone(22.dp, 12, Modifier.width(DayTemperatureWidth), Alignment.CenterEnd)
             }
             Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x1AFFFFFF)))
         }
@@ -192,9 +194,14 @@ private fun Fact(icon: Int, text: String) {
 
 @Composable
 private fun NextDays(days: List<DaySlot>, modifier: Modifier) {
-    val low = days.minOfOrNull { it.min } ?: 0
-    val high = days.maxOfOrNull { it.max } ?: 1
     Column(modifier) {
+        Row(Modifier.fillMaxWidth().padding(bottom = 5.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Spacer(Modifier.weight(1f))
+            Text(stringResource(R.string.weather_minimum), color = WeatherSecondary, fontSize = 10.sp,
+                textAlign = TextAlign.End, modifier = Modifier.width(DayTemperatureWidth))
+            Text(stringResource(R.string.weather_maximum), color = WeatherSecondary, fontSize = 10.sp,
+                textAlign = TextAlign.End, modifier = Modifier.width(DayTemperatureWidth))
+        }
         days.forEach { day ->
             Row(
                 Modifier.fillMaxWidth().padding(vertical = 7.dp),
@@ -203,29 +210,12 @@ private fun NextDays(days: List<DaySlot>, modifier: Modifier) {
             ) {
                 Text(dayLabel(day), color = Tokens.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(72.dp))
                 WeatherIcon(day.condition, true, 14.dp, Tokens.TextPrimary)
-                Text("${day.min}°", color = WeatherSecondary, fontSize = 12.sp, textAlign = TextAlign.End, modifier = Modifier.width(28.dp))
-                RangeBar(day.min, day.max, low, high, Modifier.weight(1f))
-                Text("${day.max}°", color = Tokens.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.width(28.dp))
+                Spacer(Modifier.weight(1f))
+                Text("${day.min}°", color = WeatherSecondary, fontSize = 12.sp, textAlign = TextAlign.End, modifier = Modifier.width(DayTemperatureWidth))
+                Text("${day.max}°", color = Tokens.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.width(DayTemperatureWidth))
             }
             Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x1AFFFFFF)))
         }
-    }
-}
-
-/** A day's temperature range placed on the week's range. */
-@Composable
-private fun RangeBar(min: Int, max: Int, weekLow: Int, weekHigh: Int, modifier: Modifier) {
-    BoxWithConstraints(modifier.height(4.dp).background(Color(0x1FFFFFFF), RoundedCornerShape(2.dp))) {
-        val span = (weekHigh - weekLow).coerceAtLeast(1).toFloat()
-        val start = maxWidth * ((min - weekLow) / span)
-        val width = maxWidth * ((max - min).coerceAtLeast(1) / span)
-        Box(
-            Modifier
-                .offset(x = start)
-                .width(width)
-                .height(4.dp)
-                .background(Brush.horizontalGradient(listOf(Color(0xFF64D2FF), Color(0xFFFFD60A))), RoundedCornerShape(2.dp)),
-        )
     }
 }
 
@@ -262,9 +252,9 @@ fun Condition.label(): Int = when (this) {
     Condition.Thunderstorm -> R.string.condition_thunderstorm
 }
 
-private const val REVEAL_MILLIS = 300
+private val DayTemperatureWidth = 40.dp
 private val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
 private val WEEKDAY: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE", PT_BR)
 
-// Brighter than the Home's usual secondary text, to stay readable over moving footage.
+// Brighter than the Home's usual secondary text, to stay readable over the animated atmosphere.
 private val WeatherSecondary = Color(0xD9FFFFFF)

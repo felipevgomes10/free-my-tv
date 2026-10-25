@@ -230,4 +230,8 @@
     <string name="screensaver_minutes">%1$d minutos</string>
     <string name="screensaver_note">Pressione OK para escolher 2, 5 ou 10 minutos. Qualquer tecla encerra o descanso. A reprodução dos apps é respeitada.</string>
     <string name="screensaver_setup_needed">Execute o Setup no computador para preparar o descanso de tela.</string>
+    <string name="weather_audio_notice">Sons de chuva: “rain ambience”, alex36917 (freesound.org/s/524605), e “Pitter Patter”, iainmccurdy (freesound.org/s/786919). CC BY 4.0: creativecommons.org/licenses/by/4.0. Trechos recortados, mixados e normalizados. Demais gravações e créditos: github.com/felipevgomes10/free-my-tv/blob/main/docs/weather-media.md.</string>
+    <string name="weather_minimum">Mín.</string>
+    <string name="weather_maximum">Máx.</string>
+    <string name="weather_animation_notice">Animações de clima: Weather Animations, © 2026 Marc. Licença MIT. github.com/g3sthousen/weather-animations. Adaptado para reprodução local na TV; licença completa incluída no app.</string>
 </resources>

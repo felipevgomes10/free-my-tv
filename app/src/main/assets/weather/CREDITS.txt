@@ -1,0 +1,39 @@
+Weather ambient recordings
+
+Adaptations: excerpts, filtering, mixing, peak control,
+loop crossfade, fixed loudness normalization and AAC encoding. No upstream app code is used.
+
+WoodThrushinMorningShawneeForestMay272012.wav — kvgarlic (Kevin Boucher)
+https://freesound.org/people/kvgarlic/sounds/156826/
+CC0-1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Upstream edit/distribution: Porrumentzio / Blanket
+
+Crickets Chirping At Night — Lisa Redfern
+https://soundbible.com/2083-Crickets-Chirping-At-Night.html
+Public Domain: https://soundbible.com/2083-Crickets-Chirping-At-Night.html
+Upstream edit/distribution: Blanket
+
+Wind blowing in a field in Texas, USA — Félix Blume
+https://freesound.org/people/felix.blume/sounds/217506/
+CC0-1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Upstream edit/distribution: Mateus Felipe / Noisekun
+
+Autumn wind and dry leaves.wav — Stek59
+https://freesound.org/people/Stek59/sounds/457318/
+CC0-1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Upstream edit/distribution: Mateus Felipe / Noisekun
+
+rain ambience — alex36917
+https://freesound.org/people/alex36917/sounds/524605/
+CC-BY-4.0: https://creativecommons.org/licenses/by/4.0/
+Upstream edit/distribution: Porrumentzio / Blanket
+
+Pitter Patter — iainmccurdy
+https://freesound.org/people/iainmccurdy/sounds/786919/
+CC-BY-4.0: https://creativecommons.org/licenses/by/4.0/
+Upstream edit/distribution: Original public preview
+
+Thunder-H2-without-windstoper.mp3 — Borysław Kozielski (Borys_Kozielski)
+https://freesound.org/people/Borys_Kozielski/sounds/316831/
+CC0-1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Upstream edit/distribution: Noisekun

@@ -8,12 +8,12 @@ import kotlinx.coroutines.test.runTest
 
 class WeatherAtmosphereTest {
     @Test
-    fun `every published Open-Meteo code has footage by day and by night`() {
+    fun `every published Open-Meteo code has an animated scene by day and by night`() {
         val codes = listOf(0, 1, 2, 3, 45, 48, 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 97, 99)
         assertEquals(29, codes.size)
         codes.forEach { code ->
             listOf(true, false).forEach { day ->
-                assertNotNull("No footage for WMO $code (day=$day)", WeatherAtmosphere.fromWmo(code, day))
+                assertNotNull("No scene for WMO $code (day=$day)", WeatherAtmosphere.fromWmo(code, day))
             }
         }
         assertEquals(Condition.Thunderstorm, Condition.fromWmo(97))

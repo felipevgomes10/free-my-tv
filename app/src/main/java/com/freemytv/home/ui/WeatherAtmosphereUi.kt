@@ -5,11 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -24,23 +20,26 @@ import com.freemytv.home.weather.WeatherAtmosphere
 @Composable
 fun WeatherAtmosphereBackground(atmosphere: WeatherAtmosphere?, active: Boolean, muted: Boolean) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    var resumed by remember(lifecycle) { mutableStateOf(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) }
-    DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, _ -> resumed = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) }
-        lifecycle.addObserver(observer)
-        onDispose { lifecycle.removeObserver(observer) }
-    }
-    if (atmosphere != null) key(atmosphere) {
+    if (atmosphere != null) {
         val context = LocalContext.current
         val view = remember { WeatherBackdrop(context, atmosphere) }
-        DisposableEffect(view) { onDispose { view.releasePlayback() } }
+        DisposableEffect(view, lifecycle) {
+            // Pause EGL/audio synchronously on ON_PAUSE. A stopped window's recomposer may
+            // suspend before it can deliver an AndroidView update, leaving a second context alive.
+            val observer = LifecycleEventObserver { _, _ ->
+                view.lifecycleResumed(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))
+            }
+            lifecycle.addObserver(observer)
+            view.lifecycleResumed(lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED))
+            onDispose { lifecycle.removeObserver(observer); view.releasePlayback() }
+        }
         AndroidView(
             factory = { view },
             modifier = Modifier.fillMaxSize(),
-            update = { it.playback(active && resumed, muted) },
+            update = { it.playback(atmosphere, active, muted) },
         )
     }
-    // Even a pure white video frame is limited to 38% white. Secondary text here is 85% white:
+    // Even a pure white animation frame is limited to 38% white. Secondary text here is 85% white:
     // the worst-case contrast is > 5:1, before the additional top/bottom shading.
     Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.62f)))
     Box(Modifier.fillMaxSize().background(Brush.verticalGradient(

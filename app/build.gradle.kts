@@ -27,6 +27,18 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+        // Release optimizations with debug-only weather fixtures/diagnostics, for the emulator.
+        // Kept separate so the published release never includes the exported preview Activity.
+        create("weatherBenchmark") {
+            initWith(getByName("release"))
+            matchingFallbacks += "release"
+        }
+    }
+
+    sourceSets.getByName("weatherBenchmark") {
+        java.srcDir("src/debug/java")
+        res.srcDir("src/debug/res")
+        manifest.srcFile("src/debug/AndroidManifest.xml")
     }
 
     compileOptions {
