@@ -92,49 +92,60 @@ class WhereToWatchTest {
         InstalledApp("com.netflix.ninja", "Netflix", hasBanner = true),
         InstalledApp("com.globo.globotv", "Globoplay", hasBanner = true),
         InstalledApp("com.disney.disneyplus", "Disney+", hasBanner = true),
+        InstalledApp("com.apple.atve.androidtv.appletv", "Apple TV", hasBanner = true),
     )
 
     @Test
     fun `selecting a service opens the Title itself in its app when Wikidata knows its id there`() = runTest {
         val platform = FakeTvPlatform(apps = installedApps)
-        val lupin = detailsOf(platform, title(96677, TitleKind.Series, "Lupin", WatchOffer(8, "Netflix", OfferKind.Subscription), mapOf("P1874" to "80994082")))
+        val tedLasso = detailsOf(platform, title(97546, TitleKind.Series, "Ted Lasso", WatchOffer(350, "Apple TV+", OfferKind.Subscription), mapOf("P9751" to "umc.cmc.vtoh0mn0xn7t3c643xqonfzy")))
 
-        Explorar(platform).watch(lupin)
+        Explorar(platform).watch(tedLasso)
 
-        assertEquals(listOf("https://www.netflix.com/title/80994082"), platform.openedLinks)
+        assertEquals(listOf("https://tv.apple.com/br/show/ted-lasso/umc.cmc.vtoh0mn0xn7t3c643xqonfzy"), platform.openedLinks)
         assertEquals(emptyList<String>(), platform.launched)
     }
 
     @Test
     fun `without the Title's id there, the app's search opens with its name, where the app has one`() = runTest {
         val platform = FakeTvPlatform(apps = installedApps)
-        val valeTudo = detailsOf(platform, title(46161, TitleKind.Series, "Vale Tudo", WatchOffer(307, "Globoplay", OfferKind.Subscription)))
+        val insideOut = detailsOf(platform, title(1022789, TitleKind.Movie, "Divertida Mente 2", WatchOffer(337, "Disney Plus", OfferKind.Subscription)))
 
-        Explorar(platform).watch(valeTudo)
+        Explorar(platform).watch(insideOut)
 
-        assertEquals(listOf("https://globoplay.globo.com/busca/Vale%20Tudo/"), platform.openedLinks)
+        assertEquals(listOf("https://www.disneyplus.com/search?q=Divertida%20Mente%202"), platform.openedLinks)
     }
 
     @Test
     fun `with neither, or when the app turns the links down, the app opens`() = runTest {
         val platform = FakeTvPlatform(apps = installedApps)
         val wandinha = detailsOf(platform, title(119051, TitleKind.Series, "Wandinha", WatchOffer(8, "Netflix", OfferKind.Subscription)))
-        val moana = detailsOf(platform, title(1022789, TitleKind.Movie, "Moana 2", WatchOffer(337, "Disney Plus", OfferKind.Subscription), mapOf("P7595" to "6MeZYf9JkFii")))
-        platform.linksOpen = false
+        val valeTudo = detailsOf(platform, title(46161, TitleKind.Series, "Vale Tudo", WatchOffer(307, "Globoplay", OfferKind.Subscription), mapOf("P12356" to "7RRVdT85Hw")))
 
         Explorar(platform).watch(wandinha)
-        Explorar(platform).watch(moana)
+        assertEquals(listOf("com.netflix.ninja"), platform.launched)
+        assertEquals(emptyList<String>(), platform.openedLinks)
 
-        assertEquals(listOf("com.netflix.ninja", "com.disney.disneyplus"), platform.launched)
+        platform.linksOpen = false
+        Explorar(platform).watch(valeTudo)
+        assertEquals(listOf("com.netflix.ninja", "com.globo.globotv"), platform.launched)
     }
 
     @Test
     fun `each service links to a Title by its own id, movies and series apart where Wikidata keeps them apart`() {
-        assertEquals("https://www.netflix.com/title/80994082", StreamingService.Netflix.titleLink(mapOf("P1874" to "80994082"), TitleKind.Series, "Lupin"))
-        assertEquals("P7595", StreamingService.DisneyPlus.wikidataProperty(TitleKind.Movie))
-        assertEquals("P7596", StreamingService.DisneyPlus.wikidataProperty(TitleKind.Series))
         assertEquals("https://play.max.com/show/93ba22b1", StreamingService.Max.titleLink(mapOf("P8298" to "show/93ba22b1"), TitleKind.Series, "The Last of Us"))
-        assertNull(StreamingService.Netflix.titleLink(mapOf("P7595" to "x"), TitleKind.Movie, "Lupin"))
-        assertNull(StreamingService.Netflix.searchLink("Lupin"))
+        assertEquals("https://globoplay.globo.com/vale-tudo/t/7RRVdT85Hw/", StreamingService.Globoplay.titleLink(mapOf("P12356" to "7RRVdT85Hw"), TitleKind.Series, "Vale Tudo"))
+        assertEquals("https://tv.apple.com/br/movie/f1/umc.cmc.3t6dvnnr87zwd4wmvpdx5came", StreamingService.AppleTv.titleLink(mapOf("P9586" to "umc.cmc.3t6dvnnr87zwd4wmvpdx5came"), TitleKind.Movie, "F1"))
+        assertEquals("crunchyroll://series/GRGGPG93R", StreamingService.Crunchyroll.titleLink(mapOf("P11330" to "GRGGPG93R"), TitleKind.Series, "Fullmetal Alchemist: Brotherhood"))
+        assertEquals("P9751", StreamingService.AppleTv.wikidataProperty(TitleKind.Series))
+    }
+
+    @Test
+    fun `services whose apps were seen to ignore Title links, or to stall on a search, get neither`() {
+        assertNull(StreamingService.Netflix.titleLink(mapOf("P1874" to "80994082"), TitleKind.Series, "Lupin"))
+        assertNull(StreamingService.PrimeVideo.titleLink(mapOf("P8055" to "B0FHGK5Q4H"), TitleKind.Movie, "Anaconda"))
+        assertNull(StreamingService.DisneyPlus.titleLink(mapOf("P7595" to "6MeZYf9JkFii"), TitleKind.Movie, "Divertida Mente 2"))
+        listOf(StreamingService.Netflix, StreamingService.PrimeVideo, StreamingService.Globoplay, StreamingService.Max, StreamingService.AppleTv, StreamingService.Crunchyroll)
+            .forEach { assertNull(it.name, it.searchLink("Lupin")) }
     }
 }
