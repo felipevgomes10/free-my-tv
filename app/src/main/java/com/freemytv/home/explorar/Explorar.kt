@@ -119,7 +119,7 @@ class Explorar(
                 summary,
                 lookup.details,
                 loading = false,
-                whereToWatch = whereToWatch(lookup.details.offers, platform::isLaunchable),
+                whereToWatch = whereToWatch(lookup.details.offers, platform::isLaunchable).map { it.linkedTo(lookup.details) },
                 trailer = chooseTrailer(lookup.details.videos),
             )
             DetailsLookup.Offline -> DetailsState(summary, loading = false, problem = ExplorarProblem.Offline)
@@ -130,9 +130,21 @@ class Explorar(
     }
 
     /** Opens the service's app, or its Play Store page when the app isn't installed. */
+    /**
+     * Opens the service's app on the Title itself when its id there is known, else on its search
+     * for the Title, else just the app; a service not installed opens its Play Store page.
+     */
     fun watch(option: WatchOption) {
         val packageName = option.packageName ?: return
-        if (platform.isLaunchable(packageName)) platform.launch(packageName) else platform.openPlayStorePage(packageName)
+        if (!platform.isLaunchable(packageName)) return platform.openPlayStorePage(packageName)
+        if (option.link != null && platform.openLink(packageName, option.link)) return
+        if (option.search != null && platform.openLink(packageName, option.search)) return
+        platform.launch(packageName)
+    }
+
+    private fun WatchOption.linkedTo(details: TitleDetails): WatchOption {
+        val service = StreamingService.entries.firstOrNull { it.packageName == packageName } ?: return this
+        return copy(link = service.titleLink(details.serviceIds, details.kind, details.name), search = service.searchLink(details.name))
     }
 
     /**

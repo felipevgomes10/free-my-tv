@@ -137,8 +137,9 @@ internal class WatchNextReader(private val context: Context) {
         )
 
         /**
-         * The intent behind an app's Watch Next link, made safe to start: it must open the app that
-         * listed it, grants nothing of the Home's, and carries no selector. Null otherwise.
+         * The intent behind an app's link, made safe to start: it must open the app that listed it,
+         * grants nothing of the Home's, and carries no selector. Null otherwise. It starts the app
+         * afresh: an app already open would only come to the front and never read the link.
          */
         fun safeIntent(packageName: String, link: String, ownPackage: String): Intent? {
             val intent = runCatching { Intent.parseUri(link, Intent.URI_INTENT_SCHEME) }.getOrNull() ?: return null
@@ -149,7 +150,7 @@ internal class WatchNextReader(private val context: Context) {
             if (target != null && target != packageName) return null
             if (packageName == ownPackage) return null
             if (target == null) intent.setPackage(packageName)
-            return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            return intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
 
         private const val GRANTS = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or

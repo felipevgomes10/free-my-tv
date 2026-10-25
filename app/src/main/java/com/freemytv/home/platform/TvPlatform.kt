@@ -220,7 +220,7 @@ interface TvPlatform {
      */
     suspend fun watchNext(): List<WatchNextProgram>?
 
-    /** Opens [packageName]'s own link, an intent URI, in that app only; false when it doesn't open. */
+    /** Opens [packageName]'s own link, an intent URI or a web address, in that app only; false when it doesn't open. */
     fun openLink(packageName: String, link: String): Boolean
 
     /** Watch Next entries the owner removed from the Up Next Tray, with when they were last watched then. */

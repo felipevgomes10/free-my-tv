@@ -6,20 +6,21 @@ import com.freemytv.home.explorar.CastMember
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
 import com.freemytv.home.explorar.OfferKind
-import com.freemytv.home.explorar.TitleVideo
-import com.freemytv.home.explorar.WatchOffer
 import com.freemytv.home.explorar.TitleDetails
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TitleSummary
+import com.freemytv.home.explorar.TitleVideo
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
+import com.freemytv.home.explorar.WIKIDATA_PROPERTIES
+import com.freemytv.home.explorar.WatchOffer
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 /**
  * TMDB's API in Portuguese, for Brazil. The token Setup handed over goes in a bearer header,
@@ -33,6 +34,8 @@ class Tmdb(private val context: Context) {
         data object Offline : Answer
         data object NoToken : Answer
     }
+
+    private val wikidata = Wikidata()
 
     // Genre names per kind, fetched once per process.
     private val genres = HashMap<TitleKind, Map<Int, String>>()
@@ -74,18 +77,25 @@ class Tmdb(private val context: Context) {
     /** Everything the details screen shows, appended to the details call so it is one request. */
     suspend fun details(kind: TitleKind, id: Int): DetailsLookup {
         val path = if (kind == TitleKind.Movie) {
-            "movie/$id?language=pt-BR&append_to_response=release_dates,credits,videos,watch/providers&include_video_language=pt,en"
+            "movie/$id?language=pt-BR&append_to_response=release_dates,credits,videos,watch/providers,external_ids&include_video_language=pt,en"
         } else {
-            "tv/$id?language=pt-BR&append_to_response=content_ratings,aggregate_credits,videos,watch/providers&include_video_language=pt,en"
+            "tv/$id?language=pt-BR&append_to_response=content_ratings,aggregate_credits,videos,watch/providers,external_ids&include_video_language=pt,en"
         }
         return when (val answer = get(path)) {
             Answer.NoToken -> DetailsLookup.MissingToken
             Answer.Offline -> DetailsLookup.Offline
-            is Answer.Ok -> runCatching { DetailsLookup.Found(parseDetails(kind, answer.json)) }
+            is Answer.Ok -> runCatching { parseDetails(kind, answer.json) }
                 .onFailure { Log.w(TAG, "Unexpected details for $kind $id", it) }
-                .getOrDefault(DetailsLookup.Offline)
+                .getOrNull()
+                ?.let { details -> DetailsLookup.Found(details.copy(serviceIds = serviceIds(answer.json))) }
+                ?: DetailsLookup.Offline
         }
     }
+
+    /** The Title's ids at the streaming services, through the Wikidata entity TMDB links it to. */
+    private suspend fun serviceIds(json: JSONObject): Map<String, String> =
+        json.optJSONObject("external_ids")?.optString("wikidata_id")?.takeIf { it.isNotBlank() }
+            ?.let { wikidata.ids(it, WIKIDATA_PROPERTIES) }.orEmpty()
 
     private fun parseDetails(kind: TitleKind, json: JSONObject): TitleDetails {
         val movie = kind == TitleKind.Movie

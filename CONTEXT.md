@@ -34,7 +34,7 @@ A movie or a series as Explorar shows it, with its details, trailer and where to
 _Avoid_: Content, item, show, media
 
 **Where to Watch** (Onde assistir):
-The streaming services that offer a Title in Brazil, each opening its app on the TV: included in a subscription, or to rent or buy.
+The streaming services that offer a Title in Brazil, included in a subscription or to rent or buy, each opening its app on the TV: at the Title itself, or at a search for it, where the app allows.
 _Avoid_: Providers, sources, offers
 
 **Trailer**:

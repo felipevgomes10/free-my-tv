@@ -25,6 +25,8 @@ data class TitleDetails(
     val offers: List<WatchOffer> = emptyList(),
     /** Videos in Portuguese or English. */
     val videos: List<TitleVideo> = emptyList(),
+    /** The Title's id at each service Wikidata knows, by Wikidata property ("P1874" → Netflix's id). */
+    val serviceIds: Map<String, String> = emptyMap(),
 )
 
 sealed interface DetailsLookup {
