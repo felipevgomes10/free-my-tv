@@ -6,9 +6,13 @@ The spec is `.scratch/companion/spec.md` in free-my-tv-remote-controller. Ticket
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] `AppLibrary`/`AllAppsStateHolder`, `InputTray`, `Multitasking` and `Explorar` are created once, in `HomeApplication`, and `MainActivity` uses them
-- [ ] Following package and Input changes keeps running while the Home's screen is stopped
-- [ ] Every existing test passes unchanged, and the Home behaves as before on the emulator (App Tray, All Apps, Input Tray, App Switcher, Explorar)
-- [ ] The Home stays within its memory budget (ADR 0004) with the TV idle on another app
+- [x] `AppLibrary`/`AllAppsStateHolder`, `InputTray`, `Multitasking` and `Explorar` are created once, in `HomeApplication`, and `MainActivity` uses them
+- [x] Following package and Input changes keeps running while the Home's screen is stopped
+- [x] Every existing test passes unchanged, and the Home behaves as before on the emulator (App Tray, All Apps, Input Tray, App Switcher, Explorar)
+- [ ] The Home stays within its memory budget (ADR 0004) with the TV idle on another app (120 MB PSS on the emulator; the TV is checked in 19)
+
+## Comments
+
+**2026-10-26, done.** `HomeApplication` now holds `library`, `allApps`, `inputs`, `multitasking`, `artwork` (the `AppArtworkLoader`, which the bridge's pictures will need) and `explorar`, and runs following package events, Input changes and the Open App Limit on its own scope; `MainActivity` takes the same instances, and still reloads them when resumed. All 266 tests pass unchanged. On the emulator the Home, Todos os apps, the Input Tray, the App Switcher and the System Monitor behaved as before; Explorar wasn't reached by keys there (and the emulator has no TMDB token), so it rests on its tests.

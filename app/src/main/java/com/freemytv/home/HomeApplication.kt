@@ -5,6 +5,12 @@ import com.freemytv.home.android.AndroidTvPlatform
 import com.freemytv.home.android.StallWatch
 import com.freemytv.home.buttons.ShortcutButtons
 import com.freemytv.home.setup.SetupWatchdog
+import com.freemytv.home.android.AppArtworkLoader
+import com.freemytv.home.apps.AllAppsStateHolder
+import com.freemytv.home.apps.AppLibrary
+import com.freemytv.home.explorar.Explorar
+import com.freemytv.home.inputs.InputTray
+import com.freemytv.home.multitasking.Multitasking
 import com.freemytv.home.upnext.UpNextTray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +42,20 @@ class HomeApplication : Application() {
 
     val upNext by lazy { UpNextTray(platform) }
 
+    // The apps, the Inputs, the Open Apps and Explorar live as long as the process, not only while the
+    // Home's screen is open, so the FMTV Controller's bridge reaches them with another app in front.
+    val library by lazy { AppLibrary(platform) }
+
+    val allApps by lazy { AllAppsStateHolder(platform, library, scope) }
+
+    val inputs by lazy { InputTray(platform, scope) }
+
+    val multitasking by lazy { Multitasking(platform) }
+
+    val artwork by lazy { AppArtworkLoader(this) }
+
+    val explorar by lazy { Explorar(platform) }
+
     override fun onCreate() {
         super.onCreate()
         StallWatch.start()
@@ -63,6 +83,13 @@ class HomeApplication : Application() {
                     }
                 },
             ).start(com.freemytv.home.webremote.WEB_REMOTE_PORT)
+        }
+        scope.launch { library.followPackageEvents() }
+        scope.launch { inputs.followInputChanges() }
+        scope.launch {
+            multitasking.load()
+            // The Open App Limit holds while the Home is alive, whichever app is in front.
+            multitasking.keepLimit()
         }
         // What plays is recorded whichever app is in front, for as long as the Home's process lives.
         scope.launch {

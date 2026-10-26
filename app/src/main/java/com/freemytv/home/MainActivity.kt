@@ -37,11 +37,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.freemytv.home.android.AndroidTvPlatform
-import com.freemytv.home.android.AppArtworkLoader
 import com.freemytv.home.android.TmdbImages
 import com.freemytv.home.apkdrop.ApkDrop
-import com.freemytv.home.apps.AllAppsStateHolder
-import com.freemytv.home.apps.AppLibrary
 import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.explorar.Explorar
 import com.freemytv.home.home.AppTrayItem
@@ -118,21 +115,21 @@ class MainActivity : ComponentActivity() {
         }
         val app = application as HomeApplication
         platform = app.platform
-        val library = AppLibrary(platform)
+        val library = app.library
         home = HomeStateHolder(platform, library, lifecycleScope)
-        val allApps = AllAppsStateHolder(platform, library, lifecycleScope)
-        inputs = InputTray(platform, lifecycleScope)
+        val allApps = app.allApps
+        inputs = app.inputs
         val widgetSettings = WidgetSettings(platform)
         val weather = WeatherWidget(platform, widgetSettings)
         val monitor = SystemMonitor(platform, widgetSettings)
         val settings = SettingsStateHolder(platform, widgetSettings, lifecycleScope)
         val updates = UpdatesStateHolder(platform)
         val notifications = NotificationCenter(platform)
-        multitasking = Multitasking(platform)
-        val artwork = AppArtworkLoader(applicationContext)
+        multitasking = app.multitasking
+        val artwork = app.artwork
         val topShelf = TopShelf(app.upNext.state)
         val apkDrop = ApkDrop(platform)
-        explorar = Explorar(platform)
+        explorar = app.explorar
         val tmdbImages = TmdbImages(applicationContext)
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
@@ -158,18 +155,11 @@ class MainActivity : ComponentActivity() {
             }
         })
 
-        lifecycleScope.launch { library.followPackageEvents() }
-        lifecycleScope.launch { inputs.followInputChanges() }
         lifecycleScope.launch { notifications.follow() }
         lifecycleScope.launch {
             updates.load()
             // Update Sources are checked about once a day while the Home runs, and whenever Updates opens.
             updates.keepChecking()
-        }
-        lifecycleScope.launch {
-            multitasking.load()
-            // The Open App Limit holds while the Home is alive, whichever app is in front.
-            multitasking.keepLimit()
         }
         lifecycleScope.launch {
             widgetSettings.load()
