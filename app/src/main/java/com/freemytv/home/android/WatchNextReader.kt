@@ -76,7 +76,8 @@ internal class WatchNextReader(private val context: Context) {
 
     /** The stored picture at [address], fetched and downscaled the first time; null if it can't be had. */
     private fun store(address: String): String? {
-        val file = File(artworkDir, "${hash(address)}.jpg")
+        // "-2": stored since YouTube's are fetched larger, so the smaller ones stored before go.
+        val file = File(artworkDir, "${hash(address)}-2.jpg")
         if (file.exists()) return file.path
         return runCatching {
             val bytes = fetch(address) ?: return null
@@ -95,18 +96,22 @@ internal class WatchNextReader(private val context: Context) {
     private fun fetch(address: String): ByteArray? {
         val uri = Uri.parse(address)
         return when (uri.scheme) {
-            "http", "https" -> (URL(address).openConnection() as HttpURLConnection).run {
-                connectTimeout = TIMEOUT_MILLIS
-                readTimeout = TIMEOUT_MILLIS
-                try {
-                    if (responseCode in 200..299) inputStream.use { it.readBytes() } else null
-                } finally {
-                    disconnect()
-                }
-            }
+            "http", "https" -> largestFirst(address).firstNotNullOfOrNull(::download)
             else -> context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
         }
     }
+
+    private fun download(address: String): ByteArray? = runCatching {
+        (URL(address).openConnection() as HttpURLConnection).run {
+            connectTimeout = TIMEOUT_MILLIS
+            readTimeout = TIMEOUT_MILLIS
+            try {
+                if (responseCode in 200..299) inputStream.use { it.readBytes() } else null
+            } finally {
+                disconnect()
+            }
+        }
+    }.getOrNull()
 
     private fun Cursor.text(column: String) = getColumnIndex(column).takeIf { it >= 0 && !isNull(it) }?.let { getString(it) }?.takeIf { it.isNotBlank() }
 
