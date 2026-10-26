@@ -189,6 +189,9 @@ interface TvPlatform {
     /** Links the Home to the TV's ADB: Android shows "Allow debugging?" and this waits for the Owner. */
     suspend fun linkAdb(): com.freemytv.home.webremote.AdbLinkResult
 
+    /** Sends one key through the TV's ADB, as a press or a long press; false when the TV didn't take it. */
+    suspend fun sendAdbKey(keyCode: Int, longPress: Boolean): Boolean
+
     suspend fun loadPairedPhones(): List<com.freemytv.home.webremote.PairedPhone>
 
     suspend fun savePairedPhones(phones: List<com.freemytv.home.webremote.PairedPhone>)

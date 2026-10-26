@@ -2,11 +2,11 @@ package com.freemytv.home.android
 
 import android.content.Context
 import com.freemytv.home.webremote.AdbLinkResult
+import dadb.AdbAuthException
 import dadb.AdbKeyPair
 import dadb.Dadb
 import java.io.File
 import java.io.IOException
-import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
 
@@ -32,21 +32,56 @@ internal class TvAdb(private val context: Context) {
 
     fun isLinked(): Boolean = prefs.getBoolean(KEY_LINKED, false)
 
+    /** The one connection to the TV's ADB, opened by Linking and kept for keys. */
+    private var adb: Dadb? = null
+
     /** Connects with the Home's key; an unknown key makes Android show its prompt, which this waits for. */
+    @Synchronized
     fun link(): AdbLinkResult {
         if (!isDebuggingOn()) return AdbLinkResult.DebuggingOff
+        close()
         val result = try {
-            Dadb.create(HOST, PORT, keyPair(), REACH_TIMEOUT_MS, PROMPT_TIMEOUT_MS).use { adb ->
-                if (adb.shell("echo linked").output.trim() == "linked") AdbLinkResult.Linked else AdbLinkResult.NotAccepted
+            val connection = Dadb.create(HOST, PORT, keyPair(), REACH_TIMEOUT_MS, PROMPT_TIMEOUT_MS, keepAlive = true)
+            if (connection.shell("echo linked").output.trim() == "linked") {
+                adb = connection
+                AdbLinkResult.Linked
+            } else {
+                connection.close()
+                AdbLinkResult.NotAccepted
             }
-        } catch (_: ConnectException) {
-            AdbLinkResult.DebuggingOff
         } catch (_: Exception) {
             // Refused, unanswered until the timeout, or the Owner dismissed the prompt: adbd says the same.
             AdbLinkResult.NotAccepted
         }
         prefs.edit().putBoolean(KEY_LINKED, result == AdbLinkResult.Linked).apply()
         return result
+    }
+
+    /** One key as `cmd input keyevent`; the connection is reopened once when it broke since the last key. */
+    @Synchronized
+    fun sendKey(keyCode: Int, longPress: Boolean): Boolean {
+        val command = "cmd input keyevent ${if (longPress) "--longpress " else ""}$keyCode"
+        repeat(2) { attempt ->
+            try {
+                val connection = adb ?: Dadb.create(HOST, PORT, keyPair(), REACH_TIMEOUT_MS, KEY_TIMEOUT_MS, keepAlive = true).also { adb = it }
+                connection.shell(command)
+                return true
+            } catch (_: AdbAuthException) {
+                // The TV no longer trusts the Home's key: Linking is lost, and only the Owner can redo it.
+                prefs.edit().putBoolean(KEY_LINKED, false).apply()
+                close()
+                return false
+            } catch (_: Exception) {
+                close()
+                if (attempt == 1) return false
+            }
+        }
+        return false
+    }
+
+    private fun close() {
+        runCatching { adb?.close() }
+        adb = null
     }
 
     private fun keyPair(): AdbKeyPair {
@@ -64,6 +99,7 @@ internal class TvAdb(private val context: Context) {
         const val REACH_TIMEOUT_MS = 1_000
         /** Long enough for the Owner to find the Remote and accept the prompt. */
         const val PROMPT_TIMEOUT_MS = 60_000
+        const val KEY_TIMEOUT_MS = 5_000
         const val PREFS = "web_remote"
         const val KEY_LINKED = "adb_linked"
     }

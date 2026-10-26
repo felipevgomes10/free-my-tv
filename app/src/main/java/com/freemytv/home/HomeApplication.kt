@@ -32,6 +32,8 @@ class HomeApplication : Application() {
 
     val webRemotePairing by lazy { com.freemytv.home.webremote.WebRemotePairing(platform, pairedPhones) }
 
+    val webRemoteBridge by lazy { com.freemytv.home.webremote.WebRemoteBridge(platform, pairedPhones) }
+
     val upNext by lazy { UpNextTray(platform) }
 
     override fun onCreate() {
@@ -41,17 +43,23 @@ class HomeApplication : Application() {
         // Checked from boot (the Home starts with the TV) and every 15 minutes, whichever app is in front.
         scope.launch { setupWatchdog.keepWatching() }
         // The FMTV Controller's bridge serves its page, Pairing and keys for as long as the Home lives.
+        // The bridge writes to phones' sockets: never on the main thread.
+        scope.launch(Dispatchers.IO) { pairedPhones.revoked.collect { webRemoteBridge.revoked(it) } }
+        scope.launch(Dispatchers.IO) { webRemoteLink.state.collect { if (it != com.freemytv.home.webremote.LinkState.Checking && it != com.freemytv.home.webremote.LinkState.Linking) webRemoteBridge.linkChanged() } }
         scope.launch {
             pairedPhones.load()
             com.freemytv.home.android.WebRemoteServer(
                 assets = assets,
                 pair = { body -> runBlocking { webRemotePairing.answer(body) } },
-                // Keys arrive with Web Remote ticket 07; until then a connection is closed at once.
                 remote = { peer ->
-                    peer.close()
+                    val session = webRemoteBridge.connect(object : com.freemytv.home.webremote.RemotePeer {
+                        override fun send(text: String) = peer.send(text)
+                        override fun close() = peer.close()
+                    })
+                    // Each connection reads on its own thread: its keys wait for one another, never for another phone's reading.
                     object : com.freemytv.home.android.WebSocketListener {
-                        override fun onText(text: String) = Unit
-                        override fun onClosed() = Unit
+                        override fun onText(text: String) = runBlocking { session.onText(text) }
+                        override fun onClosed() = session.onClosed()
                     }
                 },
             ).start(com.freemytv.home.webremote.WEB_REMOTE_PORT)
