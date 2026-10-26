@@ -35,3 +35,12 @@ The spec is `.scratch/web-remote/spec.md` in free-my-tv-remote-controller. Ticke
 - The TV Remote Service works from any other device on the network, so a bridge on an always-on machine would work as designed.
 
 The TV now lists two paired "FMTV Controller probe" clients from these probes; they can be forgotten in Android's settings.
+
+**2026-10-26, accessibility can't stand in for the arrows either.** The owner asked for a way without ADB and without the refused port, so a probe in the key filter (branch `prototype/accessibility-navigation`, never on `main`; installed on the TV only while measuring, then the clean release put back) tried each key through accessibility on the TV, in an idle moment:
+
+- **Android's own Settings (standard views): works.** `focusSearch` plus a focus action moved the focus up and down, a click on the focused row opened it, and the global Back went back (emulator).
+- **YouTube: doesn't.** Cobalt exposes no UI to accessibility: one full-screen view and a 3×3 grid of invisible 10 px cells. Input focus moves between the cells, but YouTube's screen doesn't move; Cobalt turns those cells into arrows only for accessibility focus, which it accepts only with a screen reader's touch exploration on (refused otherwise), and turning that on changes the whole TV.
+- **Netflix: doesn't.** One full-screen view, `player0`, with nothing inside, and no focus to move; its screen can't even be captured.
+- What would still work without ADB: Back, Home, the App Switcher and the Notification Panel (global actions and the Home itself), volume and mute (`AudioManager`), play/pause (`AudioManager.dispatchMediaKeyEvent` to the app playing), and typing into standard text fields. Not the arrows or OK inside YouTube or Netflix.
+
+So the Web Remote's core needs real key events, which leaves ADB on the TV itself or a device of its own on the network.
