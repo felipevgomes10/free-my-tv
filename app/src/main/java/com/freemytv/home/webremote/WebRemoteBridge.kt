@@ -1,5 +1,6 @@
 package com.freemytv.home.webremote
 
+import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.platform.TvPlatform
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -79,8 +80,17 @@ class WebRemoteBridge(private val platform: TvPlatform, private val phones: Pair
         private suspend fun key(message: JSONObject) {
             if (!ready) return
             val id = message.optInt("id")
-            val code = KEY_CODES[message.optString("key")] ?: return
-            val sent = when (message.optString("action")) {
+            val key = message.optString("key")
+            val code = KEY_CODES[key] ?: return
+            val action = message.optString("action")
+            if (key == "home" && action == "hold-start") {
+                // Holding Home opens the Notification Panel, as on the Remote; the key filter that does it for the
+                // Remote never sees keys from ADB, and a long-pressed Home from ADB is Android's own (the Assistant).
+                platform.openHome(HomeDestination.NotificationPanel)
+                peer.send(JSONObject().put("type", "ack").put("id", id).toString())
+                return
+            }
+            val sent = when (action) {
                 "press" -> keys.withLock { platform.sendAdbKey(code, longPress = false) }
                 // cmd input on Android 12 can't keep a key down: a hold is a long press, and its end has nothing left to do.
                 "hold-start" -> keys.withLock { platform.sendAdbKey(code, longPress = true) }
