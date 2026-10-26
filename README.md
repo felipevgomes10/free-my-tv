@@ -290,6 +290,7 @@ Checks Setup and Restore against fake TV states: only missing steps are planned,
 ```bash
 ./gradlew testDebugUnitTest   # the Home's unit tests (JVM)
 ./gradlew assembleDebug       # a debug APK for the emulator
+python3 scripts/check-up-next-focus.py  # scroll out and back into Up Next on a debug emulator
 ```
 
 The Home is Kotlin with [Compose for TV](https://developer.android.com/training/tv/playback/compose). All of Android sits behind one interface, `TvPlatform`. The tests drive the real feature code against a `FakeTvPlatform` on the JVM, with no device needed. Gradle needs JDK 17: point `JAVA_HOME` at it if your default Java is newer.

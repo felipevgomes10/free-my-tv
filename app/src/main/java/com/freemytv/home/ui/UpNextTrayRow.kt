@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -76,6 +77,7 @@ fun UpNextTrayRow(
     val app = chosen?.takeIf { pkg -> apps.any { it.first == pkg } }
     val shown = state.entriesOf(app)
     val trayFocus = rememberTrayFocus(shown.map { it.key })
+    val tiles = remember { FocusRequester() }
     val row = rememberLazyListState()
     LaunchedEffect(app) { row.scrollToItem(0) }
     // Edit Mode on this Tray has a single action, so holding OK opens it straight away.
@@ -89,13 +91,12 @@ fun UpNextTrayRow(
         ) {
             Text(stringResource(R.string.up_next), color = Tokens.TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
             if (apps.size > 1) {
-                // Coming down from the App Tray, focus passes the pills for the tiles it was on.
+                // Target the row: LazyRow may have disposed the first or previously focused tile.
                 val toTiles = Modifier
                     .focusProperties {
                         enter = { direction ->
                             if (direction == FocusDirection.Down) {
-                                val key = trayFocus.focusedKey?.takeIf { k -> shown.any { it.key == k } } ?: shown.first().key
-                                trayFocus.requester(key)
+                                tiles
                             } else {
                                 FocusRequester.Default
                             }
@@ -111,7 +112,7 @@ fun UpNextTrayRow(
             }
         }
         LazyRow(
-            Modifier.fillMaxWidth().then(trayFocus.trayModifier()),
+            Modifier.fillMaxWidth().focusRequester(tiles).focusGroup().then(trayFocus.trayModifier()),
             state = row,
             contentPadding = PaddingValues(horizontal = Tokens.SafeAreaHorizontal, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(20.dp),
