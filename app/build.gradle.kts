@@ -71,6 +71,8 @@ val webRemotePage = tasks.register("webRemotePage") {
     inputs.property("sha256", sha256)
     inputs.property("localZip", localZip)
     outputs.dir(webRemoteOut)
+    // A local zip changes under the same path between builds: always unpack it again.
+    outputs.upToDateWhen { localZip.get().isBlank() }
     doLast {
         val out = webRemoteOut.get().asFile
         out.deleteRecursively()

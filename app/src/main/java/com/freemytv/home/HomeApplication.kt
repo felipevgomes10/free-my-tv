@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import com.freemytv.home.webremote.addShortcuts
 import com.freemytv.home.webremote.answer
 import kotlinx.coroutines.runBlocking
 
@@ -68,6 +69,9 @@ class HomeApplication : Application() {
         // The bridge writes to phones' sockets: never on the main thread.
         scope.launch(Dispatchers.IO) { pairedPhones.revoked.collect { webRemoteBridge.revoked(it) } }
         scope.launch(Dispatchers.IO) { webRemoteLink.state.collect { if (it != com.freemytv.home.webremote.LinkState.Checking && it != com.freemytv.home.webremote.LinkState.Linking) webRemoteBridge.linkChanged() } }
+        // The companion features the FMTV Controller's tabs ask for (its ADR 0006).
+        webRemoteBridge.companion.addShortcuts(shortcutButtons, platform)
+        scope.launch(Dispatchers.IO) { shortcutButtons.assignments.collect { webRemoteBridge.push("shortcuts") } }
         scope.launch {
             pairedPhones.load()
             com.freemytv.home.android.WebRemoteServer(
