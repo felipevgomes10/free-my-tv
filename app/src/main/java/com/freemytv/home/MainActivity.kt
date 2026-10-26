@@ -1,5 +1,8 @@
 package com.freemytv.home
 
+import androidx.compose.runtime.DisposableEffect
+import com.freemytv.home.ui.SettingsSection
+import com.freemytv.home.ui.PairPhoneScreen
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -89,9 +92,11 @@ import kotlinx.coroutines.awaitCancellation
 
 class MainActivity : ComponentActivity() {
 
-    private enum class Screen { Home, Explorar, TitleDetails, Trailer, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher }
+    private enum class Screen { Home, Explorar, TitleDetails, Trailer, AllApps, ApkDrop, Weather, Monitor, Settings, Updates, Switcher, PairPhone }
 
     private var screen by mutableStateOf(Screen.Home)
+    /** The section Settings opens on: back from Parear aparelho, the FMTV Controller's. */
+    private var settingsSection = SettingsSection.Widgets
     private var notificationsOpen by mutableStateOf(false)
     private var explorarReturnsToCard = false
     private lateinit var explorar: Explorar
@@ -142,6 +147,10 @@ class MainActivity : ComponentActivity() {
                     home.state.value.lifted != null -> home.cancelEdit()
                     inputs.state.value.lifted != null -> inputs.cancelEdit()
                     screen == Screen.ApkDrop -> screen = Screen.AllApps
+                    screen == Screen.PairPhone -> {
+                        settingsSection = SettingsSection.WebRemote
+                        screen = Screen.Settings
+                    }
                     screen == Screen.TitleDetails -> closeDetails()
                     screen == Screen.Trailer -> screen = Screen.TitleDetails
                     else -> screen = Screen.Home
@@ -328,6 +337,15 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
+                        Screen.PairPhone -> {
+                            val pairingState by app.webRemotePairing.state.collectAsStateWithLifecycle()
+                            // Pairing is possible only while this screen is on.
+                            DisposableEffect(Unit) {
+                                scope.launch { app.webRemotePairing.open() }
+                                onDispose { app.webRemotePairing.close() }
+                            }
+                            PairPhoneScreen(state = pairingState, clock = homeState.statusClock, statusWidgets = statusWidgets)
+                        }
                         Screen.ApkDrop -> {
                             val apkDropState by apkDrop.state.collectAsStateWithLifecycle()
                             // The page is served only while this screen is on.
@@ -354,6 +372,7 @@ class MainActivity : ComponentActivity() {
                             val assignments by app.shortcutButtons.assignments.collectAsStateWithLifecycle()
                             val setupState by app.setupWatchdog.state.collectAsStateWithLifecycle()
                             val webRemoteLink by app.webRemoteLink.state.collectAsStateWithLifecycle()
+                            val pairedPhones by app.pairedPhones.phones.collectAsStateWithLifecycle()
                             val allAppsState by allApps.state.collectAsStateWithLifecycle()
                             SettingsScreen(
                                 state = settingsState,
@@ -366,6 +385,8 @@ class MainActivity : ComponentActivity() {
                                 ),
                                 setup = setupState,
                                 webRemote = webRemoteLink,
+                                pairedPhones = pairedPhones,
+                                initialSection = settingsSection.also { settingsSection = SettingsSection.Widgets },
                                 clock = homeState.statusClock,
                                 statusWidgets = statusWidgets,
                                 actions = SettingsActions(
@@ -373,6 +394,8 @@ class MainActivity : ComponentActivity() {
                                     onScreensaverMinutes = { scope.launch { settings.setScreensaverMinutes(it) } },
                                     onRefreshWebRemote = { scope.launch { app.webRemoteLink.refresh() } },
                                     onLinkWebRemote = { app.scope.launch { app.webRemoteLink.link() } },
+                                    onPairPhone = { screen = Screen.PairPhone },
+                                    onRevokePhone = { phone -> scope.launch { app.pairedPhones.revoke(phone) } },
                                     onWeatherVisible = { scope.launch { settings.setWeatherVisible(it) } },
                                     onMonitorVisible = { scope.launch { settings.setMonitorVisible(it) } },
                                     onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },

@@ -53,6 +53,8 @@ import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.setup.SetupState
 import com.freemytv.home.ui.theme.Tokens
 import com.freemytv.home.webremote.LinkState
+import com.freemytv.home.webremote.PairedPhone
+import androidx.compose.ui.draw.alpha
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -80,6 +82,8 @@ class SettingsActions(
     val onScreensaverMinutes: (Int) -> Unit,
     val onRefreshWebRemote: () -> Unit,
     val onLinkWebRemote: () -> Unit,
+    val onPairPhone: () -> Unit,
+    val onRevokePhone: (PairedPhone) -> Unit,
 )
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -90,13 +94,15 @@ fun SettingsScreen(
     buttons: ButtonsPanelState,
     setup: SetupState,
     webRemote: LinkState,
+    pairedPhones: List<PairedPhone>,
     clock: StatusClock,
     statusWidgets: @Composable () -> Unit,
     actions: SettingsActions,
+    initialSection: SettingsSection = SettingsSection.Widgets,
 ) {
-    var section by remember { mutableStateOf(SettingsSection.Widgets) }
+    var section by remember { mutableStateOf(initialSection) }
     val sectionFocus = remember { SettingsSection.entries.associateWith { FocusRequester() } }
-    LaunchedEffect(Unit) { runCatching { sectionFocus.getValue(SettingsSection.Widgets).requestFocus() } }
+    LaunchedEffect(Unit) { runCatching { sectionFocus.getValue(initialSection).requestFocus() } }
 
     Column(
         Modifier
@@ -161,7 +167,7 @@ fun SettingsScreen(
                         }
                         SettingsSection.Buttons -> ButtonsPanel(buttons, actions.onAssignButton)
                         SettingsSection.Cast -> CastPanel(state)
-                        SettingsSection.WebRemote -> WebRemotePanel(webRemote, actions)
+                        SettingsSection.WebRemote -> WebRemotePanel(webRemote, pairedPhones, actions)
                         SettingsSection.Setup -> SetupPanel(setup)
                         SettingsSection.About -> AboutPanel(state)
                         SettingsSection.AndroidSettings -> Note(stringResource(R.string.android_settings_note))
@@ -233,7 +239,7 @@ private fun CastPanel(state: SettingsState) {
 
 /** Linking the Home to the TV's ADB, through which the FMTV Controller's keys reach every app. */
 @Composable
-private fun WebRemotePanel(link: LinkState, actions: SettingsActions) {
+private fun WebRemotePanel(link: LinkState, phones: List<PairedPhone>, actions: SettingsActions) {
     LaunchedEffect(Unit) { actions.onRefreshWebRemote() }
     val detail = stringResource(
         when (link) {
@@ -253,6 +259,29 @@ private fun WebRemotePanel(link: LinkState, actions: SettingsActions) {
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
             )
+        }
+    }
+    val linked = link == LinkState.Linked
+    // A revoked phone's row goes away under the focus: the focus moves up to Parear aparelho first, rather than leaving the panel.
+    val pairFocus = remember { FocusRequester() }
+    Box(Modifier.alpha(if (linked) 1f else 0.4f)) {
+        ValueRow(
+            stringResource(R.string.web_remote_pair),
+            stringResource(if (linked) R.string.web_remote_pair_detail else R.string.web_remote_pair_after_linking),
+            "",
+            Modifier.focusRequester(pairFocus),
+        ) {
+            if (linked) actions.onPairPhone()
+        }
+    }
+    Text(stringResource(R.string.web_remote_paired_phones), color = Tokens.TextSecondary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(start = 12.dp, top = 18.dp, bottom = 4.dp))
+    if (phones.isEmpty()) Note(stringResource(R.string.web_remote_no_phones))
+    phones.forEach { phone ->
+        SettingRow(phone.name, stringResource(R.string.web_remote_paired_on, phone.pairedAt.atZone(java.time.ZoneId.systemDefault()).format(DAY_MONTH)), onClick = {
+            runCatching { pairFocus.requestFocus() }
+            actions.onRevokePhone(phone)
+        }) {
+            Text(stringResource(R.string.web_remote_revoke), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -306,18 +335,18 @@ private fun ToggleRow(title: String, detail: String?, on: Boolean, onToggle: () 
 
 /** A setting with a value the owner changes elsewhere. */
 @Composable
-private fun ValueRow(title: String, detail: String?, value: String, onClick: () -> Unit) {
-    SettingRow(title, detail, onClick) {
+private fun ValueRow(title: String, detail: String?, value: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    SettingRow(title, detail, onClick, modifier) {
         Text(value, fontSize = 12.sp, color = LocalContentColor.current.copy(alpha = 0.6f))
         Icon(painterResource(R.drawable.ic_chevron_right), contentDescription = null, modifier = Modifier.size(12.dp), tint = LocalContentColor.current.copy(alpha = 0.6f))
     }
 }
 
 @Composable
-private fun SettingRow(title: String, detail: String?, onClick: () -> Unit, trailing: @Composable () -> Unit) {
+private fun SettingRow(title: String, detail: String?, onClick: () -> Unit, modifier: Modifier = Modifier, trailing: @Composable () -> Unit) {
     Surface(
         onClick = onClick,
-        modifier = Modifier.slidingHighlightItem().fillMaxWidth(),
+        modifier = Modifier.slidingHighlightItem().then(modifier).fillMaxWidth(),
         shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(9.dp)),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1f),
         colors = highlightColors(),
@@ -384,5 +413,7 @@ fun StatusIconButton(icon: Int, contentDescription: String, onClick: () -> Unit)
         Icon(painterResource(icon), contentDescription = contentDescription, modifier = Modifier.padding(7.dp).size(14.dp))
     }
 }
+
+private val DAY_MONTH: DateTimeFormatter = DateTimeFormatter.ofPattern("d 'de' MMMM", Locale.forLanguageTag("pt-BR"))
 
 private val LONG_DATE: DateTimeFormatter = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("pt-BR"))

@@ -189,6 +189,10 @@ interface TvPlatform {
     /** Links the Home to the TV's ADB: Android shows "Allow debugging?" and this waits for the Owner. */
     suspend fun linkAdb(): com.freemytv.home.webremote.AdbLinkResult
 
+    suspend fun loadPairedPhones(): List<com.freemytv.home.webremote.PairedPhone>
+
+    suspend fun savePairedPhones(phones: List<com.freemytv.home.webremote.PairedPhone>)
+
     /** Whether each part of Setup holds right now. */
     suspend fun setupStatus(): Map<SetupCheck, Boolean>
 

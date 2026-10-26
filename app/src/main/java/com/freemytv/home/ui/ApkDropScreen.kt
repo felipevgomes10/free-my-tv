@@ -109,7 +109,7 @@ private fun Waiting(state: ApkDropState) {
 
 /** A numbered instruction; a one-line instruction sits centered on its number. */
 @Composable
-private fun Step(number: Int, label: String, value: (@Composable () -> Unit)? = null) {
+internal fun Step(number: Int, label: String, value: (@Composable () -> Unit)? = null) {
     Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = if (value == null) Alignment.CenterVertically else Alignment.Top) {
         Box(Modifier.size(28.dp).background(Tokens.Glass, CircleShape), contentAlignment = Alignment.Center) {
             Text(number.toString(), color = Tokens.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
@@ -175,7 +175,7 @@ private fun megabytes(bytes: Long): String {
     return String.format(Locale.forLanguageTag("pt-BR"), if (mb < 10) "%.1f MB" else "%.0f MB", mb)
 }
 
-private fun qrCode(text: String): Bitmap {
+internal fun qrCode(text: String): Bitmap {
     val matrix = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 0, 0, mapOf(EncodeHintType.MARGIN to 0))
     // One pixel per module, scaled up without smoothing.
     return Bitmap.createBitmap(matrix.width, matrix.height, Bitmap.Config.ARGB_8888).apply {
@@ -183,4 +183,4 @@ private fun qrCode(text: String): Bitmap {
     }
 }
 
-private val QR_CARD = 210.dp
+internal val QR_CARD = 210.dp

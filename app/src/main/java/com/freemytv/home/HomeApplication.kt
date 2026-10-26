@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import com.freemytv.home.webremote.answer
+import kotlinx.coroutines.runBlocking
 
 /** What the Home's screens and its key filter share for as long as the process lives. */
 class HomeApplication : Application() {
@@ -26,6 +28,10 @@ class HomeApplication : Application() {
 
     val webRemoteLink by lazy { com.freemytv.home.webremote.WebRemoteLink(platform) }
 
+    val pairedPhones by lazy { com.freemytv.home.webremote.PairedPhones(platform) }
+
+    val webRemotePairing by lazy { com.freemytv.home.webremote.WebRemotePairing(platform, pairedPhones) }
+
     val upNext by lazy { UpNextTray(platform) }
 
     override fun onCreate() {
@@ -34,6 +40,22 @@ class HomeApplication : Application() {
         scope.launch { shortcutButtons.load() }
         // Checked from boot (the Home starts with the TV) and every 15 minutes, whichever app is in front.
         scope.launch { setupWatchdog.keepWatching() }
+        // The FMTV Controller's bridge serves its page, Pairing and keys for as long as the Home lives.
+        scope.launch {
+            pairedPhones.load()
+            com.freemytv.home.android.WebRemoteServer(
+                assets = assets,
+                pair = { body -> runBlocking { webRemotePairing.answer(body) } },
+                // Keys arrive with Web Remote ticket 07; until then a connection is closed at once.
+                remote = { peer ->
+                    peer.close()
+                    object : com.freemytv.home.android.WebSocketListener {
+                        override fun onText(text: String) = Unit
+                        override fun onClosed() = Unit
+                    }
+                },
+            ).start(com.freemytv.home.webremote.WEB_REMOTE_PORT)
+        }
         // What plays is recorded whichever app is in front, for as long as the Home's process lives.
         scope.launch {
             upNext.load()

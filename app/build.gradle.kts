@@ -1,3 +1,7 @@
+import java.net.URI
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -55,6 +59,60 @@ android {
     }
 }
 
+// The FMTV Controller page, pinned in gradle.properties: downloaded from its GitHub release,
+// checked against its SHA-256 and unpacked into the APK's assets (web-remote/), with the
+// protocol's JSON examples for the bridge's tests (free-my-tv-remote-controller's ADR 0002).
+val webRemoteOut = layout.buildDirectory.dir("generated/webRemote")
+val webRemotePage = tasks.register("webRemotePage") {
+    val version = providers.gradleProperty("webRemoteVersion").orElse("")
+    val sha256 = providers.gradleProperty("webRemoteSha256").orElse("")
+    val localZip = providers.gradleProperty("webRemoteZip").orElse("")
+    inputs.property("version", version)
+    inputs.property("sha256", sha256)
+    inputs.property("localZip", localZip)
+    outputs.dir(webRemoteOut)
+    doLast {
+        val out = webRemoteOut.get().asFile
+        out.deleteRecursively()
+        val zip: File = when {
+            localZip.get().isNotBlank() -> file(localZip.get())
+            version.get().isNotBlank() -> {
+                val cached = layout.buildDirectory.file("webRemote/web-remote-${version.get()}.zip").get().asFile
+                if (!cached.exists()) {
+                    cached.parentFile.mkdirs()
+                    val url = "https://github.com/felipevgomes10/free-my-tv-remote-controller/releases/download/v${version.get()}/web-remote-${version.get()}.zip"
+                    URI(url).toURL().openStream().use { input -> cached.outputStream().use { input.copyTo(it) } }
+                }
+                val actual = MessageDigest.getInstance("SHA-256").digest(cached.readBytes()).joinToString("") { "%02x".format(it) }
+                if (actual != sha256.get().trim().lowercase()) {
+                    cached.delete()
+                    throw GradleException("web-remote-${version.get()}.zip has SHA-256 $actual, not the pinned ${sha256.get()}")
+                }
+                cached
+            }
+            else -> {
+                logger.warn("webRemoteVersion is empty: building the Home without the FMTV Controller page.")
+                return@doLast
+            }
+        }
+        ZipFile(zip).use { archive ->
+            for (entry in archive.entries()) {
+                if (entry.isDirectory) continue
+                val target = when {
+                    entry.name.startsWith("page/") -> File(out, "assets/web-remote/" + entry.name.removePrefix("page/"))
+                    entry.name.startsWith("protocol/") -> File(out, "test/web-remote-protocol/" + entry.name.removePrefix("protocol/"))
+                    else -> continue
+                }
+                target.parentFile.mkdirs()
+                archive.getInputStream(entry).use { input -> target.outputStream().use { input.copyTo(it) } }
+            }
+        }
+    }
+}
+android.sourceSets.getByName("main").assets.srcDir(webRemoteOut.map { it.dir("assets") })
+android.sourceSets.getByName("test").resources.srcDir(webRemoteOut.map { it.dir("test") })
+tasks.named("preBuild") { dependsOn(webRemotePage) }
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -75,5 +133,7 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
+    // org.json is Android's own; on the JVM, the bridge's tests need the real one, not android.jar's stubs.
+    testImplementation("org.json:json:20240303")
     testImplementation(libs.kotlinx.coroutines.test)
 }
