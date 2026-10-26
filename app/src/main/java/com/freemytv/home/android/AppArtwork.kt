@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.util.LruCache
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import com.freemytv.home.home.TileArt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.concurrent.ConcurrentHashMap
 
 /** The picture for an app's tile: its App Banner, or its icon plus a backdrop color taken from it. */
 sealed interface AppArtwork {
@@ -20,7 +20,12 @@ sealed interface AppArtwork {
 class AppArtworkLoader(context: Context) {
 
     private val packageManager = context.packageManager
-    private val cache = ConcurrentHashMap<String, AppArtwork>()
+    private val cache = object : LruCache<String, AppArtwork>(4 * 1024 * 1024) {
+        override fun sizeOf(key: String, value: AppArtwork): Int = when (value) {
+            is AppArtwork.Banner -> value.bitmap.allocationByteCount
+            is AppArtwork.IconOnColor -> value.icon.allocationByteCount
+        }
+    }
 
     suspend fun load(packageName: String, art: TileArt): AppArtwork? = cache[packageName] ?: withContext(Dispatchers.IO) {
         val info = try {
@@ -42,16 +47,24 @@ class AppArtworkLoader(context: Context) {
             val swatch = Palette.from(icon).generate().let { it.darkVibrantSwatch ?: it.dominantSwatch }
             AppArtwork.IconOnColor(icon, swatch?.rgb ?: Color.DKGRAY)
         }
-        artwork.also { cache[packageName] = it }
+        artwork.also { cache.put(packageName, it) }
     }
 
-    private val icons = ConcurrentHashMap<String, Bitmap>()
+    private val icons = object : LruCache<String, Bitmap>(512 * 1024) {
+        override fun sizeOf(key: String, value: Bitmap) = value.allocationByteCount
+    }
 
     fun cachedIcon(packageName: String): Bitmap? = icons[packageName]
 
     /** The app's launcher icon, small, for notification badges. */
     suspend fun icon(packageName: String): Bitmap? = icons[packageName] ?: withContext(Dispatchers.IO) {
-        runCatching { packageManager.getApplicationIcon(packageName).toBitmap(ICON_SIZE, ICON_SIZE) }.getOrNull()?.also { icons[packageName] = it }
+        runCatching { packageManager.getApplicationIcon(packageName).toBitmap(ICON_SIZE, ICON_SIZE) }.getOrNull()?.also { icons.put(packageName, it) }
+    }
+
+    /** Drop cache references, never recycle pictures a visible screen may still be drawing. */
+    fun clear() {
+        cache.evictAll()
+        icons.evictAll()
     }
 
     private companion object {

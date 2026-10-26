@@ -74,10 +74,18 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     private val prefs = context.getSharedPreferences("home", Context.MODE_PRIVATE)
     private val mediaSessions = MediaSessions(context)
     private val watchNextReader = WatchNextReader(context)
-    private val apkDropServer = ApkDropServer(java.io.File(context.cacheDir, "apkdrop"))
+    private val apkDropFiles = TemporaryDownloads(java.io.File(context.cacheDir, "apkdrop"))
+    private val updateFiles = TemporaryDownloads(java.io.File(context.cacheDir, "updates"))
+    private val apkDropServer = ApkDropServer(apkDropFiles)
     private val apkInstaller = ApkInstaller(context)
     private val tmdb = Tmdb(context)
-    private val gitHub = GitHubReleases({ GitHubEndpoint.api(context) }, java.io.File(context.cacheDir, "updates"))
+    private val gitHub = GitHubReleases({ GitHubEndpoint.api(context) }, updateFiles)
+
+    /** Called off the main thread at startup; writers also prepare before using either directory. */
+    fun prepareTemporaryDownloads() {
+        apkDropFiles.directory()
+        updateFiles.directory()
+    }
 
     override suspend fun installedApps(): List<InstalledApp> = withContext(Dispatchers.IO) {
         val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)

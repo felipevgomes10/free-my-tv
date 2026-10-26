@@ -149,4 +149,22 @@ class CompanionTest {
         pictures.serve("app:a", "Bearer cred")
         assertEquals(3, renders)
     }
+
+    @Test
+    fun `memory pressure releases cached pictures and a paired phone can fetch them again`() = runTest {
+        var renders = 0
+        val pictures = WebRemotePictures(phones, budgetBytes = 10)
+        pictures.source("app") { renders++; ByteArray(6) }
+        phones.add(PairedPhone("iPhone", sha256("cred"), Instant.EPOCH))
+        pictures.serve("app:a", "Bearer cred")
+        pictures.clear()
+
+        assertEquals(401, pictures.serve("app:a", null).first)
+        assertEquals(200, pictures.serve("app:a", "Bearer cred").first)
+        pictures.serve("app:a", "Bearer cred")
+        assertEquals(2, renders)
+        pictures.serve("app:b", "Bearer cred")
+        pictures.serve("app:a", "Bearer cred")
+        assertEquals(4, renders)
+    }
 }

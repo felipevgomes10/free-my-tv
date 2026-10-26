@@ -132,6 +132,8 @@ private fun glow(picture: Bitmap): Bitmap {
 
 private val prepared = LruCache<String, ShelfPicture>(KEPT)
 
+internal fun clearShelfPictures() = prepared.evictAll()
+
 // Each kept picture is about 0.6 MB, mostly its card (ADR 0004).
 private const val KEPT = 3
 private const val FILL_TOLERANCE = 0.2f

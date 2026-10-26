@@ -23,7 +23,7 @@ import java.net.SocketException
  * `GET /` is the page; `POST /upload` takes the raw file with its code in an `X-Code` header,
  * so nothing is accepted before the Home has seen the code and the size.
  */
-class ApkDropServer(private val dir: File) {
+internal class ApkDropServer(private val downloads: TemporaryDownloads) {
 
     fun serve(port: Int, verdict: (code: String, sizeBytes: Long) -> UploadVerdict): Flow<String> = callbackFlow {
         val server = try {
@@ -34,7 +34,7 @@ class ApkDropServer(private val dir: File) {
             close()
             return@callbackFlow
         }
-        dir.mkdirs()
+        downloads.directory()
         launch {
             while (isActive) {
                 val socket = try {
@@ -83,7 +83,7 @@ class ApkDropServer(private val dir: File) {
             UploadVerdict.TooBig -> out.respond(413, "text/plain; charset=utf-8", "Não cabe na TV: libere espaço e tente de novo.")
             UploadVerdict.Busy -> out.respond(409, "text/plain; charset=utf-8", "A TV já tem um arquivo esperando. Instale ou cancele na TV primeiro.")
             UploadVerdict.Accept -> {
-                val file = File(dir, "${System.currentTimeMillis()}.apk")
+                val file = File(downloads.directory(), "${System.currentTimeMillis()}.apk")
                 try {
                     file.outputStream().use { sink -> copy(input, sink, size) }
                 } catch (e: IOException) {

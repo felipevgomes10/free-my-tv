@@ -65,13 +65,33 @@ class HomeApplication : Application() {
 
     val multitasking by lazy { Multitasking(platform) }
 
-    val artwork by lazy { AppArtworkLoader(this) }
+    private val cachedArtwork = lazy { AppArtworkLoader(this) }
+    val artwork get() = cachedArtwork.value
 
     val explorar by lazy { Explorar(platform) }
+
+    @Suppress("DEPRECATION")
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= TRIM_MEMORY_RUNNING_LOW) clearPictures()
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onLowMemory() {
+        super.onLowMemory()
+        clearPictures()
+    }
+
+    private fun clearPictures() {
+        if (cachedArtwork.isInitialized()) artwork.clear()
+        webRemotePictures.clear()
+        com.freemytv.home.ui.clearShelfPictures()
+    }
 
     override fun onCreate() {
         super.onCreate()
         StallWatch.start()
+        scope.launch(Dispatchers.IO) { platform.prepareTemporaryDownloads() }
         scope.launch { shortcutButtons.load() }
         // Checked from boot (the Home starts with the TV) and every 15 minutes, whichever app is in front.
         scope.launch { setupWatchdog.keepWatching() }

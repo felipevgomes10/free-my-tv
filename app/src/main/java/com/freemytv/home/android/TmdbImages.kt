@@ -9,17 +9,19 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-/** TMDB's images, downloaded once into the Home's cache, which Android may clear when space runs low. */
+/** TMDB's images, kept within 32 MiB on disk, oldest unused first out. */
 class TmdbImages(context: Context) {
 
-    private val dir = File(context.cacheDir, "tmdb")
+    private val cache = ImageFiles(File(context.cacheDir, "tmdb"), 32 * 1024 * 1024)
+
+    /** Runs off the main thread at startup, including before Explorar is first opened. */
+    suspend fun trim() = withContext(Dispatchers.IO) { cache.trim() }
 
     /** The local file for a TMDB image path at [width] ("w780", "w1280"), or null when it can't be had. */
     suspend fun file(path: String, width: String): String? = withContext(Dispatchers.IO) {
-        val file = File(dir, width + path.replace('/', '_'))
-        if (file.exists()) return@withContext file.absolutePath
-        dir.mkdirs()
-        val partial = File(file.path + ".part")
+        val name = width + path.replace('/', '_')
+        cache.find(name)?.let { return@withContext it.absolutePath }
+        val partial = cache.partial()
         try {
             val connection = URL(Tmdb.imageUrl(path, width)).openConnection() as HttpURLConnection
             connection.connectTimeout = 15_000
@@ -30,12 +32,12 @@ class TmdbImages(context: Context) {
             } finally {
                 connection.disconnect()
             }
-            partial.renameTo(file)
-            file.absolutePath
+            cache.commit(partial, name)?.absolutePath
         } catch (e: IOException) {
             Log.w("TmdbImages", "No image for $path", e)
-            partial.delete()
             null
+        } finally {
+            partial.delete()
         }
     }
 }

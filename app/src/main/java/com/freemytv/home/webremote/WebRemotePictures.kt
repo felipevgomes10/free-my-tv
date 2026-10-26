@@ -34,6 +34,12 @@ class WebRemotePictures(private val phones: PairedPhones, private val budgetByte
     private fun cached(id: String): ByteArray? = cache[id]
 
     @Synchronized
+    fun clear() {
+        cache.clear()
+        cachedBytes = 0
+    }
+
+    @Synchronized
     private fun keep(id: String, png: ByteArray) {
         if (png.size > budgetBytes) return
         cache.put(id, png)?.let { cachedBytes -= it.size }

@@ -13,7 +13,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /** Public GitHub releases, read without a token (60 requests an hour is plenty for a daily check). */
-class GitHubReleases(private val api: () -> String, private val downloads: File) {
+internal class GitHubReleases(private val api: () -> String, private val downloads: TemporaryDownloads) {
 
     suspend fun latest(repository: String): ReleaseLookup = withContext(Dispatchers.IO) {
         val connection = URL("${api()}/repos/$repository/releases/latest").openConnection() as HttpURLConnection
@@ -50,8 +50,7 @@ class GitHubReleases(private val api: () -> String, private val downloads: File)
     }
 
     suspend fun download(asset: ReleaseAsset): String? = withContext(Dispatchers.IO) {
-        downloads.mkdirs()
-        val file = File(downloads, asset.name.replace(Regex("""[^\w.-]"""), "_"))
+        val file = File(downloads.directory(), asset.name.replace(Regex("""[^\w.-]"""), "_"))
         try {
             // GitHub answers with a redirect to its file storage, on another host.
             var url = URL(asset.url)

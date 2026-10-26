@@ -49,7 +49,8 @@ class SystemReader(private val context: Context) {
         packageManager.getInstalledApplications(0).mapNotNull { app ->
             runCatching {
                 val usage = stats.queryStatsForPackage(StorageManager.UUID_DEFAULT, app.packageName, Process.myUserHandle())
-                AppStorage(app.packageName, usage.appBytes + usage.dataBytes + usage.cacheBytes, removable = app.flags and ApplicationInfo.FLAG_SYSTEM == 0)
+                // dataBytes already includes cacheBytes (StorageStats); adding it again doubles the cache.
+                AppStorage(app.packageName, usage.appBytes + usage.dataBytes, removable = app.flags and ApplicationInfo.FLAG_SYSTEM == 0)
             }.getOrNull()
         }
     }

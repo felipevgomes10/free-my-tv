@@ -131,6 +131,7 @@ class MainActivity : ComponentActivity() {
         val apkDrop = ApkDrop(platform)
         explorar = app.explorar
         val tmdbImages = TmdbImages(applicationContext)
+        lifecycleScope.launch { tmdbImages.trim() }
 
         // Back leaves Edit Mode, then All Apps; on the Home itself it has nowhere to go.
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
