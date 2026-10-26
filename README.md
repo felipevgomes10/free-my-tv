@@ -119,6 +119,10 @@ Enable Weather in **Configurações → Descanso de tela** and choose 2, 5 or 10
     <td width="50%"><img src="docs/design/updates.jpg" alt="Updates with system and app updates" width="100%"><br><sub><b>Atualizações</b> — security patch, Play Store, and apps installed from APKs</sub></td>
     <td width="50%"><img src="docs/design/explorar-trailer.jpg" alt="Full-screen trailer with playback controls" width="100%"><br><sub><b>Trailer</b> — played inside the Home with the Home’s own controls</sub></td>
   </tr>
+  <tr>
+    <td width="50%"><img src="docs/design/settings-fmtv-controller-linked.jpg" alt="Settings with the FMTV Controller section" width="100%"><br><sub><b>FMTV Controller</b> — Linking and the Paired Phones</sub></td>
+    <td width="50%"><img src="docs/design/pair-a-phone.jpg" alt="Pairing an iPhone with a code" width="100%"><br><sub><b>Parear aparelho</b> — the code an iPhone types in FMTV Controller</sub></td>
+  </tr>
 </table>
 
 The editable frames live in [`design.pen`](design.pen); exported previews are in [`docs/design`](docs/design).
@@ -145,6 +149,7 @@ The editable frames live in [`design.pen`](design.pen); exported previews are in
 - **Remote buttons** — the Netflix, Globoplay, Prime Video, Disney+ and YouTube buttons keep working once the stock launcher is gone, and each can open any app, an input or the App Switcher. The gear opens the Home's Settings; holding Home opens notifications.
 - **Notifications** — a panel and banners, since the stock notification UI belongs to the launcher.
 - **Enviar APK** — send an APK from your phone or computer over Wi-Fi with a 4-digit code.
+- **FMTV Controller** — an iPhone remote that opens from the Home Screen, served by the Home itself: link the Home once in *Configurações → FMTV Controller*, pair each iPhone with a code from *Parear aparelho*, and revoke any of them there. Its keys reach every app as real key events, through the TV's own ADB. The page lives in [free-my-tv-remote-controller](https://github.com/felipevgomes10/free-my-tv-remote-controller).
 - **Updates** — the security patch level, a shortcut to Play Store updates, and updates for apps installed from APKs straight from their GitHub releases. The Home updates itself the same way.
 
 Everything is in Brazilian Portuguese and tuned for a 2 GB TCL set: the Home stays within a small memory budget ([ADR 0004](docs/adr/0004-low-memory-budget.md)), answers the remote on a thread of its own, and animates only what is cheap to draw.
@@ -167,6 +172,7 @@ Everything is in Brazilian Portuguese and tuned for a 2 GB TCL set: the Home sta
 - **An accessibility key filter** ([ADR 0005](docs/adr/0005-accessibility-key-filter-for-shortcut-buttons.md)) sees remote keys first, so shortcut buttons keep working and can be reassigned.
 - **ADB grants instead of root**: `DUMP`, `PACKAGE_USAGE_STATS`, `WRITE_SECURE_SETTINGS` and `READ_TV_LISTINGS` let the Home read memory per app ([ADR 0006](docs/adr/0006-process-memory-through-dumpsys-activity.md)), recent usage and other apps' Watch Next, and keep its key filter on.
 - **Watch Next**, with media sessions as the fallback, feeds *Continuar assistindo* ([ADR 0012](docs/adr/0012-up-next-from-watch-next.md)).
+- **The FMTV Controller's keys go through the TV's own ADB**: the TV Remote Service refuses keys from the TV itself, so the Home is an ADB client of `127.0.0.1:5555`, allowed once on the TV's "Allow debugging?" prompt, and serves the page and its bridge on port 8766 (free-my-tv-remote-controller's ADR 0005).
 - **TMDB's token never ships in the APK** ([ADR 0008](docs/adr/0008-tmdb-token-delivered-by-setup.md)): it stays in a git-ignored file on your computer, and Setup hands it to the TV.
 
 The language of the project — *Top Shelf*, *App Tray*, *Open App*, *Title*… — is defined in [`CONTEXT.md`](CONTEXT.md); every decision with a trade-off is an [ADR](docs/adr).
