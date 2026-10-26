@@ -16,7 +16,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import com.freemytv.home.android.picturePng
+import com.freemytv.home.webremote.addApps
+import com.freemytv.home.webremote.addInputs
 import com.freemytv.home.webremote.addShortcuts
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import com.freemytv.home.webremote.answer
 import kotlinx.coroutines.runBlocking
 
@@ -72,6 +77,13 @@ class HomeApplication : Application() {
         // The companion features the FMTV Controller's tabs ask for (its ADR 0006).
         webRemoteBridge.companion.addShortcuts(shortcutButtons, platform)
         scope.launch(Dispatchers.IO) { shortcutButtons.assignments.collect { webRemoteBridge.push("shortcuts") } }
+        webRemoteBridge.companion.addApps(library, platform)
+        webRemoteBridge.companion.addInputs(inputs)
+        webRemotePictures.source("app") { pkg ->
+            platform.installedApps().firstOrNull { it.packageName == pkg }?.let { artwork.picturePng(it) }
+        }
+        scope.launch(Dispatchers.IO) { library.library.collect { webRemoteBridge.push("apps") } }
+        scope.launch(Dispatchers.IO) { inputs.state.map { it.inputs }.distinctUntilChanged().collect { webRemoteBridge.push("inputs") } }
         scope.launch {
             pairedPhones.load()
             com.freemytv.home.android.WebRemoteServer(

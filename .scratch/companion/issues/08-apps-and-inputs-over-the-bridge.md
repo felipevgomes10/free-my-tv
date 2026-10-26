@@ -6,10 +6,14 @@ The spec is `.scratch/companion/spec.md` in free-my-tv-remote-controller. Ticket
 
 **Blocked by:** 04 (The bridge speaks protocol 2), 07 (The Apps tab: Todos os apps and Entradas)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Apps are listed App Tray first, then the rest by name, each with a picture the bridge serves
-- [ ] Hidden Inputs are left out; the Owner's names are used
-- [ ] Opening an app or an Input does what the Home's own tiles do
-- [ ] Installing or removing an app pushes the list again
-- [ ] Tests read the examples and drive the bridge against `FakeTvPlatform`
+- [x] Apps are listed App Tray first, then the rest by name, each with a picture the bridge serves
+- [x] Hidden Inputs are left out; the Owner's names are used
+- [x] Opening an app or an Input does what the Home's own tiles do
+- [x] Installing or removing an app pushes the list again
+- [x] Tests read the examples and drive the bridge against `FakeTvPlatform`
+
+## Comments
+
+**2026-10-26, done, on `companion`.** `addApps` lists the App Tray first, in its order, then the rest by name, each with `inTray` and the picture `app:<package>`; opening launches the app, as its tile does, and refuses one that isn't installed. `addInputs` lists the Input Tray's Inputs (hidden ones are already left out by the tray) with the Owner's names, the antenna as Antena on TV aberta, and opens one with `InputTray.select`. `AppPicture.kt` renders the picture: the App Banner, or the icon centred on its colour in a 320×180 tile, as PNG. The lists are pushed when the library or the Inputs change. On the emulator, with the real page: the Apps tab showed the four Inputs and the apps with their banners, and tapping Settings opened it on the TV. 4 new tests, 283 in all.
