@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import com.freemytv.home.android.picturePng
 import com.freemytv.home.android.upNextPictureJpeg
 import com.freemytv.home.webremote.addApps
+import com.freemytv.home.webremote.addExplorar
 import com.freemytv.home.webremote.addInputs
 import com.freemytv.home.webremote.addOpenApps
 import com.freemytv.home.webremote.addShortcuts
@@ -85,6 +86,7 @@ class HomeApplication : Application() {
         webRemoteBridge.companion.addInputs(inputs)
         webRemoteBridge.companion.addOpenApps(multitasking)
         webRemoteBridge.companion.addUpNext(upNext)
+        webRemoteBridge.companion.addExplorar(explorar, platform)
         webRemotePictures.source("upnext") { key -> upNext.state.value.entries.firstOrNull { it.key == key }?.artwork?.let { upNextPictureJpeg(it) } }
         scope.launch(Dispatchers.IO) { upNext.state.map { it.entries }.distinctUntilChanged().collect { webRemoteBridge.push("up-next") } }
         scope.launch(Dispatchers.IO) { webRemoteBridge.watchOpenApps(multitasking) }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.milliseconds
 
 /** Trending over the day or over the week. */
@@ -88,7 +89,7 @@ class Explorar(
 
     private val choice = MutableStateFlow(TrendWindow.Today to KindFilter.All)
     private val focused = MutableStateFlow<TitleSummary?>(null)
-    private val cache = HashMap<Pair<TrendWindow, KindFilter>, Pair<Instant, List<TitleSummary>>>()
+    private val cache = ConcurrentHashMap<Pair<TrendWindow, KindFilter>, Pair<Instant, List<TitleSummary>>>()
 
     fun choose(window: TrendWindow) {
         choice.update { it.copy(first = window) }
@@ -114,22 +115,42 @@ class Explorar(
     /** Opens a Title's details: one TMDB request for everything the screen shows. */
     suspend fun openDetails(summary: TitleSummary) {
         _state.update { it.copy(hero = summary, details = DetailsState(summary)) }
-        val details = when (val lookup = platform.titleDetails(summary.kind, summary.id)) {
-            is DetailsLookup.Found -> DetailsState(
-                summary,
-                lookup.details,
-                loading = false,
-                whereToWatch = whereToWatch(lookup.details.offers, platform::isLaunchable).map { it.linkedTo(lookup.details) },
-                trailer = chooseTrailer(lookup.details.videos),
-            )
-            DetailsLookup.Offline -> DetailsState(summary, loading = false, problem = ExplorarProblem.Offline)
-            DetailsLookup.MissingToken -> DetailsState(summary, loading = false, problem = ExplorarProblem.MissingToken)
-        }
+        val details = lookUp(summary)
         // The owner may have left the details while they loaded.
         _state.update { if (it.details?.summary == summary) it.copy(details = details) else it }
     }
 
-    /** Opens the service's app, or its Play Store page when the app isn't installed. */
+    /** A Title's details, Onde assistir and Trailer, in one TMDB request; nothing on screen changes. */
+    suspend fun lookUp(summary: TitleSummary): DetailsState = when (val lookup = platform.titleDetails(summary.kind, summary.id)) {
+        is DetailsLookup.Found -> DetailsState(
+            summary,
+            lookup.details,
+            loading = false,
+            whereToWatch = whereToWatch(lookup.details.offers, platform::isLaunchable).map { it.linkedTo(lookup.details) },
+            trailer = chooseTrailer(lookup.details.videos),
+        )
+        DetailsLookup.Offline -> DetailsState(summary, loading = false, problem = ExplorarProblem.Offline)
+        DetailsLookup.MissingToken -> DetailsState(summary, loading = false, problem = ExplorarProblem.MissingToken)
+    }
+
+    /** Puts a Title's details, looked up elsewhere (the FMTV Controller), on the details screen. */
+    fun showDetails(details: DetailsState) {
+        _state.update { it.copy(hero = details.summary, details = details) }
+    }
+
+    /**
+     * Trending Titles for the FMTV Controller: from the cache while fresh, else from TMDB, kept for
+     * the next ask. The Home's own row is left as it is.
+     */
+    suspend fun trending(window: TrendWindow, filter: KindFilter): TrendingLookup {
+        val key = window to filter
+        val now = platform.now().toInstant()
+        cache[key]?.let { (at, titles) -> if (Duration.between(at, now) < cacheFor) return TrendingLookup.Found(titles) }
+        val lookup = platform.trending(window, filter)
+        if (lookup is TrendingLookup.Found) cache[key] = now to lookup.titles
+        return lookup
+    }
+
     /**
      * Opens the service's app on the Title itself when its id there is known, else on its search
      * for the Title, else just the app; a service not installed opens its Play Store page.
