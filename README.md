@@ -9,7 +9,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-Compose%20for%20TV-7f52ff?logo=kotlin&logoColor=white)
 ![UI in pt-BR](https://img.shields.io/badge/UI-pt--BR-009c3b)
 
-<img src="docs/screenshots/home.jpg" alt="The Home: what you last watched in the focused app above the App Tray, Continuar assistindo below" width="100%">
+<img src="docs/design/home-top-shelf.jpg" alt="The Home: what you last watched in the focused app above the App Tray, Continuar assistindo below" width="100%">
 
 </div>
 
@@ -19,46 +19,109 @@ Google TV's launcher on a TCL set is a billboard: rows of sponsored content, app
 
 It is not a ROM and it doesn't root anything. It is an ordinary Android app that becomes the TV's Home, plus a Setup script that runs from your computer over ADB, shows its whole plan before touching anything, and can undo every change it made.
 
-## Screenshots
+## Design previews
+
+All previews below are exported from the current [`design.pen`](design.pen). The interface is in pt-BR; the weather images show representative frames of the atmospheric backgrounds.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/home.jpg" alt="Home"><br><sub><b>Home</b> — the Top Shelf shows what you last watched in the focused app</sub></td>
-    <td width="50%"><img src="docs/screenshots/home-inputs.jpg" alt="Home with Continuar assistindo and Entradas"><br><sub><b>Continuar assistindo</b> and <b>Entradas</b> — resume a video or jump to an HDMI input</sub></td>
+    <td width="50%"><img src="docs/design/home-top-shelf.jpg" alt="Home with the Top Shelf and App Tray" width="100%"><br><sub><b>Home</b> — the Top Shelf shows what you last watched in the focused app</sub></td>
+    <td width="50%"><img src="docs/design/home-input-tray.jpg" alt="Home with Continuar assistindo and Entradas" width="100%"><br><sub><b>Continuar assistindo and Entradas</b> — resume a video or jump to an HDMI input</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/explorar.jpg" alt="Explorar"><br><sub><b>Explorar</b> — today's and this week's trending movies and series, from TMDB</sub></td>
-    <td><img src="docs/screenshots/title-details.jpg" alt="Title details"><br><sub><b>A Title</b> — facts, cast, trailer, and where to watch it in Brazil</sub></td>
+    <td width="50%"><img src="docs/design/explorar-today.jpg" alt="Explorar with trending movies and series" width="100%"><br><sub><b>Explorar</b> — today’s and this week’s trending movies and series, from TMDB</sub></td>
+    <td width="50%"><img src="docs/design/explorar-movie-details.jpg" alt="Movie details with cast and streaming shortcuts" width="100%"><br><sub><b>A Title</b> — facts, cast, trailer, and where to watch it in Brazil</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/weather.jpg" alt="Weather"><br><sub><b>Weather</b> — now, the next 12 hours and 7 days</sub></td>
-    <td><img src="docs/screenshots/system-monitor.jpg" alt="System Monitor"><br><sub><b>System Monitor</b> — storage, memory, the apps behind them and the Home's frame rate</sub></td>
+    <td width="50%"><img src="docs/design/weather-clear-day.jpg" alt="Weather with a clear daytime sky" width="100%"><br><sub><b>Weather</b> — now, the next 12 hours and 7 days</sub></td>
+    <td width="50%"><img src="docs/design/system-monitor-detail.jpg" alt="System Monitor with storage and memory details" width="100%"><br><sub><b>System Monitor</b> — storage, memory, the apps behind them and the Home’s frame rate</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/settings.jpg" alt="Settings"><br><sub><b>Settings</b> — widgets, open apps, remote buttons, casting, Setup status</sub></td>
-    <td><img src="docs/design/app-switcher.png" alt="App Switcher design"><br><sub><b>App Switcher</b> (design) — press Home twice to switch or close apps</sub></td>
+    <td width="50%"><img src="docs/design/settings.jpg" alt="Settings with the current section menu" width="100%"><br><sub><b>Settings</b> — widgets, screensaver, open apps, remote buttons, casting and Setup</sub></td>
+    <td width="50%"><img src="docs/design/app-switcher.jpg" alt="App Switcher with open apps" width="100%"><br><sub><b>App Switcher</b> — press Home twice to switch or close apps</sub></td>
+  </tr>
+</table>
+
+### Explorar loading states
+
+Initial loading keeps navigation and filters visible while placeholders for the hero and cards pulse gently. When opening a Title, its known name and overview remain visible while the full details arrive.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/design/explorar-loading-today.jpg" alt="Explorar Today loading with hero and card placeholders" width="100%"><br><sub><b>Today — loading highlights</b></sub></td>
+    <td width="50%"><img src="docs/design/explorar-loading-week.jpg" alt="Explorar Week loading with the weekly period selected" width="100%"><br><sub><b>Week — loading highlights</b></sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/design/explorar-loading-movie-details.jpg" alt="Movie details loading while the title and overview remain visible" width="100%"><br><sub><b>Movie details — loading</b></sub></td>
+    <td width="50%"><img src="docs/design/explorar-loading-series-details.jpg" alt="Series details loading while the title and overview remain visible" width="100%"><br><sub><b>Series details — loading</b></sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/design/explorar-loading-artwork.jpg" alt="Explorar with title data available while card artwork is loading" width="100%"><br><sub><b>Artwork loading</b> — titles, metadata and navigation are already available</sub></td>
+  </tr>
+</table>
+
+### Weather variations
+
+Ten scenes cover the supported weather families, including day/night versions of clear and partly cloudy skies. Each has matching recorded ambience and a mute button that remembers your choice. The [weather media guide](docs/weather-media.md) lists the API mappings and sound sources.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/design/weather-clear-day.jpg" alt="Clear daytime weather with sun" width="100%"><br><sub><b>Clear sky — day</b></sub></td>
+    <td width="50%"><img src="docs/design/weather-clear-night.jpg" alt="Clear nighttime weather with moon and stars" width="100%"><br><sub><b>Clear sky — night</b></sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/design/weather-partly-cloudy-day.jpg" alt="Partly cloudy daytime weather" width="100%"><br><sub><b>Partly cloudy — day</b></sub></td>
+    <td width="50%"><img src="docs/design/weather-partly-cloudy-night.jpg" alt="Partly cloudy nighttime weather" width="100%"><br><sub><b>Partly cloudy — night</b></sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/design/weather-cloudy.jpg" alt="Overcast weather with layered clouds" width="100%"><br><sub><b>Overcast</b></sub></td>
+    <td width="50%"><img src="docs/design/weather-fog.jpg" alt="Foggy weather with diffuse mist" width="100%"><br><sub><b>Fog</b></sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/design/weather-drizzle.jpg" alt="Drizzle with fine rain streaks" width="100%"><br><sub><b>Drizzle</b></sub></td>
+    <td width="50%"><img src="docs/design/weather-rain.jpg" alt="Steady rain with darker clouds" width="100%"><br><sub><b>Rain</b></sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/design/weather-snow.jpg" alt="Snowfall with floating snowflakes" width="100%"><br><sub><b>Snow</b></sub></td>
+    <td width="50%"><img src="docs/design/weather-thunderstorm.jpg" alt="Thunderstorm with rain and lightning" width="100%"><br><sub><b>Thunderstorm</b></sub></td>
+  </tr>
+</table>
+
+### Screensaver
+
+Enable Weather in **Configurações → Descanso de tela** and choose 2, 5 or 10 idle minutes. It works across the TV’s apps, respects playback, and returns to the previous app on any key.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/design/settings-screensaver-off.jpg" alt="Screensaver settings with the weather toggle off" width="100%"><br><sub><b>Screensaver disabled</b> — the delay stays hidden until enabled</sub></td>
+    <td width="50%"><img src="docs/design/settings-screensaver-5-minutes.jpg" alt="Screensaver enabled with a five-minute delay" width="100%"><br><sub><b>Screensaver enabled</b> — press OK on the delay to cycle through 2, 5 and 10 minutes</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/design/screensaver-clear-day.jpg" alt="Daytime weather screensaver without navigation controls" width="100%"><br><sub><b>Daytime screensaver</b></sub></td>
+    <td width="50%"><img src="docs/design/screensaver-clear-night.jpg" alt="Nighttime weather screensaver without navigation controls" width="100%"><br><sub><b>Nighttime screensaver</b></sub></td>
   </tr>
 </table>
 
 <details>
-<summary><b>More screens, from the design file</b></summary>
+<summary><b>More screens from the design</b></summary>
 <br>
+
 <table>
   <tr>
-    <td width="50%"><img src="docs/design/all-apps.png" alt="All Apps design"><br><sub><b>Todos os apps</b> — pin, uninstall, install</sub></td>
-    <td width="50%"><img src="docs/design/home-edit-mode.png" alt="Edit Mode design"><br><sub><b>Edit Mode</b> — hold OK to reorder the App Tray</sub></td>
+    <td width="50%"><img src="docs/design/all-apps.jpg" alt="All Apps with installed applications" width="100%"><br><sub><b>Todos os apps</b> — pin, uninstall, install</sub></td>
+    <td width="50%"><img src="docs/design/home-edit-mode.jpg" alt="Home in Edit Mode" width="100%"><br><sub><b>Edit Mode</b> — hold OK to reorder the App Tray</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/design/notification-panel.png" alt="Notification Panel design"><br><sub><b>Notification Panel</b></sub></td>
-    <td><img src="docs/design/apk-drop.png" alt="APK Drop design"><br><sub><b>Enviar APK</b> — install an app sent from your phone</sub></td>
+    <td width="50%"><img src="docs/design/notification-panel.jpg" alt="Home with the Notification Panel open" width="100%"><br><sub><b>Notification Panel</b></sub></td>
+    <td width="50%"><img src="docs/design/apk-drop.jpg" alt="APK Drop ready to receive an APK" width="100%"><br><sub><b>Enviar APK</b> — install an app sent from your phone</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/design/updates.png" alt="Updates design"><br><sub><b>Atualizações</b> — security patch, Play Store, and apps installed from APKs</sub></td>
-    <td><img src="docs/design/explorar-trailer.png" alt="Trailer design"><br><sub><b>Trailer</b> — played inside the Home with its own controls</sub></td>
+    <td width="50%"><img src="docs/design/updates.jpg" alt="Updates with system and app updates" width="100%"><br><sub><b>Atualizações</b> — security patch, Play Store, and apps installed from APKs</sub></td>
+    <td width="50%"><img src="docs/design/explorar-trailer.jpg" alt="Full-screen trailer with playback controls" width="100%"><br><sub><b>Trailer</b> — played inside the Home with the Home’s own controls</sub></td>
   </tr>
 </table>
 
-Screenshots come from the Google TV emulator; the designs live in [`design.pen`](design.pen) and [`docs/design`](docs/design).
+The editable frames live in [`design.pen`](design.pen); exported previews are in [`docs/design`](docs/design).
 </details>
 
 ## What it does
