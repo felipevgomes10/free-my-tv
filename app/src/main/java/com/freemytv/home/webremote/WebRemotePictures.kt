@@ -13,12 +13,12 @@ class WebRemotePictures(private val phones: PairedPhones, private val budgetByte
     private val cache = object : LinkedHashMap<String, ByteArray>(16, 0.75f, true) {}
     private var cachedBytes = 0
 
-    /** Pictures whose id starts with `prefix:`; [load] gets the rest of the id and renders a PNG, or null. */
+    /** Pictures whose id starts with `prefix:`; [load] gets the rest of the id and renders the image (PNG or JPEG), or null. */
     fun source(prefix: String, load: suspend (String) -> ByteArray?) {
         sources[prefix] = load
     }
 
-    /** The answer to `GET /pictures/{id}`: a status and, for 200, the PNG. */
+    /** The answer to `GET /pictures/{id}`: a status and, for 200, the image. */
     suspend fun serve(id: String, authorization: String?): Pair<Int, ByteArray?> {
         val credential = authorization?.removePrefix("Bearer ")?.trim()
         if (credential.isNullOrEmpty() || phones.find(credential) == null) return 401 to null

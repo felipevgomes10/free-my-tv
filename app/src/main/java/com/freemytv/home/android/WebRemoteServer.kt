@@ -84,9 +84,9 @@ class WebRemoteServer(
             }
             method == "GET" && path.startsWith("/pictures/") -> socket.use {
                 val id = java.net.URLDecoder.decode(path.removePrefix("/pictures/"), "UTF-8")
-                val (status, png) = picture(id, headers["authorization"])
-                if (png == null) out.respond(status, "text/plain; charset=utf-8", ByteArray(0), cache = "no-store")
-                else out.respond(200, "image/png", png, cache = "private, max-age=3600")
+                val (status, image) = picture(id, headers["authorization"])
+                if (image == null) out.respond(status, "text/plain; charset=utf-8", ByteArray(0), cache = "no-store")
+                else out.respond(200, imageType(image), image, cache = "private, max-age=3600")
             }
             method == "GET" -> socket.use { serveAsset(out, path) }
             else -> socket.use { out.respond(405, "text/plain; charset=utf-8", "Método não permitido".toByteArray(), cache = "no-store") }
@@ -200,6 +200,10 @@ class WebRemoteServer(
             line.append(c.toChar())
         }
     }
+
+    /** App pictures are PNG; Up Next stills stay JPEG, as the apps gave them. */
+    private fun imageType(image: ByteArray) =
+        if (image.size > 2 && image[0] == 0xFF.toByte() && image[1] == 0xD8.toByte()) "image/jpeg" else "image/png"
 
     private fun contentType(name: String) = when (name.substringAfterLast('.')) {
         "html" -> "text/html; charset=utf-8"

@@ -17,10 +17,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import com.freemytv.home.android.picturePng
+import com.freemytv.home.android.upNextPictureJpeg
 import com.freemytv.home.webremote.addApps
 import com.freemytv.home.webremote.addInputs
 import com.freemytv.home.webremote.addOpenApps
 import com.freemytv.home.webremote.addShortcuts
+import com.freemytv.home.webremote.addUpNext
 import com.freemytv.home.webremote.watchOpenApps
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -82,6 +84,9 @@ class HomeApplication : Application() {
         webRemoteBridge.companion.addApps(library, platform)
         webRemoteBridge.companion.addInputs(inputs)
         webRemoteBridge.companion.addOpenApps(multitasking)
+        webRemoteBridge.companion.addUpNext(upNext)
+        webRemotePictures.source("upnext") { key -> upNext.state.value.entries.firstOrNull { it.key == key }?.artwork?.let { upNextPictureJpeg(it) } }
+        scope.launch(Dispatchers.IO) { upNext.state.map { it.entries }.distinctUntilChanged().collect { webRemoteBridge.push("up-next") } }
         scope.launch(Dispatchers.IO) { webRemoteBridge.watchOpenApps(multitasking) }
         webRemotePictures.source("app") { pkg ->
             platform.installedApps().firstOrNull { it.packageName == pkg }?.let { artwork.picturePng(it) }
