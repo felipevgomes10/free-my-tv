@@ -45,6 +45,9 @@ class WebRemoteBridge(
         sessions.filter { it.phone != null }.forEach { it.tell(state) }
     }
 
+    /** Whether any phone is connected and ready, so a list worth pushing has someone to hear it. */
+    val hasReadyPhone get() = sessions.any { it.isReady }
+
     /** A list changed on the TV: every ready connection gets it again. */
     suspend fun push(of: String) {
         val ready = sessions.filter { it.isReady }

@@ -19,7 +19,9 @@ import kotlinx.coroutines.launch
 import com.freemytv.home.android.picturePng
 import com.freemytv.home.webremote.addApps
 import com.freemytv.home.webremote.addInputs
+import com.freemytv.home.webremote.addOpenApps
 import com.freemytv.home.webremote.addShortcuts
+import com.freemytv.home.webremote.watchOpenApps
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import com.freemytv.home.webremote.answer
@@ -79,6 +81,8 @@ class HomeApplication : Application() {
         scope.launch(Dispatchers.IO) { shortcutButtons.assignments.collect { webRemoteBridge.push("shortcuts") } }
         webRemoteBridge.companion.addApps(library, platform)
         webRemoteBridge.companion.addInputs(inputs)
+        webRemoteBridge.companion.addOpenApps(multitasking)
+        scope.launch(Dispatchers.IO) { webRemoteBridge.watchOpenApps(multitasking) }
         webRemotePictures.source("app") { pkg ->
             platform.installedApps().firstOrNull { it.packageName == pkg }?.let { artwork.picturePng(it) }
         }
