@@ -30,7 +30,7 @@ sealed interface ButtonTarget {
 }
 
 /** Where the Home should open when a button asks for it. */
-enum class HomeDestination { InputTray, AppSwitcher, NotificationPanel, Settings }
+enum class HomeDestination { InputTray, AppSwitcher, NotificationPanel, Settings, Trailer }
 
 /** What the key filter does with a key event. */
 sealed interface KeyDecision {

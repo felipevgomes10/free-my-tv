@@ -16,6 +16,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import com.freemytv.home.android.picturePng
+import com.freemytv.home.android.upNextPictureJpeg
+import com.freemytv.home.webremote.addApps
+import com.freemytv.home.webremote.addExplorar
+import com.freemytv.home.webremote.addInputs
+import com.freemytv.home.webremote.addOpenApps
+import com.freemytv.home.webremote.addShortcuts
+import com.freemytv.home.webremote.addUpNext
+import com.freemytv.home.webremote.watchOpenApps
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import com.freemytv.home.webremote.answer
 import kotlinx.coroutines.runBlocking
 
@@ -39,6 +50,8 @@ class HomeApplication : Application() {
     val webRemotePairing by lazy { com.freemytv.home.webremote.WebRemotePairing(platform, pairedPhones) }
 
     val webRemoteBridge by lazy { com.freemytv.home.webremote.WebRemoteBridge(platform, pairedPhones) }
+
+    val webRemotePictures by lazy { com.freemytv.home.webremote.WebRemotePictures(pairedPhones) }
 
     val upNext by lazy { UpNextTray(platform) }
 
@@ -66,6 +79,22 @@ class HomeApplication : Application() {
         // The bridge writes to phones' sockets: never on the main thread.
         scope.launch(Dispatchers.IO) { pairedPhones.revoked.collect { webRemoteBridge.revoked(it) } }
         scope.launch(Dispatchers.IO) { webRemoteLink.state.collect { if (it != com.freemytv.home.webremote.LinkState.Checking && it != com.freemytv.home.webremote.LinkState.Linking) webRemoteBridge.linkChanged() } }
+        // The companion features the FMTV Controller's tabs ask for (its ADR 0006).
+        webRemoteBridge.companion.addShortcuts(shortcutButtons, platform)
+        scope.launch(Dispatchers.IO) { shortcutButtons.assignments.collect { webRemoteBridge.push("shortcuts") } }
+        webRemoteBridge.companion.addApps(library, platform)
+        webRemoteBridge.companion.addInputs(inputs)
+        webRemoteBridge.companion.addOpenApps(multitasking)
+        webRemoteBridge.companion.addUpNext(upNext)
+        webRemoteBridge.companion.addExplorar(explorar, platform)
+        webRemotePictures.source("upnext") { key -> upNext.state.value.entries.firstOrNull { it.key == key }?.artwork?.let { upNextPictureJpeg(it) } }
+        scope.launch(Dispatchers.IO) { upNext.state.map { it.entries }.distinctUntilChanged().collect { webRemoteBridge.push("up-next") } }
+        scope.launch(Dispatchers.IO) { webRemoteBridge.watchOpenApps(multitasking) }
+        webRemotePictures.source("app") { pkg ->
+            platform.installedApps().firstOrNull { it.packageName == pkg }?.let { artwork.picturePng(it) }
+        }
+        scope.launch(Dispatchers.IO) { library.library.collect { webRemoteBridge.push("apps") } }
+        scope.launch(Dispatchers.IO) { inputs.state.map { it.inputs }.distinctUntilChanged().collect { webRemoteBridge.push("inputs") } }
         scope.launch {
             pairedPhones.load()
             com.freemytv.home.android.WebRemoteServer(
@@ -82,6 +111,7 @@ class HomeApplication : Application() {
                         override fun onClosed() = session.onClosed()
                     }
                 },
+                picture = { id, authorization -> runBlocking { webRemotePictures.serve(id, authorization) } },
             ).start(com.freemytv.home.webremote.WEB_REMOTE_PORT)
         }
         scope.launch { library.followPackageEvents() }

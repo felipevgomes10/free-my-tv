@@ -60,7 +60,7 @@ class WebRemoteBridgeTest {
     fun `a page speaking another protocol is told to reload`() = runTest {
         paired()
 
-        val (phone) = connected(example("hello").put("protocol", 2))
+        val (phone) = connected(example("hello").put("protocol", 1))
 
         assertSame(example("reload"), phone.last())
         assertTrue(phone.closed)

@@ -515,7 +515,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Where a Shortcut Button, the settings button, long-press Home or a double Home press sends the owner. */
+    /** Where a Shortcut Button, the settings button, long-press Home, a double Home press or the FMTV Controller sends the owner. */
     private fun open(destination: HomeDestination) {
         when (destination) {
             HomeDestination.NotificationPanel -> notificationsOpen = true
@@ -531,6 +531,11 @@ class MainActivity : ComponentActivity() {
             HomeDestination.Settings -> {
                 multitasking.closeSwitcher()
                 screen = Screen.Settings
+            }
+            // The FMTV Controller's Ver trailer na TV: the Title's details are already on Explorar.
+            HomeDestination.Trailer -> if (explorar.state.value.details?.trailer != null) {
+                multitasking.closeSwitcher()
+                screen = Screen.Trailer
             }
         }
     }

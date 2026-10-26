@@ -21,7 +21,12 @@ interface RemotePeer {
  * on the TV's own ADB, one at a time, in the order they came. Nothing is queued for a phone that
  * isn't connected.
  */
-class WebRemoteBridge(private val platform: TvPlatform, private val phones: PairedPhones) {
+class WebRemoteBridge(
+    private val platform: TvPlatform,
+    private val phones: PairedPhones,
+    /** The companion features' answers (ADR 0006 in free-my-tv-remote-controller). */
+    val companion: CompanionFeatures = CompanionFeatures(),
+) {
 
     private val sessions = CopyOnWriteArraySet<Session>()
     /** Keys from every phone go to the TV one at a time, in the order they came. */
@@ -40,12 +45,27 @@ class WebRemoteBridge(private val platform: TvPlatform, private val phones: Pair
         sessions.filter { it.phone != null }.forEach { it.tell(state) }
     }
 
+    /** Whether any phone is connected and ready, so a list worth pushing has someone to hear it. */
+    val hasReadyPhone get() = sessions.any { it.isReady }
+
+    /** A list changed on the TV: every ready connection gets it again. */
+    suspend fun push(of: String) {
+        val ready = sessions.filter { it.isReady }
+        if (ready.isEmpty()) return
+        val items = companion.items(of) ?: return
+        val message = JSONObject().put("type", "list").put("of", of).put("items", items).toString()
+        ready.forEach { it.send(message) }
+    }
+
     private suspend fun readiness() = if (platform.isNetworkDebuggingOn() && platform.isAdbLinked()) "ready" else "not-linked"
 
     inner class Session internal constructor(private val peer: RemotePeer) {
         @Volatile internal var phone: PairedPhone? = null
             private set
         @Volatile private var ready = false
+        internal val isReady get() = ready
+
+        internal fun send(text: String) = peer.send(text)
 
         suspend fun onText(text: String) {
             val message = try {
@@ -56,6 +76,7 @@ class WebRemoteBridge(private val platform: TvPlatform, private val phones: Pair
             when (message.optString("type")) {
                 "hello" -> hello(message)
                 "key" -> key(message)
+                else -> request(message)
             }
         }
 
@@ -75,6 +96,12 @@ class WebRemoteBridge(private val platform: TvPlatform, private val phones: Pair
             }
             phone = known
             tell(readiness())
+        }
+
+        /** A companion feature's request: answered by its `id`, and only once the bridge is ready. */
+        private suspend fun request(message: JSONObject) {
+            if (!ready || !message.has("id")) return
+            peer.send(companion.reply(message).put("id", message.getInt("id")).toString())
         }
 
         private suspend fun key(message: JSONObject) {
@@ -127,7 +154,8 @@ class WebRemoteBridge(private val platform: TvPlatform, private val phones: Pair
     }
 
     companion object {
-        const val PROTOCOL_VERSION = 1
+        /** 2 since the companion features' requests (ADR 0006); 1 had only keys. */
+        const val PROTOCOL_VERSION = 2
 
         /** The protocol's intentions as Android key codes. */
         val KEY_CODES = mapOf(
