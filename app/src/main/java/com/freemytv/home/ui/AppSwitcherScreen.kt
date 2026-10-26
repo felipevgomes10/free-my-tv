@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,6 +56,7 @@ fun AppSwitcherScreen(
 ) {
     val apps = state.apps.orEmpty()
     val focus = rememberTrayFocus(apps.map { it.packageName })
+    val lastClose = remember { mutableLongStateOf(0L) }
     LaunchedEffect(Unit) {
         apps.getOrNull(state.initialFocus)?.let { runCatching { focus.requester(it.packageName).requestFocus() } }
     }
@@ -94,7 +96,15 @@ fun AppSwitcherScreen(
                             .then(focus.itemModifier(app.packageName, index))
                             .onFocusChanged { focused = it.isFocused }
                             .onPreviewKeyEvent { event ->
-                                (event.key == Key.DirectionUp).also { if (it && event.type == KeyEventType.KeyDown) onClose(app) }
+                                (event.key == Key.DirectionUp).also { up ->
+                                    val native = event.nativeKeyEvent
+                                    // One app per press: a held Up repeats, and a swipe on the FMTV Controller sends Ups
+                                    // in quick succession, which would close the next app as soon as it took the focus.
+                                    if (up && event.type == KeyEventType.KeyDown && native.repeatCount == 0 && native.eventTime - lastClose.longValue >= CLOSE_GAP_MILLIS) {
+                                        lastClose.longValue = native.eventTime
+                                        onClose(app)
+                                    }
+                                }
                             },
                     ) {
                         AppArt(app.packageName, app.label, app.art, artwork)
@@ -118,6 +128,9 @@ fun AppSwitcherScreen(
         }
     }
 }
+
+/** After closing an app, Up closes nothing for this long. */
+private const val CLOSE_GAP_MILLIS = 500L
 
 private val CARD_WIDTH = 192.dp
 private val CARD_HEIGHT = 108.dp

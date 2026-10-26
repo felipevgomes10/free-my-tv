@@ -90,6 +90,19 @@ class WebRemoteBridgeTest {
     }
 
     @Test
+    fun `holding Home opens the Notification Panel instead of sending a key`() = runTest {
+        paired()
+        val (phone, session) = connected()
+
+        session.onText(example("key-hold-start").put("key", "home").toString())
+        session.onText(example("key-hold-end").put("key", "home").toString())
+
+        assertEquals(listOf(com.freemytv.home.buttons.HomeDestination.NotificationPanel), platform.homeOpenedAt)
+        assertTrue(platform.adbKeys.isEmpty())
+        assertEquals("ack", phone.last().getString("type"))
+    }
+
+    @Test
     fun `wake turns the TV on and never toggles its power`() = runTest {
         paired()
         val (_, session) = connected()
