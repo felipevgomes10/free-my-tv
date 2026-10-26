@@ -8,6 +8,7 @@ import com.freemytv.home.buttons.HomeDestination
 import com.freemytv.home.buttons.ShortcutButton
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.SearchLookup
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
@@ -190,6 +191,15 @@ class FakeTvPlatform(
     var details: Map<Int, DetailsLookup> = emptyMap()
 
     override suspend fun titleDetails(kind: TitleKind, id: Int) = details[id] ?: DetailsLookup.Offline
+
+    /** Search answers per query; a missing query finds nothing. */
+    var searches: Map<String, SearchLookup> = emptyMap()
+    val searchQueries = mutableListOf<String>()
+
+    override suspend fun searchTitles(query: String): SearchLookup {
+        searchQueries += query
+        return searches[query] ?: SearchLookup.Found(emptyList())
+    }
 
     val playStorePages = mutableListOf<String>()
     val youTubeVideos = mutableListOf<String>()

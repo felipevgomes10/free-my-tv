@@ -6,6 +6,7 @@ import com.freemytv.home.apkdrop.UploadVerdict
 import com.freemytv.home.buttons.ButtonTarget
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
+import com.freemytv.home.explorar.SearchLookup
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TrendWindow
 import com.freemytv.home.explorar.TrendingLookup
@@ -288,6 +289,9 @@ interface TvPlatform {
 
     /** A Title's details for Brazil, in Portuguese, in one TMDB request. */
     suspend fun titleDetails(kind: TitleKind, id: Int): DetailsLookup
+
+    /** TMDB's movies and series matching a name, in Portuguese. */
+    suspend fun searchTitles(query: String): SearchLookup
 
     /** The owner's pinned apps in tray order, or null if the owner has never had a tray. */
     suspend fun loadPinnedApps(): List<String>?

@@ -5,6 +5,8 @@ import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.Explorar
 import com.freemytv.home.explorar.KindFilter
 import com.freemytv.home.explorar.OfferKind
+import com.freemytv.home.explorar.SearchLookup
+import com.freemytv.home.explorar.SearchResult
 import com.freemytv.home.explorar.TitleDetails
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TitleSummary
@@ -105,5 +107,35 @@ class ExplorarFeatureTest {
         val details = explorar.state.value.details!!
         assertEquals("Último trem", details.summary.name)
         assertEquals("abc123", details.trailer?.key)
+    }
+
+    @Test
+    fun `a search answers movies and series, shaped like the example`() = runTest {
+        platform.searches = mapOf(
+            "último trem" to SearchLookup.Found(
+                listOf(
+                    SearchResult(1084242, TitleKind.Movie, "Último trem", 2025, "/ultimo-trem.jpg", "/ultimo-trem-poster.jpg"),
+                    SearchResult(81234, TitleKind.Series, "O Último Trem para Casa", 2019, null, "/trem-para-casa.jpg"),
+                    SearchResult(55001, TitleKind.Movie, "Último Trem para Busan", null, null, null),
+                ),
+            ),
+        )
+
+        val answer = features.reply(example("search"))
+
+        val expected = example("search-results")
+        assertEquals(expected.keySet() - "id", answer.keySet())
+        assertEquals(expected.getString("query"), answer.getString("query"))
+        assertEquals(expected.getJSONArray("results").toString(), answer.getJSONArray("results").toString())
+    }
+
+    @Test
+    fun `a search trims what was typed, and no token or offline are answered as such`() = runTest {
+        features.reply(example("search").put("query", "  trem "))
+        assertEquals(listOf("trem"), platform.searchQueries)
+
+        platform.searches = mapOf("a" to SearchLookup.MissingToken, "b" to SearchLookup.Offline)
+        assertEquals("missing-token", features.reply(example("search").put("query", "a")).getString("reason"))
+        assertEquals("offline", features.reply(example("search").put("query", "b")).getString("reason"))
     }
 }

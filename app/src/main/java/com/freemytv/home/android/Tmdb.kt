@@ -6,6 +6,8 @@ import com.freemytv.home.explorar.CastMember
 import com.freemytv.home.explorar.DetailsLookup
 import com.freemytv.home.explorar.KindFilter
 import com.freemytv.home.explorar.OfferKind
+import com.freemytv.home.explorar.SearchLookup
+import com.freemytv.home.explorar.SearchResult
 import com.freemytv.home.explorar.TitleDetails
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TitleSummary
@@ -17,6 +19,7 @@ import com.freemytv.home.explorar.WatchOffer
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
@@ -159,6 +162,36 @@ class Tmdb(private val context: Context) {
     private fun seriesCertification(json: JSONObject): String? {
         val results = json.optJSONObject("content_ratings")?.optJSONArray("results") ?: return null
         return List(results.length()) { results.getJSONObject(it) }.firstOrNull { it.optString("iso_3166_1") == BRAZIL }?.optString("rating")?.takeIf { it.isNotBlank() }
+    }
+
+    /** Movies and series whose name matches [query], in Portuguese, best first; never people. */
+    suspend fun search(query: String): SearchLookup {
+        val encoded = URLEncoder.encode(query, "UTF-8").replace("+", "%20")
+        return when (val answer = get("search/multi?language=pt-BR&include_adult=false&query=$encoded")) {
+            Answer.NoToken -> SearchLookup.MissingToken
+            Answer.Offline -> SearchLookup.Offline
+            is Answer.Ok -> {
+                val results = answer.json.optJSONArray("results") ?: return SearchLookup.Offline
+                SearchLookup.Found(
+                    List(results.length()) { results.getJSONObject(it) }.mapNotNull { item ->
+                        val kind = when (item.optString("media_type")) {
+                            "movie" -> TitleKind.Movie
+                            "tv" -> TitleKind.Series
+                            else -> return@mapNotNull null
+                        }
+                        val movie = kind == TitleKind.Movie
+                        SearchResult(
+                            id = item.getInt("id"),
+                            kind = kind,
+                            name = item.optString(if (movie) "title" else "name"),
+                            year = item.optString(if (movie) "release_date" else "first_air_date").take(4).toIntOrNull(),
+                            backdrop = item.optString("backdrop_path").takeIf { it.startsWith("/") },
+                            poster = item.optString("poster_path").takeIf { it.startsWith("/") },
+                        )
+                    },
+                )
+            }
+        }
     }
 
     private suspend fun genreNames(kind: TitleKind): Map<Int, String> = genres[kind] ?: run {

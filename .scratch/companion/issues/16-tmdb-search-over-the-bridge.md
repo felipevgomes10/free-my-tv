@@ -6,8 +6,12 @@ The spec is `.scratch/companion/spec.md` in free-my-tv-remote-controller. Ticket
 
 **Blocked by:** 14 (Explorar over the bridge), 15 (Search)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] A search returns movies and series, never people, in Portuguese
-- [ ] No token and offline are answered as such
-- [ ] Tests read the examples and drive the bridge against `FakeTvPlatform`
+- [x] A search returns movies and series, never people, in Portuguese
+- [x] No token and offline are answered as such
+- [x] Tests read the examples and drive the bridge against `FakeTvPlatform`
+
+## Comments
+
+**2026-10-26, done, on `companion`.** `Tmdb.search` asks `search/multi` in `pt-BR` without adult titles and keeps movies and series only, each with its year from the release or first air date, backdrop and poster; it reaches the bridge through `TvPlatform.searchTitles`. `addExplorar` answers `search` with `search-results` (the query as sent, what was typed trimmed before searching), TMDB pictures as full URLs (`w780` backdrops, `w342` posters), and `missing-token` or `offline` when TMDB can't answer. On the emulator, with the real page and TMDB: "duna" listed the films and the series with their years and pictures as typing paused. 2 new tests, 296 in all.

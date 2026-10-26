@@ -7,6 +7,7 @@ import com.freemytv.home.explorar.Explorar
 import com.freemytv.home.explorar.ExplorarProblem
 import com.freemytv.home.explorar.KindFilter
 import com.freemytv.home.explorar.OfferKind
+import com.freemytv.home.explorar.SearchLookup
 import com.freemytv.home.explorar.TitleKind
 import com.freemytv.home.explorar.TitleSummary
 import com.freemytv.home.explorar.TrendWindow
@@ -18,9 +19,10 @@ import org.json.JSONObject
 import kotlin.math.roundToInt
 
 /**
- * Em alta hoje and a Title's screen on the FMTV Controller's Assistir tab, from Explorar: TMDB's
- * trending Titles of the day, a Title's details and Onde assistir, and the Title opened in a
- * service's app or its Trailer played on the Home, as Explorar's own buttons do.
+ * Em alta hoje, search and a Title's screen on the FMTV Controller's Assistir tab, from Explorar:
+ * TMDB's trending Titles of the day, movies and series by name, a Title's details and Onde
+ * assistir, and the Title opened in a service's app or its Trailer played on the Home, as
+ * Explorar's own buttons do.
  */
 fun CompanionFeatures.addExplorar(explorar: Explorar, platform: TvPlatform) {
     list("trending") {
@@ -40,6 +42,33 @@ fun CompanionFeatures.addExplorar(explorar: Explorar, platform: TvPlatform) {
             TrendingLookup.Offline -> throw Refused("offline")
             TrendingLookup.MissingToken -> throw Refused("missing-token")
         }
+    }
+    answer("search") { request ->
+        val query = request.getString("query").trim()
+        val results = if (query.isEmpty()) emptyList() else when (val lookup = platform.searchTitles(query)) {
+            is SearchLookup.Found -> lookup.results
+            SearchLookup.Offline -> throw Refused("offline")
+            SearchLookup.MissingToken -> throw Refused("missing-token")
+        }
+        JSONObject()
+            .put("type", "search-results")
+            .put("query", request.getString("query"))
+            .put(
+                "results",
+                JSONArray().apply {
+                    for (result in results) {
+                        put(
+                            JSONObject()
+                                .put("kind", result.kind.protocolName)
+                                .put("tmdbId", result.id)
+                                .put("name", result.name)
+                                .put("year", result.year ?: JSONObject.NULL)
+                                .put("backdrop", result.backdrop?.let { Tmdb.imageUrl(it, "w780") } ?: JSONObject.NULL)
+                                .put("poster", result.poster?.let { Tmdb.imageUrl(it, "w342") } ?: JSONObject.NULL),
+                        )
+                    }
+                },
+            )
     }
     answer("title") { request ->
         val state = explorar.lookUpFor(request)
