@@ -36,6 +36,8 @@ class WebRemoteServer(
     private val assets: AssetManager,
     private val pair: (body: String) -> Pair<Int, String>,
     private val remote: (WebSocketPeer) -> WebSocketListener,
+    /** `GET /pictures/{id}` with the request's `Authorization`: a status and, for 200, a PNG. */
+    private val picture: (id: String, authorization: String?) -> Pair<Int, ByteArray?> = { _, _ -> 404 to null },
 ) {
 
     private val pool = Executors.newCachedThreadPool { r -> Thread(r, "WebRemote").apply { isDaemon = true } }
@@ -79,6 +81,12 @@ class WebRemoteServer(
                 val body = ByteArray(length).also { DataInputStream(input).readFully(it) }.toString(Charsets.UTF_8)
                 val (status, json) = pair(body)
                 out.respond(status, "application/json", json.toByteArray(), cache = "no-store")
+            }
+            method == "GET" && path.startsWith("/pictures/") -> socket.use {
+                val id = java.net.URLDecoder.decode(path.removePrefix("/pictures/"), "UTF-8")
+                val (status, png) = picture(id, headers["authorization"])
+                if (png == null) out.respond(status, "text/plain; charset=utf-8", ByteArray(0), cache = "no-store")
+                else out.respond(200, "image/png", png, cache = "private, max-age=3600")
             }
             method == "GET" -> socket.use { serveAsset(out, path) }
             else -> socket.use { out.respond(405, "text/plain; charset=utf-8", "Método não permitido".toByteArray(), cache = "no-store") }

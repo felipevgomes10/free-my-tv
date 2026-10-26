@@ -40,6 +40,8 @@ class HomeApplication : Application() {
 
     val webRemoteBridge by lazy { com.freemytv.home.webremote.WebRemoteBridge(platform, pairedPhones) }
 
+    val webRemotePictures by lazy { com.freemytv.home.webremote.WebRemotePictures(pairedPhones) }
+
     val upNext by lazy { UpNextTray(platform) }
 
     // The apps, the Inputs, the Open Apps and Explorar live as long as the process, not only while the
@@ -82,6 +84,7 @@ class HomeApplication : Application() {
                         override fun onClosed() = session.onClosed()
                     }
                 },
+                picture = { id, authorization -> runBlocking { webRemotePictures.serve(id, authorization) } },
             ).start(com.freemytv.home.webremote.WEB_REMOTE_PORT)
         }
         scope.launch { library.followPackageEvents() }
