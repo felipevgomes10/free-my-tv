@@ -86,13 +86,12 @@ fun HomeScreen(
     val lowered = inputsFocused || upNextFocused
     // The Home Navigation takes the top of what used to be this space, so the Trays stay put.
     val topArea by animateDpAsState(if (lowered) 24.dp else 184.dp, label = "top area")
+    val shelfPage = rememberShelfPage(topShelf)
+    val editing = state.lifted != null || inputs.lifted != null
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(Tokens.Background)
-            .background(Brush.verticalGradient(0f to Color(0xFF14161C), 0.6f to Tokens.Background)),
-    ) {
+    // One opaque gradient for the background: under the glow, every layer counts on the TV (ADR 0004).
+    Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0f to Color(0xFF14161C), 0.6f to Tokens.Background))) {
+        TopShelfGlow(shelfPage, visible = !lowered && !editing, Modifier.fillMaxWidth().height(GLOW_HEIGHT))
         // Laid out at full height and clipped by the screen: trays below the fold peek in, nothing scrolls.
         Column(Modifier.fillMaxSize().wrapContentHeight(Alignment.Top, unbounded = true)) {
             StatusBar(state.statusClock, Modifier.padding(start = Tokens.SafeAreaHorizontal, end = Tokens.SafeAreaHorizontal, top = Tokens.SafeAreaTop), statusWidgets)
@@ -102,7 +101,7 @@ fun HomeScreen(
                     ?: inputs.lifted?.let { stringResource(R.string.inputs) to it.displayName() }
                 when {
                     hint != null -> EditModeHint(hint.first, hint.second, Modifier.padding(start = Tokens.SafeAreaHorizontal, top = 40.dp))
-                    !lowered -> TopShelf(topShelf, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, bottom = 20.dp))
+                    !lowered -> TopShelf(topShelf, shelfPage, Modifier.align(Alignment.BottomStart).padding(start = Tokens.SafeAreaHorizontal, bottom = 20.dp))
                 }
             }
             AppTray(state, artwork, actions, dimmed = inputs.lifted != null)

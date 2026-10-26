@@ -12525,7 +12525,8 @@
                           "fill": "$text-secondary",
                           "content": "Netflix",
                           "fontFamily": "$font",
-                          "fontSize": 24
+                          "fontSize": 24,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "icon",
@@ -12604,7 +12605,8 @@
                           "fill": "$text-secondary",
                           "content": "Globoplay",
                           "fontFamily": "$font",
-                          "fontSize": 24
+                          "fontSize": 24,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "icon",
@@ -12863,7 +12865,8 @@
                           "fill": "$text-secondary",
                           "content": "YouTube",
                           "fontFamily": "$font",
-                          "fontSize": 24
+                          "fontSize": 24,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "icon",
@@ -13032,7 +13035,8 @@
                           "fill": "$text-secondary",
                           "content": "Notificações",
                           "fontFamily": "$font",
-                          "fontSize": 24
+                          "fontSize": 24,
+                          "fontWeight": "normal"
                         },
                         {
                           "type": "icon",
@@ -18587,7 +18591,8 @@
               "content": "Uma guia de montanha volta à vila onde cresceu e encontra o irmão desaparecido há dez anos.",
               "lineHeight": 1.35,
               "fontFamily": "$font",
-              "fontSize": 26
+              "fontSize": 26,
+              "fontWeight": "normal"
             },
             {
               "type": "frame",
@@ -18888,7 +18893,8 @@
           "fill": "$text-secondary",
           "content": "Use as setas para explorar. Pressione OK para ver os detalhes.",
           "fontFamily": "$font",
-          "fontSize": 21
+          "fontSize": 21,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -19554,7 +19560,8 @@
               "content": "Uma maquinista recebe uma mensagem impossível durante a última viagem da noite. A próxima parada pode mudar tudo.",
               "lineHeight": 1.35,
               "fontFamily": "$font",
-              "fontSize": 26
+              "fontSize": 26,
+              "fontWeight": "normal"
             },
             {
               "type": "frame",
@@ -19858,7 +19865,8 @@
           "fill": "$text-secondary",
           "content": "Use as setas para explorar. Pressione OK para ver os detalhes.",
           "fontFamily": "$font",
-          "fontSize": 21
+          "fontSize": 21,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -20432,7 +20440,8 @@
               "content": "Uma maquinista recebe uma mensagem da filha desaparecida durante a última viagem da noite. Sem poder parar o trem, ela precisa descobrir quem está a bordo antes que a próxima estação chegue.",
               "lineHeight": 1.4,
               "fontFamily": "$font",
-              "fontSize": 27
+              "fontSize": 27,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -20510,7 +20519,8 @@
                           "fill": "#00000099",
                           "content": "Incluído na assinatura",
                           "fontFamily": "$font",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -20564,7 +20574,8 @@
                           "fill": "$text-secondary",
                           "content": "Alugar ou comprar",
                           "fontFamily": "$font",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -20579,7 +20590,8 @@
               "fill": "$text-secondary",
               "content": "Abre a obra no app do streaming. Pode exigir assinatura ou pagamento.",
               "fontFamily": "$font",
-              "fontSize": 21
+              "fontSize": 21,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -20635,7 +20647,8 @@
                       "fill": "$text-secondary",
                       "content": "Clara",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -20664,7 +20677,8 @@
                       "fill": "$text-secondary",
                       "content": "Miguel",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -20693,7 +20707,8 @@
                       "fill": "$text-secondary",
                       "content": "Laura",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -20722,7 +20737,8 @@
                       "fill": "$text-secondary",
                       "content": "Inspetor Azevedo",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -21353,7 +21369,8 @@
               "content": "Uma guia de montanha retorna à vila onde cresceu e encontra o irmão desaparecido há dez anos. Enquanto tenta entender o que aconteceu, antigos segredos da comunidade começam a vir à tona.",
               "lineHeight": 1.4,
               "fontFamily": "$font",
-              "fontSize": 27
+              "fontSize": 27,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -21431,7 +21448,8 @@
                           "fill": "#00000099",
                           "content": "Incluído na assinatura",
                           "fontFamily": "$font",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -21485,7 +21503,8 @@
                           "fill": "$text-secondary",
                           "content": "Incluído na assinatura",
                           "fontFamily": "$font",
-                          "fontSize": 20
+                          "fontSize": 20,
+                          "fontWeight": "normal"
                         }
                       ]
                     }
@@ -21500,7 +21519,8 @@
               "fill": "$text-secondary",
               "content": "Abre a obra no app do streaming. Pode exigir assinatura ou pagamento.",
               "fontFamily": "$font",
-              "fontSize": 21
+              "fontSize": 21,
+              "fontWeight": "normal"
             }
           ]
         },
@@ -21556,7 +21576,8 @@
                       "fill": "$text-secondary",
                       "content": "Nora",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -21585,7 +21606,8 @@
                       "fill": "$text-secondary",
                       "content": "Tomás",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -21614,7 +21636,8 @@
                       "fill": "$text-secondary",
                       "content": "Inês",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -21643,7 +21666,8 @@
                       "fill": "$text-secondary",
                       "content": "Elias",
                       "fontFamily": "$font",
-                      "fontSize": 23
+                      "fontSize": 23,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -23053,6 +23077,2219 @@
               "fontFamily": "$font",
               "fontSize": 27,
               "fontWeight": "500"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Gyw73",
+      "x": -2040,
+      "y": 5920,
+      "name": "Home — Top Shelf A: luz da obra com capa",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "wsF5g",
+          "x": -160,
+          "y": -160,
+          "name": "Top Shelf Image",
+          "opacity": 0.95,
+          "metadata": {
+            "type": "unsplash",
+            "username": "timoun",
+            "link": "https://unsplash.com/@timoun",
+            "author": "Tim Oun"
+          },
+          "width": 2240,
+          "height": 1060,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1766787584009-cb082d87a5b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTMwMTg2NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "cover"
+          },
+          "effect": {
+            "type": "blur",
+            "radius": 110
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "IuTwQ",
+          "x": 0,
+          "y": 0,
+          "name": "Top Shelf Fade",
+          "width": 1920,
+          "height": 1080,
+          "fill": [
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 180,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000066",
+                  "position": 0
+                },
+                {
+                  "color": "#00000014",
+                  "position": 0.24
+                },
+                {
+                  "color": "#00000099",
+                  "position": 0.5
+                },
+                {
+                  "color": "#000000",
+                  "position": 0.6
+                },
+                {
+                  "color": "#000000",
+                  "position": 1
+                }
+              ]
+            },
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 270,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000080",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.6
+                }
+              ]
+            }
+          ],
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "ToYhe",
+          "x": 96,
+          "y": 48,
+          "name": "Status Bar",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "afG0j",
+              "name": "Clock",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "JTQHr",
+                  "name": "Time",
+                  "fill": "$text-primary",
+                  "content": "21:40",
+                  "fontFamily": "$font",
+                  "fontSize": 34,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.5
+                },
+                {
+                  "type": "text",
+                  "id": "t2ACp",
+                  "name": "Date",
+                  "fill": "$text-secondary",
+                  "content": "sexta, 23 de outubro",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XwyUr",
+              "name": "Right",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "EtoiQ",
+                  "name": "Weather Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "OJYQk",
+                      "name": "Weather Icon",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "cloud-moon",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "JxEu1",
+                      "name": "Temp",
+                      "fill": "$text-primary",
+                      "content": "18°",
+                      "fontFamily": "$font",
+                      "fontSize": 26,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "qSwKx",
+                      "name": "Range",
+                      "fill": "$text-secondary",
+                      "content": "24° / 15°",
+                      "fontFamily": "$font",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "v6OIJz",
+                  "name": "System Monitor Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "moRlI",
+                      "name": "Metric hard-drive",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "M6UU9c",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "hard-drive",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "K2Xnzh",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "56%",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "p20R7w",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "usado",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZgXby",
+                      "name": "Metric memory-stick",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "UDHN2",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "memory-stick",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "eb8k7",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "1,4 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "a3KH3",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "de 2 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jzP9Y",
+                      "name": "Metric gauge",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "bP1X8",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "gauge",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "OW8Qf",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "60 fps",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Npynm",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "60 Hz",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "t5Xiye",
+                  "name": "System Icons",
+                  "gap": 28,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "pc2Gf",
+                      "name": "Wi-Fi",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "wifi",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Hon2p",
+                      "name": "Updates",
+                      "width": 24,
+                      "height": 24,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "f74srw",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Updates Icon",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow-down-to-line",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "cu3df",
+                          "x": 17,
+                          "y": 0,
+                          "name": "Attention Dot",
+                          "fill": "$attention",
+                          "width": 7,
+                          "height": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "p32iO",
+                      "name": "Settings",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "H5pxDs",
+          "x": 96,
+          "y": 282,
+          "name": "Top Shelf Content",
+          "gap": 48,
+          "alignItems": "end",
+          "children": [
+            {
+              "type": "frame",
+              "id": "jgLhX",
+              "name": "Artwork",
+              "metadata": {
+                "type": "unsplash",
+                "username": "3scph",
+                "link": "https://unsplash.com/@3scph",
+                "author": "Stefan Szankowski"
+              },
+              "clip": true,
+              "width": 576,
+              "height": 324,
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "https://images.unsplash.com/photo-1766787584009-cb082d87a5b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTMwMTg2NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+                "mode": "cover"
+              },
+              "cornerRadius": 20,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#00000080",
+                "offset": {
+                  "x": 0,
+                  "y": 24
+                },
+                "blur": 64
+              }
+            },
+            {
+              "type": "frame",
+              "id": "Ot9UC",
+              "name": "Words",
+              "width": 880,
+              "layout": "vertical",
+              "gap": 18,
+              "padding": [
+                0,
+                0,
+                6,
+                0
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "wzE8n",
+                  "name": "Title",
+                  "fill": "$text-primary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sombras do Norte",
+                  "lineHeight": 1.02,
+                  "fontFamily": "$font",
+                  "fontSize": 80,
+                  "fontWeight": "700",
+                  "letterSpacing": -2
+                },
+                {
+                  "type": "text",
+                  "id": "UwrOJ",
+                  "name": "Episode",
+                  "fill": "#FFFFFFCC",
+                  "content": "Temporada 2, episódio 4: O farol",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "dSUQb",
+                  "name": "Progress",
+                  "gap": 20,
+                  "padding": [
+                    6,
+                    0,
+                    0,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "a4py3",
+                      "name": "Track",
+                      "width": 320,
+                      "height": 6,
+                      "fill": "#FFFFFF40",
+                      "cornerRadius": 3,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 3,
+                          "id": "o0kkj",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Watched",
+                          "fill": "$text-primary",
+                          "width": 208,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "FDvwA",
+                      "name": "Left",
+                      "fill": "#FFFFFFCC",
+                      "content": "faltam 18 min",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "z2Wm2w",
+                  "name": "Shelf Pager",
+                  "gap": 10,
+                  "padding": [
+                    14,
+                    0,
+                    0,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "B7Nmdx",
+                      "name": "Dot 1",
+                      "fill": "$text-primary",
+                      "width": 28,
+                      "height": 8
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "L1QvWE",
+                      "name": "Dot 2",
+                      "fill": "#FFFFFF80",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "gOtCP",
+                      "name": "Dot 3",
+                      "fill": "#FFFFFF80",
+                      "width": 8,
+                      "height": 8
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Xytin",
+          "x": 96,
+          "y": 660,
+          "name": "App Tray",
+          "width": 1728,
+          "height": 230,
+          "gap": 40,
+          "children": [
+            {
+              "type": "frame",
+              "id": "hdfwd",
+              "name": "App Netflix",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "eUozH",
+                  "name": "Tile",
+                  "width": 276,
+                  "height": 166,
+                  "fill": "#B20710",
+                  "cornerRadius": 26,
+                  "stroke": "#FFFFFF59",
+                  "strokeWidth": 2,
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#000000B3",
+                      "offset": {
+                        "x": 0,
+                        "y": 24
+                      },
+                      "blur": 48
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#00000000"
+                    }
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "WjXVr",
+                      "name": "Wordmark",
+                      "fill": "#FFFFFF",
+                      "content": "Netflix",
+                      "fontFamily": "$font",
+                      "fontSize": 36,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "G4PUD",
+                  "name": "Focused Name",
+                  "fill": "$text-primary",
+                  "content": "Netflix",
+                  "fontFamily": "$font",
+                  "fontSize": 22,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "KVPgC",
+              "name": "App YouTube",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zKC9u",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "oi3CH",
+                      "name": "Wordmark",
+                      "fill": "#E62117",
+                      "content": "YouTube",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "WKHY1",
+              "name": "App Prime Video",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "a7hR9u",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#0F79AF",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "w9NGjc",
+                      "name": "Wordmark",
+                      "fill": "#FFFFFF",
+                      "content": "Prime Video",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "yT1wc",
+              "name": "App Plex",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "mJ3R0",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#1F1F1F",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "HDaO0",
+                      "name": "Wordmark",
+                      "fill": "#E5A00D",
+                      "content": "Plex",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "s5YUTp",
+              "name": "App Spotify",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "t6OQGE",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#1DB954",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "UPqtK",
+                      "name": "Wordmark",
+                      "fill": "#000000",
+                      "content": "Spotify",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GJpJD",
+              "name": "All Apps",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "HIvIx",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "$glass",
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "zPoH1",
+                      "name": "Grid",
+                      "width": 36,
+                      "height": 36,
+                      "icon": "layout-grid",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mYPNP",
+                      "name": "Label",
+                      "fill": "$text-primary",
+                      "content": "Todos os apps",
+                      "fontFamily": "$font",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "w5a3QU",
+          "x": 96,
+          "y": 930,
+          "name": "Continuar assistindo — prévia",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 20,
+          "children": [
+            {
+              "type": "text",
+              "id": "QJQua",
+              "name": "Tray Title",
+              "fill": "$text-secondary",
+              "content": "Continuar assistindo",
+              "fontFamily": "$font",
+              "fontSize": 24,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "px3c1",
+              "name": "Row",
+              "gap": 40,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "S1Xe4",
+                  "name": "Card a",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "dream_anchor",
+                    "link": "https://unsplash.com/@dream_anchor",
+                    "author": "Nathan Payne"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1620356186668-5b94db4a3b94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "B0EYy",
+                  "name": "Card b",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "califso",
+                    "link": "https://unsplash.com/@califso",
+                    "author": "Shinichiro Ichimura"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1631874890481-672f848d6c50?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "VFa4h",
+                  "name": "Card c",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "cvbattum",
+                    "link": "https://unsplash.com/@cvbattum",
+                    "author": "Casper van Battum"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1674857145833-1f9ef5823a57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "M8EMU",
+                  "name": "Card d",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "kylejglenn",
+                    "link": "https://unsplash.com/@kylejglenn",
+                    "author": "Kyle Glenn"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1506452305024-9d3f02d1c9b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VhtGl",
+          "x": 96,
+          "y": 166,
+          "name": "Navegação principal",
+          "width": 1728,
+          "height": 72,
+          "gap": 16,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "m8QExf",
+              "name": "Aba Início",
+              "fill": "$glass-strong",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Dq1kn",
+                  "name": "Início",
+                  "fill": "$text-primary",
+                  "content": "Início",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "LWY99",
+              "name": "Aba Explorar",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "wulAM",
+                  "name": "Explorar",
+                  "fill": "$text-secondary",
+                  "content": "Explorar",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "xLZMc",
+              "name": "Aba Todos os apps",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "G2jH9W",
+                  "name": "Todos os apps",
+                  "fill": "$text-secondary",
+                  "content": "Todos os apps",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "HgBtq",
+      "x": 6100,
+      "y": 5920,
+      "name": "Home — Top Shelf B: luz da obra, só texto",
+      "clip": true,
+      "width": 1920,
+      "height": 1080,
+      "fill": "$bg",
+      "layout": "none",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Ya3wC",
+          "x": -160,
+          "y": -160,
+          "name": "Top Shelf Image",
+          "opacity": 0.95,
+          "metadata": {
+            "type": "unsplash",
+            "username": "timoun",
+            "link": "https://unsplash.com/@timoun",
+            "author": "Tim Oun"
+          },
+          "width": 2240,
+          "height": 1060,
+          "fill": {
+            "type": "image",
+            "enabled": true,
+            "url": "https://images.unsplash.com/photo-1766787584009-cb082d87a5b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTMwMTg2NDZ8&ixlib=rb-4.1.0&q=80&w=1080",
+            "mode": "cover"
+          },
+          "effect": {
+            "type": "blur",
+            "radius": 110
+          },
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "F1vKY",
+          "x": 0,
+          "y": 0,
+          "name": "Top Shelf Fade",
+          "width": 1920,
+          "height": 1080,
+          "fill": [
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 180,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000066",
+                  "position": 0
+                },
+                {
+                  "color": "#00000014",
+                  "position": 0.24
+                },
+                {
+                  "color": "#00000099",
+                  "position": 0.5
+                },
+                {
+                  "color": "#000000",
+                  "position": 0.6
+                },
+                {
+                  "color": "#000000",
+                  "position": 1
+                }
+              ]
+            },
+            {
+              "type": "gradient",
+              "gradientType": "linear",
+              "enabled": true,
+              "rotation": 270,
+              "size": {
+                "height": 1
+              },
+              "colors": [
+                {
+                  "color": "#00000080",
+                  "position": 0
+                },
+                {
+                  "color": "#00000000",
+                  "position": 0.6
+                }
+              ]
+            }
+          ],
+          "layout": "none"
+        },
+        {
+          "type": "frame",
+          "id": "g9lM8E",
+          "x": 96,
+          "y": 48,
+          "name": "Status Bar",
+          "width": 1728,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "iqbNt",
+              "name": "Clock",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "i9Og8",
+                  "name": "Time",
+                  "fill": "$text-primary",
+                  "content": "21:40",
+                  "fontFamily": "$font",
+                  "fontSize": 34,
+                  "fontWeight": "600",
+                  "letterSpacing": -0.5
+                },
+                {
+                  "type": "text",
+                  "id": "SNd5X",
+                  "name": "Date",
+                  "fill": "$text-secondary",
+                  "content": "sexta, 23 de outubro",
+                  "fontFamily": "$font",
+                  "fontSize": 18,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "OO1F2",
+              "name": "Right",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "PR3dN",
+                  "name": "Weather Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "NjWfn",
+                      "name": "Weather Icon",
+                      "width": 28,
+                      "height": 28,
+                      "icon": "cloud-moon",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "y9FML",
+                      "name": "Temp",
+                      "fill": "$text-primary",
+                      "content": "18°",
+                      "fontFamily": "$font",
+                      "fontSize": 26,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "g9iv93",
+                      "name": "Range",
+                      "fill": "$text-secondary",
+                      "content": "24° / 15°",
+                      "fontFamily": "$font",
+                      "fontSize": 20,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yGL4b",
+                  "name": "System Monitor Widget",
+                  "fill": "$glass",
+                  "cornerRadius": 999,
+                  "gap": 20,
+                  "padding": [
+                    14,
+                    24
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "GQwEm",
+                      "name": "Metric hard-drive",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "IU3VL",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "hard-drive",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "qMbov",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "56%",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "NLxYa",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "usado",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "X9Un5a",
+                      "name": "Metric memory-stick",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "e0qK9l",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "memory-stick",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "jz3iP",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "1,4 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "b196SN",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "de 2 GB",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DFrPv",
+                      "name": "Metric gauge",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "N8Y8e",
+                          "name": "Icon",
+                          "width": 22,
+                          "height": 22,
+                          "icon": "gauge",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "PrY6R",
+                          "name": "Value",
+                          "fill": "$text-primary",
+                          "content": "60 fps",
+                          "fontFamily": "$font",
+                          "fontSize": 20,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "w4MUa",
+                          "name": "Unit",
+                          "fill": "$text-secondary",
+                          "content": "60 Hz",
+                          "fontFamily": "$font",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "eBXzW",
+                  "name": "System Icons",
+                  "gap": 28,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "CyiMR",
+                      "name": "Wi-Fi",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "wifi",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "VEAYm",
+                      "name": "Updates",
+                      "width": 24,
+                      "height": 24,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "fIJxc",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Updates Icon",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow-down-to-line",
+                          "library": "lucide",
+                          "fill": "$text-secondary"
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "wlL1Q",
+                          "x": 17,
+                          "y": 0,
+                          "name": "Attention Dot",
+                          "fill": "$attention",
+                          "width": 7,
+                          "height": 7
+                        }
+                      ]
+                    },
+                    {
+                      "type": "icon",
+                      "id": "cT2mc",
+                      "name": "Settings",
+                      "width": 24,
+                      "height": 24,
+                      "icon": "settings",
+                      "library": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "NolHg",
+          "x": 96,
+          "y": 345,
+          "name": "Top Shelf Content",
+          "gap": 48,
+          "alignItems": "end",
+          "children": [
+            {
+              "type": "frame",
+              "id": "xC4Np",
+              "name": "Words",
+              "width": 1180,
+              "layout": "vertical",
+              "gap": 18,
+              "padding": [
+                0,
+                0,
+                6,
+                0
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "u95VF8",
+                  "name": "Title",
+                  "fill": "$text-primary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Sombras do Norte",
+                  "lineHeight": 0.98,
+                  "fontFamily": "$font",
+                  "fontSize": 112,
+                  "fontWeight": "700",
+                  "letterSpacing": -3.5
+                },
+                {
+                  "type": "text",
+                  "id": "JSJpF",
+                  "name": "Episode",
+                  "fill": "#FFFFFFCC",
+                  "content": "Temporada 2, episódio 4: O farol",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "rPG4X",
+                  "name": "Progress",
+                  "gap": 20,
+                  "padding": [
+                    6,
+                    0,
+                    0,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ATwMq",
+                      "name": "Track",
+                      "width": 320,
+                      "height": 6,
+                      "fill": "#FFFFFF40",
+                      "cornerRadius": 3,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 3,
+                          "id": "LwpFI",
+                          "x": 0,
+                          "y": 0,
+                          "name": "Watched",
+                          "fill": "$text-primary",
+                          "width": 208,
+                          "height": 6
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "KW04R",
+                      "name": "Left",
+                      "fill": "#FFFFFFCC",
+                      "content": "faltam 18 min",
+                      "fontFamily": "$font",
+                      "fontSize": 24,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "aT94o",
+                  "name": "Shelf Pager",
+                  "gap": 10,
+                  "padding": [
+                    14,
+                    0,
+                    0,
+                    0
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "OAns4",
+                      "name": "Dot 1",
+                      "fill": "$text-primary",
+                      "width": 28,
+                      "height": 8
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "R9fGb4",
+                      "name": "Dot 2",
+                      "fill": "#FFFFFF80",
+                      "width": 8,
+                      "height": 8
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "GOlFz",
+                      "name": "Dot 3",
+                      "fill": "#FFFFFF80",
+                      "width": 8,
+                      "height": 8
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "l12JZ5",
+          "x": 96,
+          "y": 660,
+          "name": "App Tray",
+          "width": 1728,
+          "height": 230,
+          "gap": 40,
+          "children": [
+            {
+              "type": "frame",
+              "id": "wslGm",
+              "name": "App Netflix",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "oTqMZ",
+                  "name": "Tile",
+                  "width": 276,
+                  "height": 166,
+                  "fill": "#B20710",
+                  "cornerRadius": 26,
+                  "stroke": "#FFFFFF59",
+                  "strokeWidth": 2,
+                  "effect": [
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#000000B3",
+                      "offset": {
+                        "x": 0,
+                        "y": 24
+                      },
+                      "blur": 48
+                    },
+                    {
+                      "type": "shadow",
+                      "shadowType": "outer",
+                      "color": "#00000000"
+                    }
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "J49mOW",
+                      "name": "Wordmark",
+                      "fill": "#FFFFFF",
+                      "content": "Netflix",
+                      "fontFamily": "$font",
+                      "fontSize": 36,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "l8vWD",
+                  "name": "Focused Name",
+                  "fill": "$text-primary",
+                  "content": "Netflix",
+                  "fontFamily": "$font",
+                  "fontSize": 22,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Gs0eJ",
+              "name": "App YouTube",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZjcSa",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "H40oh",
+                      "name": "Wordmark",
+                      "fill": "#E62117",
+                      "content": "YouTube",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "V9CcC3",
+              "name": "App Prime Video",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "tV6Og",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#0F79AF",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "S7KK7O",
+                      "name": "Wordmark",
+                      "fill": "#FFFFFF",
+                      "content": "Prime Video",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "d1U8E",
+              "name": "App Plex",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "N3DGuE",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#1F1F1F",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "cUOLz",
+                      "name": "Wordmark",
+                      "fill": "#E5A00D",
+                      "content": "Plex",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "UZmMT",
+              "name": "App Spotify",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "m2vRNK",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "#1DB954",
+                  "cornerRadius": 22,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "vzqAC",
+                      "name": "Wordmark",
+                      "fill": "#000000",
+                      "content": "Spotify",
+                      "fontFamily": "$font",
+                      "fontSize": 32,
+                      "fontWeight": "800",
+                      "letterSpacing": -0.5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "UCDLE",
+              "name": "All Apps",
+              "layout": "vertical",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "e2rgc",
+                  "name": "Tile",
+                  "width": 248,
+                  "height": 149,
+                  "fill": "$glass",
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "OsBCZ",
+                      "name": "Grid",
+                      "width": 36,
+                      "height": 36,
+                      "icon": "layout-grid",
+                      "library": "lucide",
+                      "fill": "$text-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "QbOmk",
+                      "name": "Label",
+                      "fill": "$text-primary",
+                      "content": "Todos os apps",
+                      "fontFamily": "$font",
+                      "fontSize": 22,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "tBsJm",
+          "x": 96,
+          "y": 930,
+          "name": "Continuar assistindo — prévia",
+          "width": 1728,
+          "layout": "vertical",
+          "gap": 20,
+          "children": [
+            {
+              "type": "text",
+              "id": "I6Wi0p",
+              "name": "Tray Title",
+              "fill": "$text-secondary",
+              "content": "Continuar assistindo",
+              "fontFamily": "$font",
+              "fontSize": 24,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "toIPM",
+              "name": "Row",
+              "gap": 40,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "I6SrJi",
+                  "name": "Card a",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "dream_anchor",
+                    "link": "https://unsplash.com/@dream_anchor",
+                    "author": "Nathan Payne"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1620356186668-5b94db4a3b94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "DIPga",
+                  "name": "Card b",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "califso",
+                    "link": "https://unsplash.com/@califso",
+                    "author": "Shinichiro Ichimura"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1631874890481-672f848d6c50?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "X8IOLe",
+                  "name": "Card c",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "cvbattum",
+                    "link": "https://unsplash.com/@cvbattum",
+                    "author": "Casper van Battum"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1674857145833-1f9ef5823a57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                },
+                {
+                  "type": "frame",
+                  "id": "PbtsF",
+                  "name": "Card d",
+                  "metadata": {
+                    "type": "unsplash",
+                    "username": "kylejglenn",
+                    "link": "https://unsplash.com/@kylejglenn",
+                    "author": "Kyle Glenn"
+                  },
+                  "clip": true,
+                  "width": 400,
+                  "height": 100,
+                  "fill": [
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "https://images.unsplash.com/photo-1506452305024-9d3f02d1c9b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3OTI3NjgzMDN8&ixlib=rb-4.1.0&q=80&w=1080",
+                      "mode": "cover"
+                    },
+                    {
+                      "type": "gradient",
+                      "gradientType": "linear",
+                      "enabled": true,
+                      "rotation": 180,
+                      "size": {
+                        "height": 1
+                      },
+                      "colors": [
+                        {
+                          "color": "#00000000",
+                          "position": 0.35
+                        },
+                        {
+                          "color": "#000000CC",
+                          "position": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "cornerRadius": 22,
+                  "layout": "vertical",
+                  "gap": 10,
+                  "padding": 20,
+                  "justifyContent": "end"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "BsumG",
+          "x": 96,
+          "y": 166,
+          "name": "Navegação principal",
+          "width": 1728,
+          "height": 72,
+          "gap": 16,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "kgdU6",
+              "name": "Aba Início",
+              "fill": "$glass-strong",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "tuCQF",
+                  "name": "Início",
+                  "fill": "$text-primary",
+                  "content": "Início",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "xQwMp",
+              "name": "Aba Explorar",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "byYwk",
+                  "name": "Explorar",
+                  "fill": "$text-secondary",
+                  "content": "Explorar",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "QZ9gT",
+              "name": "Aba Todos os apps",
+              "fill": "#00000000",
+              "cornerRadius": 999,
+              "padding": [
+                16,
+                28
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "X5vCJ0",
+                  "name": "Todos os apps",
+                  "fill": "$text-secondary",
+                  "content": "Todos os apps",
+                  "fontFamily": "$font",
+                  "fontSize": 28,
+                  "fontWeight": "500"
+                }
+              ]
             }
           ]
         }

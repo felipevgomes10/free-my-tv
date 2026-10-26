@@ -189,8 +189,7 @@ class MediaSessions(private val context: Context) {
 
     /** A picture behind a link; YouTube's thumbnails are asked for at their largest size first. */
     private fun download(url: String): Bitmap? {
-        val candidates = if ("ytimg.com" in url) listOf(url.replace(YOUTUBE_THUMBNAIL, "/maxresdefault."), url).distinct() else listOf(url)
-        return candidates.firstNotNullOfOrNull { candidate ->
+        return largestFirst(url).firstNotNullOfOrNull { candidate ->
             runCatching {
                 val connection = URL(candidate).openConnection() as HttpURLConnection
                 connection.connectTimeout = 10_000
@@ -223,6 +222,5 @@ class MediaSessions(private val context: Context) {
         const val POSITION_EVERY_MILLIS = 15_000L
         const val MAX_WIDTH = 1920
         const val MAX_HEIGHT = 1080
-        val YOUTUBE_THUMBNAIL = Regex("""/(hq|mq|sd|)default\.""")
     }
 }

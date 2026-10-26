@@ -176,12 +176,13 @@ private fun UpNextTile(entry: UpNextEntry, artwork: AppArtworkLoader) {
 
 /** "Episódio 4, faltam 18 min": the app's subtitle and the time left, whichever are known. */
 @Composable
-internal fun upNextDetail(entry: UpNextEntry): String? {
-    val left = entry.remainingMillis?.let { millis ->
-        val minutes = ((millis + 59_999) / 60_000).toInt()
-        if (minutes < 60) stringResource(R.string.left_minutes, minutes) else stringResource(R.string.left_hours, minutes / 60, minutes % 60)
-    }
-    return listOfNotNull(entry.subtitle, left).joinToString(", ").ifEmpty { null }
+internal fun upNextDetail(entry: UpNextEntry): String? = listOfNotNull(entry.subtitle, timeLeft(entry)).joinToString(", ").ifEmpty { null }
+
+/** "faltam 18 min", when the app tells how long the title is and where the owner stopped. */
+@Composable
+internal fun timeLeft(entry: UpNextEntry): String? = entry.remainingMillis?.let { millis ->
+    val minutes = ((millis + 59_999) / 60_000).toInt()
+    if (minutes < 60) stringResource(R.string.left_minutes, minutes) else stringResource(R.string.left_hours, minutes / 60, minutes % 60)
 }
 
 /** Decoded near tile size: a 1080p artwork would cost the Home ~8 MB per tile (ADR 0004). */
