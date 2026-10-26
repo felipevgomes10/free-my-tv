@@ -353,6 +353,7 @@ class MainActivity : ComponentActivity() {
                             val settingsState by settings.state.collectAsStateWithLifecycle()
                             val assignments by app.shortcutButtons.assignments.collectAsStateWithLifecycle()
                             val setupState by app.setupWatchdog.state.collectAsStateWithLifecycle()
+                            val webRemoteLink by app.webRemoteLink.state.collectAsStateWithLifecycle()
                             val allAppsState by allApps.state.collectAsStateWithLifecycle()
                             SettingsScreen(
                                 state = settingsState,
@@ -364,11 +365,14 @@ class MainActivity : ComponentActivity() {
                                     inputs = inputState.inputs,
                                 ),
                                 setup = setupState,
+                                webRemote = webRemoteLink,
                                 clock = homeState.statusClock,
                                 statusWidgets = statusWidgets,
                                 actions = SettingsActions(
                                     onScreensaverEnabled = { scope.launch { settings.setScreensaverEnabled(it) } },
                                     onScreensaverMinutes = { scope.launch { settings.setScreensaverMinutes(it) } },
+                                    onRefreshWebRemote = { scope.launch { app.webRemoteLink.refresh() } },
+                                    onLinkWebRemote = { app.scope.launch { app.webRemoteLink.link() } },
                                     onWeatherVisible = { scope.launch { settings.setWeatherVisible(it) } },
                                     onMonitorVisible = { scope.launch { settings.setMonitorVisible(it) } },
                                     onWeatherCity = { scope.launch { settings.setWeatherCity(it) } },

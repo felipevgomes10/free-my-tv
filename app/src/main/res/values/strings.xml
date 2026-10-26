@@ -207,6 +207,17 @@
     <string name="up_next_app">Continuar no %1$s</string>
     <string name="left_minutes">faltam %1$d min</string>
     <string name="left_hours">faltam %1$dh%2$02d</string>
+    <string name="check_network_debugging">Depuração pela rede (FMTV Controller)</string>
+    <string name="section_web_remote">FMTV Controller</string>
+    <string name="web_remote_linking">Vinculação</string>
+    <string name="web_remote_link">Vincular</string>
+    <string name="web_remote_link_again">Vincular de novo</string>
+    <string name="web_remote_checking">Verificando…</string>
+    <string name="web_remote_linked">Vinculado. O FMTV Controller manda teclas para qualquer app.</string>
+    <string name="web_remote_not_linked">Não vinculado. Sem isso, o FMTV Controller não consegue mandar teclas para os apps.</string>
+    <string name="web_remote_linking_now">Aceite o aviso “Permitir depuração?” na TV, marcando Sempre permitir neste computador.</string>
+    <string name="web_remote_not_accepted">O aviso não foi aceito. Escolha Vincular de novo e aceite, marcando Sempre permitir neste computador.</string>
+    <string name="web_remote_debugging_off">A depuração pela rede está desligada. Rode a Preparação de novo no computador e escolha Vincular de novo.</string>
     <string name="check_ok">Ativo</string>
     <string name="check_missing">Falta</string>
     <string name="setup_lost_launcher_title">O launcher original voltou</string>

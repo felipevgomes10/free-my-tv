@@ -291,6 +291,23 @@ class FakeTvPlatform(
     val homeOpenedAt = mutableListOf<HomeDestination>()
     val setupNotifications = mutableListOf<SetupCheck>()
 
+    var networkDebuggingOn = true
+    var adbLinked = false
+    /** What the Owner does with the "Allow debugging?" prompt. */
+    var adbAnswer = com.freemytv.home.webremote.AdbLinkResult.Linked
+    var adbLinkRequests = 0
+
+    override suspend fun isNetworkDebuggingOn() = networkDebuggingOn
+
+    override suspend fun isAdbLinked() = adbLinked
+
+    override suspend fun linkAdb(): com.freemytv.home.webremote.AdbLinkResult {
+        adbLinkRequests++
+        val answer = if (!networkDebuggingOn) com.freemytv.home.webremote.AdbLinkResult.DebuggingOff else adbAnswer
+        adbLinked = answer == com.freemytv.home.webremote.AdbLinkResult.Linked
+        return answer
+    }
+
     override suspend fun setupStatus() = setup
 
     override suspend fun loadSetupHistory() = setupHistory

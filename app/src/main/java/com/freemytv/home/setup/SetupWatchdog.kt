@@ -33,6 +33,9 @@ enum class SetupCheck(
     /** Explorar's TMDB token, handed over by Setup (ADR 0008). */
     Explorar(announcedWhenLost = false),
     Screensaver,
+
+    /** Network debugging on 127.0.0.1:5555: the Web Remote's keys (free-my-tv-remote-controller's ADR 0005). */
+    NetworkDebugging,
 }
 
 data class SetupState(

@@ -180,6 +180,15 @@ interface TvPlatform {
     /** Turns the key filter on; needs WRITE_SECURE_SETTINGS (granted by Setup). Returns whether it worked. */
     fun enableKeyFilter(): Boolean
 
+    /** Whether the TV's network debugging answers on 127.0.0.1:5555, where the Web Remote's keys go. */
+    suspend fun isNetworkDebuggingOn(): Boolean
+
+    /** Whether the Home was linked to the TV's ADB, as far as it last knew. */
+    suspend fun isAdbLinked(): Boolean
+
+    /** Links the Home to the TV's ADB: Android shows "Allow debugging?" and this waits for the Owner. */
+    suspend fun linkAdb(): com.freemytv.home.webremote.AdbLinkResult
+
     /** Whether each part of Setup holds right now. */
     suspend fun setupStatus(): Map<SetupCheck, Boolean>
 

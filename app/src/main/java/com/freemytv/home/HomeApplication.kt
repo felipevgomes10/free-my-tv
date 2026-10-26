@@ -24,6 +24,8 @@ class HomeApplication : Application() {
 
     val setupWatchdog by lazy { SetupWatchdog(platform) }
 
+    val webRemoteLink by lazy { com.freemytv.home.webremote.WebRemoteLink(platform) }
+
     val upNext by lazy { UpNextTray(platform) }
 
     override fun onCreate() {

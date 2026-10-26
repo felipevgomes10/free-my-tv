@@ -71,6 +71,7 @@ dependencies {
     // The APK Drop QR code.
     implementation(libs.zxing.core)
     implementation(libs.media3.exoplayer)
+    implementation(libs.dadb)
     debugImplementation(libs.compose.ui.tooling)
 
     testImplementation(libs.junit)
