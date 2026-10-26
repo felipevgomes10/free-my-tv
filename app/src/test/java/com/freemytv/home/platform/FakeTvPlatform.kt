@@ -308,6 +308,14 @@ class FakeTvPlatform(
         return answer
     }
 
+    var pairedPhones: List<com.freemytv.home.webremote.PairedPhone> = emptyList()
+
+    override suspend fun loadPairedPhones() = pairedPhones
+
+    override suspend fun savePairedPhones(phones: List<com.freemytv.home.webremote.PairedPhone>) {
+        pairedPhones = phones
+    }
+
     override suspend fun setupStatus() = setup
 
     override suspend fun loadSetupHistory() = setupHistory

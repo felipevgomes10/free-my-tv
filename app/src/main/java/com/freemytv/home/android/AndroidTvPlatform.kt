@@ -284,6 +284,23 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override suspend fun linkAdb() = withContext(Dispatchers.IO) { adb.link() }
 
+    private val webRemotePrefs by lazy { context.getSharedPreferences("web_remote", Context.MODE_PRIVATE) }
+
+    override suspend fun loadPairedPhones() = withContext(Dispatchers.IO) {
+        val array = runCatching { org.json.JSONArray(webRemotePrefs.getString("paired_phones", "[]")) }.getOrDefault(org.json.JSONArray())
+        (0 until array.length()).mapNotNull { i ->
+            val o = array.optJSONObject(i) ?: return@mapNotNull null
+            com.freemytv.home.webremote.PairedPhone(o.getString("name"), o.getString("credentialSha256"), java.time.Instant.ofEpochMilli(o.getLong("pairedAt")))
+        }
+    }
+
+    override suspend fun savePairedPhones(phones: List<com.freemytv.home.webremote.PairedPhone>) = withContext(Dispatchers.IO) {
+        val array = org.json.JSONArray()
+        phones.forEach { array.put(org.json.JSONObject().put("name", it.name).put("credentialSha256", it.credentialSha256).put("pairedAt", it.pairedAt.toEpochMilli())) }
+        webRemotePrefs.edit().putString("paired_phones", array.toString()).commit()
+        Unit
+    }
+
     override suspend fun setupStatus(): Map<SetupCheck, Boolean> = withContext(Dispatchers.IO) {
         fun granted(permission: String) = context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
         val notifications = context.getSystemService(NotificationManager::class.java)

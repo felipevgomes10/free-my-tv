@@ -12,11 +12,19 @@ The spec is `.scratch/web-remote/spec.md` in free-my-tv-remote-controller. Ticke
 
 **Blocked by:** 02 (Linking in Settings), 04 (Release the page as a versioned zip), 05 (Pairing on the page): it pins a page release that has Pairing
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] The build fetches the pinned page and fails on a checksum mismatch
-- [ ] Safari on a phone on the same network opens the page from the QR code (checked with curl on the emulator; a real iPhone in 09)
-- [ ] Pairing works only while Parear aparelho is open; wrong codes are refused and change the code after a few tries
-- [ ] A Paired Phone appears by its name, and revoking removes it
-- [ ] The screens match their new design
-- [ ] Tests cover the Pairing session lifecycle, the code rules and the Paired Phones list, in the manner of `ApkDropTest`, and read the Pairing JSON examples
+- [ ] The build fetches the pinned page and fails on a checksum mismatch (the mismatch is checked; fetching from GitHub waits for the first page release, 0.1.0, which needs the owner's go-ahead to publish)
+- [x] Safari on a phone on the same network opens the page from the QR code (checked with curl on the emulator; a real iPhone in 09)
+- [x] Pairing works only while Parear aparelho is open; wrong codes are refused and change the code after a few tries
+- [x] A Paired Phone appears by its name, and revoking removes it
+- [x] The screens match their new design
+- [x] Tests cover the Pairing session lifecycle, the code rules and the Paired Phones list, in the manner of `ApkDropTest`, and read the Pairing JSON examples
+
+## Comments
+
+**2026-10-26, done but for the GitHub fetch.** `webRemotePage` in the app's build unpacks the pinned zip's `page/` into the APK's `assets/web-remote/` and its `protocol/` into the test resources; `webRemoteVersion` is empty until the first page release, so `main` builds without the page (the bridge then answers 503), and `-PwebRemoteZip=<path>` builds with a local zip. A wrong checksum fails the build and deletes the download.
+
+`WebRemoteServer` starts with the Home on port 8766 and stays up: the page from the assets (hashed `assets/` cached for a year, everything else `no-cache`), `POST /pair`, and `/remote` upgraded to a WebSocket (closed at once until ticket 07). `WebRemotePairing` opens only with Parear aparelho, gives a 4-digit code that changes after 3 wrong tries and after each phone paired; `PairedPhones` keeps names and credential hashes in the Home's preferences. 9 new tests read the protocol's examples from the zip; 254 in all.
+
+On the emulator, through `adb forward tcp:8766`: the page, manifest, service worker and icons were served; Pairing was refused with the screen closed (409); the browser pane paired "iPhone de teste" with the TV's code, the TV said "iPhone de teste foi pareado." and changed its code, and Settings listed it; revoking emptied the list. Revoking took the focus with the row and dropped it on Widgets; the focus now moves to Parear aparelho first.
