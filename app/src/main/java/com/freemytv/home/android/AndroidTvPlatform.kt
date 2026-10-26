@@ -276,6 +276,14 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     private val keyFilter = ComponentName(context, KeyFilterService::class.java)
 
+    private val adb by lazy { TvAdb(context) }
+
+    override suspend fun isNetworkDebuggingOn() = withContext(Dispatchers.IO) { adb.isDebuggingOn() }
+
+    override suspend fun isAdbLinked() = withContext(Dispatchers.IO) { adb.isLinked() }
+
+    override suspend fun linkAdb() = withContext(Dispatchers.IO) { adb.link() }
+
     override suspend fun setupStatus(): Map<SetupCheck, Boolean> = withContext(Dispatchers.IO) {
         fun granted(permission: String) = context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
         val notifications = context.getSystemService(NotificationManager::class.java)
@@ -288,6 +296,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
             SetupCheck.InstallApps to context.packageManager.canRequestPackageInstalls(),
             SetupCheck.Explorar to (TmdbToken.read(context) != null),
             SetupCheck.Screensaver to AndroidScreensaver.ready(context),
+            SetupCheck.NetworkDebugging to adb.isDebuggingOn(),
         )
     }
 

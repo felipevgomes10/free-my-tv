@@ -52,6 +52,7 @@ import com.freemytv.home.settings.SettingsState
 import com.freemytv.home.setup.SetupCheck
 import com.freemytv.home.setup.SetupState
 import com.freemytv.home.ui.theme.Tokens
+import com.freemytv.home.webremote.LinkState
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -62,6 +63,7 @@ enum class SettingsSection(val title: Int, val icon: Int) {
     OpenApps(R.string.section_open_apps, R.drawable.ic_apps),
     Buttons(R.string.section_buttons, R.drawable.ic_settings_remote),
     Cast(R.string.section_cast, R.drawable.ic_cast),
+    WebRemote(R.string.section_web_remote, R.drawable.ic_phone),
     Setup(R.string.section_setup, R.drawable.ic_build),
     About(R.string.section_about, R.drawable.ic_info),
     AndroidSettings(R.string.section_android_settings, R.drawable.ic_open_in_new),
@@ -76,6 +78,8 @@ class SettingsActions(
     val onAssignButton: (ShortcutButton, ButtonTarget?) -> Unit,
     val onScreensaverEnabled: (Boolean) -> Unit,
     val onScreensaverMinutes: (Int) -> Unit,
+    val onRefreshWebRemote: () -> Unit,
+    val onLinkWebRemote: () -> Unit,
 )
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -85,6 +89,7 @@ fun SettingsScreen(
     openAppLimit: Int,
     buttons: ButtonsPanelState,
     setup: SetupState,
+    webRemote: LinkState,
     clock: StatusClock,
     statusWidgets: @Composable () -> Unit,
     actions: SettingsActions,
@@ -156,6 +161,7 @@ fun SettingsScreen(
                         }
                         SettingsSection.Buttons -> ButtonsPanel(buttons, actions.onAssignButton)
                         SettingsSection.Cast -> CastPanel(state)
+                        SettingsSection.WebRemote -> WebRemotePanel(webRemote, actions)
                         SettingsSection.Setup -> SetupPanel(setup)
                         SettingsSection.About -> AboutPanel(state)
                         SettingsSection.AndroidSettings -> Note(stringResource(R.string.android_settings_note))
@@ -223,6 +229,32 @@ private fun CastPanel(state: SettingsState) {
         )
     }
     Note(stringResource(R.string.cast_note, state.tvName ?: stringResource(R.string.this_tv)))
+}
+
+/** Linking the Home to the TV's ADB, through which the FMTV Controller's keys reach every app. */
+@Composable
+private fun WebRemotePanel(link: LinkState, actions: SettingsActions) {
+    LaunchedEffect(Unit) { actions.onRefreshWebRemote() }
+    val detail = stringResource(
+        when (link) {
+            LinkState.Checking -> R.string.web_remote_checking
+            LinkState.Linked -> R.string.web_remote_linked
+            LinkState.NotLinked -> R.string.web_remote_not_linked
+            LinkState.Linking -> R.string.web_remote_linking_now
+            LinkState.NotAccepted -> R.string.web_remote_not_accepted
+            LinkState.DebuggingOff -> R.string.web_remote_debugging_off
+        },
+    )
+    val busy = link == LinkState.Linking || link == LinkState.Checking
+    SettingRow(stringResource(R.string.web_remote_linking), detail, onClick = { if (!busy) actions.onLinkWebRemote() }) {
+        if (!busy) {
+            Text(
+                stringResource(if (link == LinkState.NotLinked) R.string.web_remote_link else R.string.web_remote_link_again),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+    }
 }
 
 @Composable

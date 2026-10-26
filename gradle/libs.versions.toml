@@ -14,6 +14,8 @@ zxing = "3.5.3"
 media3 = "1.5.1"
 
 [libraries]
+# The Home as a client of the TV's own ADB: the Web Remote's keys (free-my-tv-remote-controller's ADR 0005).
+dadb = { module = "dev.mobile:dadb", version = "2.0.0" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }

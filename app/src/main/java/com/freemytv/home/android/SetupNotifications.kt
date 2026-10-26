@@ -52,6 +52,7 @@ object SetupNotifications {
         SetupCheck.InstallApps -> R.string.check_install_apps
         SetupCheck.Explorar -> R.string.check_explorar
         SetupCheck.Screensaver -> R.string.section_screensaver
+        SetupCheck.NetworkDebugging -> R.string.check_network_debugging
     }
 
     private const val NOTIFICATION_BASE = 4200
