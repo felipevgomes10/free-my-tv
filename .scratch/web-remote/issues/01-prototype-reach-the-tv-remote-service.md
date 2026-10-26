@@ -12,7 +12,7 @@ The spec is `.scratch/web-remote/spec.md` in free-my-tv-remote-controller. Ticke
 
 **Blocked by:** None (can start immediately)
 
-**Status:** needs-info
+**Status:** resolved
 
 - [ ] The Home connects to the TV Remote Service at `127.0.0.1` on the real TV (refused: see Comments)
 - [x] Linking succeeds with the code Android shows (through `127.0.0.1`, typed by the probe rather than the Remote)
@@ -44,3 +44,5 @@ The TV now lists two paired "FMTV Controller probe" clients from these probes; t
 - What would still work without ADB: Back, Home, the App Switcher and the Notification Panel (global actions and the Home itself), volume and mute (`AudioManager`), play/pause (`AudioManager.dispatchMediaKeyEvent` to the app playing), and typing into standard text fields. Not the arrows or OK inside YouTube or Netflix.
 
 So the Web Remote's core needs real key events, which leaves ADB on the TV itself or a device of its own on the network.
+
+**2026-10-26, decided: ADR 0005.** The owner chose the TV's own ADB with the PWA: the Home becomes an ADB client of `127.0.0.1:5555` and sends `cmd input keyevent`. ADR 0001 is superseded; tickets 02, 07 and 09 are rewritten for it.

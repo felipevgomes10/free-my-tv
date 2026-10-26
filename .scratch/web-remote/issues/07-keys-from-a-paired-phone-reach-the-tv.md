@@ -1,9 +1,9 @@
 # 07: Keys from a Paired Phone reach the TV
 
-**What to build:** The bridge's key path, from a Paired Phone to the TV Remote Service.
+**What to build:** The bridge's key path, from a Paired Phone to the TV's own ADB (ADR 0005).
 - **The connection:** one WebSocket per open Web Remote, authenticated with the Paired Phone's credential. It opens with a hello carrying the protocol version. A page whose version the bridge doesn't speak is told to reload.
 - **The state:** the bridge tells the page whether it is ready, not linked or revoked.
-- **The keys:** each intention and direction is passed to the TV Remote Service through `TvPlatform` and acknowledged. Nothing is queued or replayed.
+- **The keys:** each intention becomes its Android key code (`wake` is `KEYCODE_WAKEUP`) and goes to `TvPlatform`, which runs `cmd input keyevent` on one ADB shell kept open; a `hold-start` is a long press and `hold-end` does nothing. Each key is acknowledged. Nothing is queued or replayed.
 - **Revoking:** revoking a Paired Phone closes its open connection at once.
 - **Concurrency:** two Paired Phones can be connected at the same time.
 
@@ -19,4 +19,4 @@ The spec is `.scratch/web-remote/spec.md` in free-my-tv-remote-controller. Ticke
 - [ ] The page learns "not linked" when the Home isn't linked, and "revoked" when its phone is revoked
 - [ ] Revoking closes that phone's connection; the other phone's stays open
 - [ ] Tests read every key and state JSON example from free-my-tv-remote-controller
-- [ ] On the emulator, keys from the page move the focus on the Home (if the emulator has the TV Remote Service, per 01)
+- [ ] On the emulator, keys from the page move the focus on the Home and in Android's Settings, and holding OK opens Edit Mode
