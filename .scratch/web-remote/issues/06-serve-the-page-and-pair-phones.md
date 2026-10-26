@@ -14,7 +14,7 @@ The spec is `.scratch/web-remote/spec.md` in free-my-tv-remote-controller. Ticke
 
 **Status:** resolved
 
-- [ ] The build fetches the pinned page and fails on a checksum mismatch (the mismatch is checked; fetching from GitHub waits for the first page release, 0.1.0, which needs the owner's go-ahead to publish)
+- [x] The build fetches the pinned page and fails on a checksum mismatch (page 0.1.0 downloaded from its GitHub release and checked once it was published)
 - [x] Safari on a phone on the same network opens the page from the QR code (checked with curl on the emulator; a real iPhone in 09)
 - [x] Pairing works only while Parear aparelho is open; wrong codes are refused and change the code after a few tries
 - [x] A Paired Phone appears by its name, and revoking removes it
