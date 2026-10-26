@@ -284,6 +284,8 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override suspend fun linkAdb() = withContext(Dispatchers.IO) { adb.link() }
 
+    override suspend fun sendAdbKey(keyCode: Int, longPress: Boolean) = withContext(Dispatchers.IO) { adb.sendKey(keyCode, longPress) }
+
     private val webRemotePrefs by lazy { context.getSharedPreferences("web_remote", Context.MODE_PRIVATE) }
 
     override suspend fun loadPairedPhones() = withContext(Dispatchers.IO) {

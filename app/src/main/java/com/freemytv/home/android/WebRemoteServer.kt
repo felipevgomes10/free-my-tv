@@ -154,7 +154,8 @@ class WebRemoteServer(
                 }
                 out.write(payload)
                 out.flush()
-            } catch (_: IOException) {
+            } catch (_: Exception) {
+                // A phone gone mid-write, or a write from the wrong thread: never worth the Home's life.
                 runCatching { socket.close() }
             }
         }

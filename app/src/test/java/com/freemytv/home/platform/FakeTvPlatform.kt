@@ -308,6 +308,17 @@ class FakeTvPlatform(
         return answer
     }
 
+    /** Keys the TV's ADB received: key code, and whether it was a long press. */
+    val adbKeys = mutableListOf<Pair<Int, Boolean>>()
+    /** Whether the TV takes the Home's keys. */
+    var adbTakesKeys = true
+
+    override suspend fun sendAdbKey(keyCode: Int, longPress: Boolean): Boolean {
+        if (!adbTakesKeys) return false
+        adbKeys += keyCode to longPress
+        return true
+    }
+
     var pairedPhones: List<com.freemytv.home.webremote.PairedPhone> = emptyList()
 
     override suspend fun loadPairedPhones() = pairedPhones
