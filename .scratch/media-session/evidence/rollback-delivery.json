@@ -1,0 +1,48 @@
+{
+  "apkSha256": "4f351662f90eb91dd1d500d6eaffe6ed72a0d3bb3907d64b1e6ea4347fdf35a4",
+  "installedMatchesPreviousApk": true,
+  "allPreviousControllerFilesMatch": true,
+  "files": [
+    {
+      "path": "assets/figtree-latin-ext-wght-normal-DCwSJGxG.woff2",
+      "matches": true
+    },
+    {
+      "path": "assets/figtree-latin-wght-normal-D_ZTVpCC.woff2",
+      "matches": true
+    },
+    {
+      "path": "assets/index-Bf02y-Zl.js",
+      "matches": true
+    },
+    {
+      "path": "assets/index-DERYbf_A.css",
+      "matches": true
+    },
+    {
+      "path": "icons/apple-touch-icon.png",
+      "matches": true
+    },
+    {
+      "path": "icons/icon-192.png",
+      "matches": true
+    },
+    {
+      "path": "icons/icon-512.png",
+      "matches": true
+    },
+    {
+      "path": "index.html",
+      "matches": true
+    },
+    {
+      "path": "manifest.webmanifest",
+      "matches": true
+    },
+    {
+      "path": "sw.js",
+      "matches": true
+    }
+  ],
+  "experimentalWavStatus": 404
+}

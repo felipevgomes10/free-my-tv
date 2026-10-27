@@ -1,0 +1,75 @@
+{
+  "serial": "192.168.100.18:5555",
+  "startedAt": 1793131552.754393,
+  "source": "adb-shell-MediaController; nao e o processo Home",
+  "events": [
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793131556396,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "aebdf30f-28ae-4f82-b432-00f95498447a",
+            "item": "4f685043f12bbfb0",
+            "package": "com.google.android.youtube.tv",
+            "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+            "subtitle": "Cortes do Flow [OFICIAL]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 663421,
+            "state": 2,
+            "rawPositionMillis": 554735,
+            "positionMillis": 554735,
+            "speed": 0,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "43971673-633d-48bd-a31b-d43e93e0b5ee",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    }
+  ],
+  "screenshots": {},
+  "finishedAt": 1793131556.257579
+}

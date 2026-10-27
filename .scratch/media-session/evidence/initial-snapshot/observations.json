@@ -1,0 +1,74 @@
+{
+  "serial": "192.168.100.18:5555",
+  "startedAt": 1793128628.6996229,
+  "source": "adb-shell-MediaController; nao e o processo Home",
+  "events": [
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793128631134,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "ca29ffff-b2e9-49ed-8855-78c0ac2ccec4",
+            "item": "ea9c07f8528493dc",
+            "package": "com.google.android.youtube.tv",
+            "title": "Falando sobre a eleição.",
+            "subtitle": "CORTES - Leon e Nilce [Oficial]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 1882021,
+            "state": 3,
+            "rawPositionMillis": 1472401,
+            "positionMillis": 1472402,
+            "speed": 1,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "74de65fd-d161-480f-a217-8cf2cd37ba46",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    }
+  ],
+  "finishedAt": 1793128631.05533
+}

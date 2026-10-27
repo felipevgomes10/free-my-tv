@@ -1,0 +1,64 @@
+{
+  "allAssetsMatch": true,
+  "files": [
+    {
+      "path": "assets/figtree-latin-ext-wght-normal-DCwSJGxG.woff2",
+      "sha256": "bf7828e2c258cffcfa50a048ee388a36b95bc16b452e8d36fa797635dbe15965",
+      "matches": true
+    },
+    {
+      "path": "assets/figtree-latin-wght-normal-D_ZTVpCC.woff2",
+      "sha256": "4ba7d3d096695818fe0686be4f1e82c6b05134e18a22260336130335027462dd",
+      "matches": true
+    },
+    {
+      "path": "assets/index-GNe2SD3Z.js",
+      "sha256": "12c534a2257e3e2e8fd1477f23efbab8735650bfd3c499e2e7661c0e0dd9cca6",
+      "matches": true
+    },
+    {
+      "path": "assets/index-SyOePVBj.css",
+      "sha256": "d95c39d86f3182786293f865471239cd553e5978fc029c8b78feafa3ae2da7db",
+      "matches": true
+    },
+    {
+      "path": "icons/apple-touch-icon.png",
+      "sha256": "4b28b3e8f571cfcd6b447202f16b19b371cc93a187daca948fa4ffcf9fd38b10",
+      "matches": true
+    },
+    {
+      "path": "icons/icon-192.png",
+      "sha256": "a96e40a5f2ef8366c5030c0365b5cb391db9db2f407afb4b91776f4cb4118813",
+      "matches": true
+    },
+    {
+      "path": "icons/icon-512.png",
+      "sha256": "e501065a91607f170e92ac302e11d0b24c239bb761f19a5a4606aa448000bb09",
+      "matches": true
+    },
+    {
+      "path": "index.html",
+      "sha256": "f4f6c5ce989c4c225bd510f5d844eeb28b999769e86ab11a49f8057c0ce61f7c",
+      "matches": true
+    },
+    {
+      "path": "manifest.webmanifest",
+      "sha256": "549d5eb8c12b9ad48ed63d4a3e451a0f3a93198439f82485cebc875b409792bc",
+      "matches": true
+    },
+    {
+      "path": "sw.js",
+      "sha256": "0b96f87526a988bec53f8f9f3c71937b95eb71f56c83ccb75e265dab56f8b590",
+      "matches": true
+    },
+    {
+      "path": "tv-silence.wav",
+      "sha256": "6e49db6ecc812f32cb043fb3c02e4aea55329fa8df27724c5b4e2a76ed57c360",
+      "matches": true
+    }
+  ],
+  "apkSha256": "29124111211b697a25b9057991767681b46724842f2fd24886f27e5021e4ae74",
+  "rollbackApk": "/tmp/fmtv-home-before-media-session.apk",
+  "controllerBundle": "/tmp/fmtv-media-session-controller.zip",
+  "verifiedAt": 1793132577.516547
+}

@@ -1,0 +1,41 @@
+{
+  "serial": "192.168.100.18:5555",
+  "startedAt": 1793128752.303712,
+  "source": "adb-shell-MediaController; nao e o processo Home",
+  "events": [
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793128754812,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "4f37cd99-870d-4679-baab-1b9c93817876",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    }
+  ],
+  "finishedAt": 1793128754.608693
+}

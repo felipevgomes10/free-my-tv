@@ -1,0 +1,725 @@
+{
+  "serial": "192.168.100.18:5555",
+  "startedAt": 1793128643.341111,
+  "source": "adb-shell-MediaController; nao e o processo Home",
+  "events": [
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793128645927,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+            "item": "ea9c07f8528493dc",
+            "package": "com.google.android.youtube.tv",
+            "title": "Falando sobre a eleição.",
+            "subtitle": "CORTES - Leon e Nilce [Oficial]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 1882021,
+            "state": 3,
+            "rawPositionMillis": 1487190,
+            "positionMillis": 1487191,
+            "speed": 1,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "805610b4-5be9-41b5-80b0-7534c3a5c1a8",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "pause",
+      "observedAtMillis": 1793128647666,
+      "uid": 2000,
+      "result": {
+        "action": "pause",
+        "before": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 3,
+          "rawPositionMillis": 1488948,
+          "positionMillis": 1488950,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 2,
+          "rawPositionMillis": 1488988,
+          "positionMillis": 1488988,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "matched": true,
+        "elapsedMillis": 146,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793128648874,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+            "item": "ea9c07f8528493dc",
+            "package": "com.google.android.youtube.tv",
+            "title": "Falando sobre a eleição.",
+            "subtitle": "CORTES - Leon e Nilce [Oficial]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 1882021,
+            "state": 2,
+            "rawPositionMillis": 1488988,
+            "positionMillis": 1488988,
+            "speed": 0,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "805610b4-5be9-41b5-80b0-7534c3a5c1a8",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "pause",
+      "observedAtMillis": 1793128650525,
+      "uid": 2000,
+      "result": {
+        "action": "pause",
+        "before": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 2,
+          "rawPositionMillis": 1488988,
+          "positionMillis": 1488988,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 2,
+          "rawPositionMillis": 1488988,
+          "positionMillis": 1488988,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "matched": true,
+        "elapsedMillis": 17,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793128651569,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+            "item": "ea9c07f8528493dc",
+            "package": "com.google.android.youtube.tv",
+            "title": "Falando sobre a eleição.",
+            "subtitle": "CORTES - Leon e Nilce [Oficial]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 1882021,
+            "state": 2,
+            "rawPositionMillis": 1488988,
+            "positionMillis": 1488988,
+            "speed": 0,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "805610b4-5be9-41b5-80b0-7534c3a5c1a8",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "play",
+      "observedAtMillis": 1793128651594,
+      "uid": 2000,
+      "result": {
+        "action": "play",
+        "before": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 2,
+          "rawPositionMillis": 1488988,
+          "positionMillis": 1488988,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 3,
+          "rawPositionMillis": 1489102,
+          "positionMillis": 1489103,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "matched": true,
+        "elapsedMillis": 126,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793128652763,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+            "item": "ea9c07f8528493dc",
+            "package": "com.google.android.youtube.tv",
+            "title": "Falando sobre a eleição.",
+            "subtitle": "CORTES - Leon e Nilce [Oficial]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 1882021,
+            "state": 3,
+            "rawPositionMillis": 1490141,
+            "positionMillis": 1490141,
+            "speed": 1,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "805610b4-5be9-41b5-80b0-7534c3a5c1a8",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "play",
+      "observedAtMillis": 1793128654622,
+      "uid": 2000,
+      "result": {
+        "action": "play",
+        "before": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 3,
+          "rawPositionMillis": 1492010,
+          "positionMillis": 1492010,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 3,
+          "rawPositionMillis": 1492032,
+          "positionMillis": 1492032,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "matched": true,
+        "elapsedMillis": 22,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793128655683,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+            "item": "ea9c07f8528493dc",
+            "package": "com.google.android.youtube.tv",
+            "title": "Falando sobre a eleição.",
+            "subtitle": "CORTES - Leon e Nilce [Oficial]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 1882021,
+            "state": 3,
+            "rawPositionMillis": 1493059,
+            "positionMillis": 1493060,
+            "speed": 1,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "805610b4-5be9-41b5-80b0-7534c3a5c1a8",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "play",
+      "observedAtMillis": 1793128655716,
+      "uid": 2000,
+      "result": {
+        "action": "play",
+        "before": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 3,
+          "rawPositionMillis": 1493102,
+          "positionMillis": 1493103,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "f7ac87a5-3d3c-4b1b-bf31-43d0236bc691",
+          "item": "ea9c07f8528493dc",
+          "package": "com.google.android.youtube.tv",
+          "title": "Falando sobre a eleição.",
+          "subtitle": "CORTES - Leon e Nilce [Oficial]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 1882021,
+          "state": 3,
+          "rawPositionMillis": 1493125,
+          "positionMillis": 1493125,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "matched": true,
+        "elapsedMillis": 23,
+        "dispatched": true
+      }
+    }
+  ],
+  "artwork": "artwork.jpg",
+  "staleTargetRejected": true,
+  "finishedAt": 1793128655.443736
+}

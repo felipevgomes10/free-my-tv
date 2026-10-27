@@ -1,0 +1,484 @@
+{
+  "serial": "192.168.100.18:5555",
+  "startedAt": 1793132153.784113,
+  "source": "adb-shell-MediaController; nao e o processo Home",
+  "events": [
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793132156929,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+            "item": "20869ac23f348ea4",
+            "package": "com.netflix.ninja",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 2,
+            "rawPositionMillis": 128883,
+            "positionMillis": 128883,
+            "speed": 1,
+            "actions": 1049468,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          },
+          {
+            "id": "5d1ab79b-ff16-466d-98be-efeff8065936",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "play",
+      "observedAtMillis": 1793132157607,
+      "uid": 2000,
+      "result": {
+        "action": "play",
+        "before": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 2,
+          "rawPositionMillis": 128883,
+          "positionMillis": 128883,
+          "speed": 1,
+          "actions": 1049468,
+          "capabilities": {
+            "play": true,
+            "pause": false,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 128927,
+          "positionMillis": 128928,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "matched": true,
+        "elapsedMillis": 235,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "seek",
+      "observedAtMillis": 1793132158870,
+      "uid": 2000,
+      "result": {
+        "action": "seek",
+        "before": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 128905,
+          "positionMillis": 128906,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 137101,
+          "positionMillis": 137101,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "targetMillis": 138906,
+        "matched": true,
+        "elapsedMillis": 2046,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793132161952,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+            "item": "20869ac23f348ea4",
+            "package": "com.netflix.ninja",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 3,
+            "rawPositionMillis": 138130,
+            "positionMillis": 138131,
+            "speed": 1,
+            "actions": 1049466,
+            "capabilities": {
+              "play": false,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          },
+          {
+            "id": "5d1ab79b-ff16-466d-98be-efeff8065936",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "seek",
+      "observedAtMillis": 1793132162392,
+      "uid": 2000,
+      "result": {
+        "action": "seek",
+        "before": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 138572,
+          "positionMillis": 138572,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 128976,
+          "positionMillis": 128976,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "targetMillis": 128572,
+        "matched": true,
+        "elapsedMillis": 1737,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793132165157,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+            "item": "20869ac23f348ea4",
+            "package": "com.netflix.ninja",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 3,
+            "rawPositionMillis": 130003,
+            "positionMillis": 130004,
+            "speed": 1,
+            "actions": 1049466,
+            "capabilities": {
+              "play": false,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          },
+          {
+            "id": "5d1ab79b-ff16-466d-98be-efeff8065936",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "seek",
+      "observedAtMillis": 1793132165704,
+      "uid": 2000,
+      "result": {
+        "action": "seek",
+        "before": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 130551,
+          "positionMillis": 130551,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 130564,
+          "positionMillis": 130565,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "targetMillis": 128883,
+        "matched": true,
+        "elapsedMillis": 12,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "pause",
+      "observedAtMillis": 1793132165734,
+      "uid": 2000,
+      "result": {
+        "action": "pause",
+        "before": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 3,
+          "rawPositionMillis": 130581,
+          "positionMillis": 130581,
+          "speed": 1,
+          "actions": 1049466,
+          "capabilities": {
+            "play": false,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "cd85350b-84b2-4cfb-abd9-a258c2c68b52",
+          "item": "20869ac23f348ea4",
+          "package": "com.netflix.ninja",
+          "title": null,
+          "subtitle": null,
+          "mediaIdPresent": false,
+          "metadataKeys": [],
+          "durationMillis": 0,
+          "state": 2,
+          "rawPositionMillis": 128885,
+          "positionMillis": 128885,
+          "speed": 1,
+          "actions": 1049468,
+          "capabilities": {
+            "play": true,
+            "pause": false,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": null,
+          "artUriPresent": false
+        },
+        "matched": true,
+        "elapsedMillis": 625,
+        "dispatched": true
+      }
+    }
+  ],
+  "screenshots": {
+    "before": "Captura indisponivel; requer observacao humana",
+    "seek-forward": "Captura indisponivel; requer observacao humana",
+    "seek-backward": "Captura indisponivel; requer observacao humana"
+  },
+  "staleTargetRejected": true,
+  "staleItemRejected": true,
+  "finishedAt": 1793132166.0763159
+}

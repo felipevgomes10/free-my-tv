@@ -1,0 +1,49 @@
+{
+  "serial": "192.168.100.18:5555",
+  "android": "12",
+  "sdk": "31",
+  "model": "Smart TV Pro",
+  "notificationListener": "com.freemytv.home/com.freemytv.home.android.HomeNotificationListener",
+  "packages": {
+    "Home": {
+      "package": "com.freemytv.home",
+      "versionName": "0.6.8",
+      "versionCode": 35
+    },
+    "YouTube": {
+      "package": "com.google.android.youtube.tv",
+      "versionName": "7.27.302",
+      "versionCode": 727302320
+    },
+    "Netflix": {
+      "package": "com.netflix.ninja",
+      "versionName": "13.2.1 build 27207",
+      "versionCode": 27207
+    },
+    "Prime Video": {
+      "package": "com.amazon.amazonvideo.livingroom",
+      "versionName": "6.24.12+v16.0.1.23-allAbis",
+      "versionCode": 606024120
+    },
+    "Globoplay": {
+      "package": "com.globo.globotv",
+      "versionName": "2.354.0",
+      "versionCode": 102387
+    },
+    "Disney+": {
+      "package": "com.disney.disneyplus",
+      "versionName": "26.19.0+rc3-2026.10.20",
+      "versionCode": 1792455080
+    },
+    "Max": {
+      "package": "com.wbd.stream",
+      "versionName": "7.14.0.69",
+      "versionCode": 1827140069
+    },
+    "Crunchyroll": {
+      "package": "com.crunchyroll.crunchyroid",
+      "versionName": "3.76.0",
+      "versionCode": 22366
+    }
+  }
+}

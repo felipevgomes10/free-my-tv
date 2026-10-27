@@ -1,0 +1,525 @@
+{
+  "serial": "192.168.100.18:5555",
+  "startedAt": 1793131566.97558,
+  "source": "adb-shell-MediaController; nao e o processo Home",
+  "events": [
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793131569525,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+            "item": "4f685043f12bbfb0",
+            "package": "com.google.android.youtube.tv",
+            "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+            "subtitle": "Cortes do Flow [OFICIAL]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 663421,
+            "state": 2,
+            "rawPositionMillis": 554735,
+            "positionMillis": 554735,
+            "speed": 0,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "62cfa279-7106-4c4f-bd10-ec9a61cb7c20",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "seek",
+      "observedAtMillis": 1793131571501,
+      "uid": 2000,
+      "result": {
+        "action": "seek",
+        "before": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 2,
+          "rawPositionMillis": 554735,
+          "positionMillis": 554735,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 2,
+          "rawPositionMillis": 564735,
+          "positionMillis": 564735,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "targetMillis": 564735,
+        "matched": true,
+        "elapsedMillis": 156,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793131572686,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+            "item": "4f685043f12bbfb0",
+            "package": "com.google.android.youtube.tv",
+            "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+            "subtitle": "Cortes do Flow [OFICIAL]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 663421,
+            "state": 2,
+            "rawPositionMillis": 564735,
+            "positionMillis": 564735,
+            "speed": 0,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "62cfa279-7106-4c4f-bd10-ec9a61cb7c20",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "seek",
+      "observedAtMillis": 1793131574424,
+      "uid": 2000,
+      "result": {
+        "action": "seek",
+        "before": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 2,
+          "rawPositionMillis": 564735,
+          "positionMillis": 564735,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 2,
+          "rawPositionMillis": 554735,
+          "positionMillis": 554735,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "targetMillis": 554735,
+        "matched": true,
+        "elapsedMillis": 140,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "snapshot",
+      "observedAtMillis": 1793131575589,
+      "uid": 2000,
+      "result": {
+        "sessions": [
+          {
+            "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+            "item": "4f685043f12bbfb0",
+            "package": "com.google.android.youtube.tv",
+            "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+            "subtitle": "Cortes do Flow [OFICIAL]",
+            "mediaIdPresent": false,
+            "metadataKeys": [
+              "android.media.metadata.ARTIST",
+              "android.media.metadata.DURATION",
+              "android.media.metadata.ART",
+              "android.media.metadata.ALBUM",
+              "android.media.metadata.TITLE"
+            ],
+            "durationMillis": 663421,
+            "state": 2,
+            "rawPositionMillis": 554735,
+            "positionMillis": 554735,
+            "speed": 0,
+            "actions": 382,
+            "capabilities": {
+              "play": true,
+              "pause": true,
+              "seek": true,
+              "next": true,
+              "previous": true
+            },
+            "artBitmap": {
+              "width": 640,
+              "height": 360
+            },
+            "artUriPresent": false
+          },
+          {
+            "id": "62cfa279-7106-4c4f-bd10-ec9a61cb7c20",
+            "item": "20869ac23f348ea4",
+            "package": "com.spotify.tv.android",
+            "title": null,
+            "subtitle": null,
+            "mediaIdPresent": false,
+            "metadataKeys": [],
+            "durationMillis": 0,
+            "state": 0,
+            "rawPositionMillis": -1,
+            "positionMillis": -1,
+            "speed": 0,
+            "actions": 3124868,
+            "capabilities": {
+              "play": true,
+              "pause": false,
+              "seek": false,
+              "next": false,
+              "previous": false
+            },
+            "artBitmap": null,
+            "artUriPresent": false
+          }
+        ]
+      }
+    },
+    {
+      "action": "seek",
+      "observedAtMillis": 1793131577667,
+      "uid": 2000,
+      "result": {
+        "action": "seek",
+        "before": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 3,
+          "rawPositionMillis": 555584,
+          "positionMillis": 555584,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 3,
+          "rawPositionMillis": 554735,
+          "positionMillis": 554735,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "targetMillis": 554735,
+        "matched": true,
+        "elapsedMillis": 129,
+        "dispatched": true
+      }
+    },
+    {
+      "action": "pause",
+      "observedAtMillis": 1793131577837,
+      "uid": 2000,
+      "result": {
+        "action": "pause",
+        "before": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 3,
+          "rawPositionMillis": 554735,
+          "positionMillis": 554735,
+          "speed": 0,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "after": {
+          "id": "ba20da3b-304c-4f7e-9b70-19279ba1864c",
+          "item": "4f685043f12bbfb0",
+          "package": "com.google.android.youtube.tv",
+          "title": "A FARSA do PLANO ECONÔMICO de Flávio Bolsonaro e COMO FICA agora o BRASIL com LULA?",
+          "subtitle": "Cortes do Flow [OFICIAL]",
+          "mediaIdPresent": false,
+          "metadataKeys": [
+            "android.media.metadata.ARTIST",
+            "android.media.metadata.DURATION",
+            "android.media.metadata.ART",
+            "android.media.metadata.ALBUM",
+            "android.media.metadata.TITLE"
+          ],
+          "durationMillis": 663421,
+          "state": 3,
+          "rawPositionMillis": 559418,
+          "positionMillis": 559419,
+          "speed": 1,
+          "actions": 382,
+          "capabilities": {
+            "play": true,
+            "pause": true,
+            "seek": true,
+            "next": true,
+            "previous": true
+          },
+          "artBitmap": {
+            "width": 640,
+            "height": 360
+          },
+          "artUriPresent": false
+        },
+        "matched": false,
+        "elapsedMillis": 5024,
+        "dispatched": true
+      }
+    }
+  ],
+  "screenshots": {
+    "before": "before.png",
+    "seek-forward": "seek-forward.png",
+    "seek-backward": "seek-backward.png"
+  },
+  "artwork": "artwork.jpg",
+  "staleTargetRejected": true,
+  "staleItemRejected": true,
+  "finishedAt": 1793131582.69791
+}
