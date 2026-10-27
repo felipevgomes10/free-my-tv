@@ -22,6 +22,8 @@ data class OpenApp(
     val lastUsed: Instant,
     /** Playing media or otherwise noticeable: never closed by the Open App Limit, never counted. */
     val playing: Boolean,
+    /** The overlay may only force stop confirmed background processes. */
+    val canClose: Boolean = true,
 )
 
 data class SwitcherState(
@@ -69,8 +71,12 @@ class Multitasking(private val platform: TvPlatform) {
     suspend fun openApps(): List<OpenApp> = snapshot().map { it.app }
 
     suspend fun openSwitcher() {
+        _switcher.value = switcherSnapshot()
+    }
+
+    suspend fun switcherSnapshot(): SwitcherState {
         val open = snapshot()
-        _switcher.value = SwitcherState(
+        return SwitcherState(
             apps = open.map { it.app },
             initialFocus = if (open.size > 1) 1 else 0,
             counted = open.count { it.counts },
@@ -147,7 +153,8 @@ class Multitasking(private val platform: TvPlatform) {
             .map { (pkg, importance) ->
                 val app = launchable.getValue(pkg)
                 Entry(
-                    OpenApp(pkg, app.label, app.tileArt(), used[pkg] ?: Instant.EPOCH, playing = importance == Importance.Perceptible),
+                    OpenApp(pkg, app.label, app.tileArt(), used[pkg] ?: Instant.EPOCH,
+                        playing = importance == Importance.Perceptible, canClose = importance == Importance.Background),
                     importance,
                 )
             }

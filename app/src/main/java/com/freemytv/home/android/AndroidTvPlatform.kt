@@ -268,6 +268,11 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
         start(MainActivity.homeIntent(context).putExtra(MainActivity.EXTRA_DESTINATION, destination.name))
     }
 
+    override suspend fun showAppSwitcherOverlay() = KeyFilterService.showAppSwitcher()
+
+    override suspend fun foregroundPackage(): String? = recentUsage(now().toInstant().minus(java.time.Duration.ofDays(1)))
+        .maxByOrNull { it.value }?.key
+
     override fun isKeyFilterEnabled(): Boolean {
         val enabled = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES).orEmpty()
         return enabled.split(':').any { ComponentName.unflattenFromString(it) == keyFilter }
@@ -293,7 +298,13 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
 
     override suspend fun linkAdb() = withContext(Dispatchers.IO) { adb.link() }
 
-    override suspend fun sendAdbKey(keyCode: Int, longPress: Boolean) = withContext(Dispatchers.IO) { adb.sendKey(keyCode, longPress) }
+    override suspend fun sendAdbKey(keyCode: Int, longPress: Boolean) = withContext(Dispatchers.IO) {
+        // Injected keys bypass the accessibility key filter. Never let them land in the
+        // temporary Settings window under ForceStopper's cover, or replay them afterwards.
+        if (KeyFilterService.isClosingApp()) true else adb.sendKey(keyCode, longPress, KeyFilterService::isClosingApp)
+    }
+
+    internal fun awaitRemoteKeys() = adb.awaitKeys()
 
     private val webRemotePrefs by lazy { context.getSharedPreferences("web_remote", Context.MODE_PRIVATE) }
 
@@ -607,6 +618,7 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
     private fun JSONArray.strings() = List(length()) { getString(it) }
 
     private fun start(intent: Intent) {
+        KeyFilterService.dismissAppSwitcher()
         context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 

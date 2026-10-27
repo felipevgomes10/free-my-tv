@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import com.freemytv.home.android.picturePng
 import com.freemytv.home.android.upNextPictureJpeg
 import com.freemytv.home.webremote.addApps
+import com.freemytv.home.webremote.addAppSwitcher
 import com.freemytv.home.webremote.addExplorar
 import com.freemytv.home.webremote.addInputs
 import com.freemytv.home.webremote.addOpenApps
@@ -103,6 +104,7 @@ class HomeApplication : Application() {
         webRemoteBridge.companion.addShortcuts(shortcutButtons, platform)
         scope.launch(Dispatchers.IO) { shortcutButtons.assignments.collect { webRemoteBridge.push("shortcuts") } }
         webRemoteBridge.companion.addApps(library, platform)
+        webRemoteBridge.companion.addAppSwitcher(platform)
         webRemoteBridge.companion.addInputs(inputs)
         webRemoteBridge.companion.addOpenApps(multitasking)
         webRemoteBridge.companion.addUpNext(upNext)

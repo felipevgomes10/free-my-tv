@@ -175,6 +175,12 @@ interface TvPlatform {
     /** Brings the Home to the front at [destination]. */
     fun openHome(destination: HomeDestination)
 
+    /** Shows the dedicated App Switcher over the current live app, without opening the Home. */
+    suspend fun showAppSwitcherOverlay(): com.freemytv.home.multitasking.OverlayResult
+
+    /** The last resumed app, including the Home; null when usage access isn't available. */
+    suspend fun foregroundPackage(): String?
+
     /** Whether the accessibility service that filters remote keys is on. */
     fun isKeyFilterEnabled(): Boolean
 

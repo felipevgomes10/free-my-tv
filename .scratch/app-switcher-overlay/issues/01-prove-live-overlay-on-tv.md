@@ -1,6 +1,6 @@
 # 01: Prove the App Switcher can overlay a live TV app
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
 **Blocked by:** None.
 
@@ -14,3 +14,5 @@
 - [ ] If visibility or input requirements fail, record the blocker and revise the mechanism/ADR before unblocking ticket 02. A screenshot or opaque Home route is not an acceptable fallback.
 
 ## Comments
+
+**2026-10-26:** Emulator mechanism and window/input checks passed; the physical TCL playback checks remain. See ../prototype-results.md.

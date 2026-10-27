@@ -59,7 +59,10 @@ internal class TvAdb(private val context: Context) {
 
     /** One key as `cmd input keyevent`; the connection is reopened once when it broke since the last key. */
     @Synchronized
-    fun sendKey(keyCode: Int, longPress: Boolean): Boolean {
+    fun sendKey(keyCode: Int, longPress: Boolean, blocked: () -> Boolean = { false }): Boolean {
+        // Check under the same monitor as awaitKeys: a key waiting behind another key
+        // must not slip into Settings after the close has drained the current one.
+        if (blocked()) return true
         val command = "cmd input keyevent ${if (longPress) "--longpress " else ""}$keyCode"
         repeat(2) { attempt ->
             try {
@@ -83,6 +86,10 @@ internal class TvAdb(private val context: Context) {
         runCatching { adb?.close() }
         adb = null
     }
+
+    /** Force stop drains an already-started key before it opens Settings. New keys are dropped while busy. */
+    @Synchronized
+    fun awaitKeys() = Unit
 
     private fun keyPair(): AdbKeyPair {
         if (!privateKey.exists()) {

@@ -1,6 +1,6 @@
 # 04: Validate the dedicated button and overlay together on the TV
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
 **Blocked by:** [Home 03: Bridge command](03-open-app-switcher-command.md), [Controller 03: Integrated page bundle](../../../../free-my-tv-remote-controller/.scratch/app-switcher-overlay/issues/03-integrated-page-bundle.md).
 
@@ -15,3 +15,5 @@
 - [ ] Record pass/fail evidence and follow-up tickets for failures; resolve only when required visibility and input behaviour pass. Record release readiness and existing publication/pin steps; do not equate documentation or prototype completion with delivery to the TV.
 
 ## Comments
+
+**2026-10-26:** Local automated/emulator validation is recorded in ../acceptance-results.md. Physical TCL/iPhone, protected playback and target memory checks have not run.

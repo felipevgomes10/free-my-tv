@@ -75,4 +75,8 @@ Tickets restart at 01 per repository; cross-project dependencies name and link t
 3. [03: Bridge command](issues/03-open-app-switcher-command.md).
 4. [04: Integrated TV acceptance](issues/04-tv-acceptance.md).
 
-The Controller owns the button, error copy, examples and page bundle. This does not redesign existing full-screen entry points, implement Android system Recents or expand app-closing permissions. These documents plan implementation; no overlay or command is implemented by this documentation change.
+The Controller owns the button, error copy, examples and page bundle. This does not redesign existing full-screen entry points, implement Android system Recents or expand app-closing permissions.
+
+## Implementation status, 2026-10-26
+
+Implemented in source and built with the local Controller bundle. The Android TV 12 emulator validated the live window, Back, OK, Home, repeated opening and a background app close returning to the same underlying Activity. [Prototype results](prototype-results.md) and [acceptance results](acceptance-results.md) distinguish this from the remaining physical TCL/iPhone and protected-playback checks. The production release/pinned page has not been changed.

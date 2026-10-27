@@ -32,6 +32,7 @@ class KeyFilterService : AccessibilityService() {
     private val home get() = application as HomeApplication
 
     private lateinit var forceStopper: ForceStopper
+    private lateinit var switcher: AppSwitcherOverlayWindow
 
     // AccessibilityService delivers its callbacks on the "main" looper (Android 12) or executor (later).
     override fun getMainLooper(): Looper = keys.looper
@@ -47,6 +48,7 @@ class KeyFilterService : AccessibilityService() {
             return true
         }
         if (event.action == KeyEvent.ACTION_UP && heldBack.remove(event.keyCode)) return true
+        if (event.keyCode == KeyEvent.KEYCODE_HOME && event.action == KeyEvent.ACTION_DOWN && ::switcher.isInitialized) switcher.dismiss()
         val decision = home.shortcutButtons.onKey(
             scanCode = event.scanCode,
             keyCode = event.keyCode,
@@ -57,10 +59,12 @@ class KeyFilterService : AccessibilityService() {
         return when (decision) {
             KeyDecision.Pass -> false
             KeyDecision.PassAndOpenNotifications -> {
+                if (::switcher.isInitialized) switcher.dismiss()
                 home.platform.openHome(HomeDestination.NotificationPanel)
                 false
             }
             is KeyDecision.Consume -> {
+                if (decision.action != null && ::switcher.isInitialized) switcher.dismiss()
                 decision.action?.let(home.shortcutButtons::perform)
                 true
             }
@@ -68,17 +72,19 @@ class KeyFilterService : AccessibilityService() {
     }
 
     override fun onServiceConnected() {
-        forceStopper = ForceStopper(this)
+        forceStopper = ForceStopper(this) { home.platform.awaitRemoteKeys() }
+        switcher = AppSwitcherOverlayWindow(this) { forceStopper.busy }
         running = this
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
-    override fun onInterrupt() = Unit
+    override fun onInterrupt() { if (::switcher.isInitialized) switcher.dismiss() }
 
     override fun onDestroy() {
         if (running === this) running = null
         if (::forceStopper.isInitialized) forceStopper.quit()
+        if (::switcher.isInitialized) switcher.quit()
         super.onDestroy()
         keys.quitSafely()
     }
@@ -87,10 +93,21 @@ class KeyFilterService : AccessibilityService() {
         @Volatile
         private var running: KeyFilterService? = null
 
+        suspend fun showAppSwitcher(): com.freemytv.home.multitasking.OverlayResult =
+            running?.switcher?.show() ?: com.freemytv.home.multitasking.OverlayResult.Unavailable
+
+        fun dismissAppSwitcher() { running?.switcher?.dismiss() }
+
+        fun isClosingApp(): Boolean = running?.forceStopper?.busy == true
+
         /** Force stops an app through Settings; false when the key filter isn't running to do it. */
         fun forceStop(packageName: String): Boolean {
             val service = running ?: return false
-            service.forceStopper.forceStop(packageName)
+            // Abertos can separately close the underlying app. That is competing navigation,
+            // not a close from this overlay: drop the overlay and use the normal return path.
+            if (service.switcher.isUnderneath(packageName)) service.switcher.dismiss()
+            val overlay = service.switcher.takeIf { it.isOpen && !it.isUnderneath(packageName) }
+            service.forceStopper.forceStop(packageName, overlay?.let { { it.covered() } }, overlay?.let { { it.uncover() } })
             return true
         }
     }

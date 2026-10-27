@@ -378,6 +378,14 @@ class FakeTvPlatform(
         homeOpenedAt += destination
     }
 
+    var overlayResult = com.freemytv.home.multitasking.OverlayResult.Shown
+    var overlayOpens = 0
+    override suspend fun showAppSwitcherOverlay(): com.freemytv.home.multitasking.OverlayResult {
+        overlayOpens++
+        return overlayResult
+    }
+    override suspend fun foregroundPackage(): String? = lastUsed.maxByOrNull { it.value }?.key
+
     override fun isKeyFilterEnabled() = keyFilterEnabled
 
     override fun enableKeyFilter(): Boolean {

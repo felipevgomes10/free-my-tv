@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicReference
  * on a thread of its own so remote keys never wait for it. A still of the screen covers Settings
  * meanwhile, so the owner never sees it, and [busy] tells the key filter to hold keys back.
  */
-internal class ForceStopper(private val service: AccessibilityService) {
+internal class ForceStopper(private val service: AccessibilityService, private val drainKeys: () -> Unit = {}) {
 
     private val thread = HandlerThread("ForceStop").apply { start() }
     private val handler = Handler(thread.looper)
@@ -47,11 +47,11 @@ internal class ForceStopper(private val service: AccessibilityService) {
     /** True from a close's request until Settings is gone again. */
     val busy get() = pending.get() > 0
 
-    fun forceStop(packageName: String) {
+    fun forceStop(packageName: String, covered: (() -> Unit)? = null, uncover: (() -> Unit)? = null) {
         pending.incrementAndGet()
         handler.post {
             try {
-                run(packageName)
+                run(packageName, covered, uncover)
             } finally {
                 pending.decrementAndGet()
             }
@@ -63,7 +63,8 @@ internal class ForceStopper(private val service: AccessibilityService) {
         cover.quit()
     }
 
-    private fun run(packageName: String) {
+    private fun run(packageName: String, covered: (() -> Unit)?, uncover: (() -> Unit)?) {
+        drainKeys()
         // Settings' own words for the button, in the TV's language ("Forçar parada").
         val forceStop = runCatching {
             val resources = service.packageManager.getResourcesForApplication(SETTINGS)
@@ -73,13 +74,33 @@ internal class ForceStopper(private val service: AccessibilityService) {
         SystemClock.sleep(SETTLE_MILLIS)
         try {
             cover.show(packageName)
+            covered?.invoke()
             trackWindows(true)
-            pressForceStop(packageName, forceStop)
-            returnHome()
+            val originalWindows = service.windows.map { it.id }.toSet()
+            pressForceStop(packageName, forceStop, separateTask = covered != null)
+            if (covered == null) returnHome() else returnToApp(originalWindows)
         } finally {
-            cover.hide()
-            trackWindows(false)
+            try { uncover?.invoke() } finally {
+                cover.hide()
+                trackWindows(false)
+            }
         }
+    }
+
+    /** With the focusable switcher detached under the cover, Back belongs to Settings alone. */
+    private fun returnToApp(originalWindows: Set<Int>) {
+        val deadline = SystemClock.uptimeMillis() + TIMEOUT_MILLIS
+        while (SystemClock.uptimeMillis() < deadline) {
+            val settings = service.windows.firstOrNull {
+                it.type == AccessibilityWindowInfo.TYPE_APPLICATION && it.isFocused &&
+                    it.id !in originalWindows && it.root?.packageName == SETTINGS
+            } ?: break
+            if (!service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK)) break
+            // Window removal/animation is asynchronous. Repeating Back while the old window
+            // still appears in the list can land the second Back in the app underneath.
+            if (!waitUntil { service.windows.none { it.id == settings.id && it.isFocused } }) break
+        }
+        SystemClock.sleep(FRAMES_MILLIS)
     }
 
     /**
@@ -92,10 +113,11 @@ internal class ForceStopper(private val service: AccessibilityService) {
         service.serviceInfo = service.serviceInfo.apply { flags = if (on) flags or flag else flags and flag.inv() }
     }
 
-    private fun pressForceStop(packageName: String, forceStop: String) {
+    private fun pressForceStop(packageName: String, forceStop: String, separateTask: Boolean) {
         service.startActivity(
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null)).addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or
+                    (if (separateTask) Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK else Intent.FLAG_ACTIVITY_CLEAR_TASK),
             ),
         )
         // The app's page: the Force stop row, disabled when the app is already stopped.
@@ -127,9 +149,10 @@ internal class ForceStopper(private val service: AccessibilityService) {
         SystemClock.sleep(FRAMES_MILLIS)
     }
 
-    private fun waitUntil(done: () -> Boolean) {
+    private fun waitUntil(done: () -> Boolean): Boolean {
         val deadline = SystemClock.uptimeMillis() + TIMEOUT_MILLIS
         while (!done() && SystemClock.uptimeMillis() < deadline) SystemClock.sleep(POLL_MILLIS)
+        return done()
     }
 
     /** Polls Settings' window until [find] finds something, or gives up after [TIMEOUT_MILLIS]. */

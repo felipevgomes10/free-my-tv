@@ -106,6 +106,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.freemytv.home.android.KeyFilterService.dismissAppSwitcher()
         // Started by name rather than as Home, Android opens a second copy of the Home in a task of
         // its own, which lingers with all its screens and pictures: hand over to the real one.
         if (!intent.isHome()) {
@@ -500,6 +501,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        com.freemytv.home.android.KeyFilterService.dismissAppSwitcher()
         // Back from closing an app through Settings: the owner stays where they were.
         if (intent.getBooleanExtra(EXTRA_RETURN, false)) return
         home.cancelEdit()
