@@ -103,7 +103,7 @@ class WebRemotePairing(
             return PairingAnswer.TooManyTries to null
         }
         val credential = Base64.getUrlEncoder().withoutPadding().encodeToString(random.nextBytes(16))
-        val phone = PairedPhone(name.trim().take(MAX_NAME_LENGTH).ifEmpty { "iPhone" }, sha256(credential), now)
+        val phone = PairedPhone(name.trim().take(MAX_NAME_LENGTH).ifEmpty { "Celular" }, sha256(credential), now)
         wrongTries = 0
         // A code is good for one phone: the next one gets a new code.
         _state.update { it.copy(code = newCode(), justPaired = phone.name) }
