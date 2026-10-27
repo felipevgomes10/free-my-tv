@@ -18,7 +18,7 @@ The Controller's `release/web-remote-app-switcher-candidate.zip` contains the bu
 ```sh
 JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home ./gradlew \
   :app:testDebugUnitTest :app:assembleRelease \
-  -PwebRemoteZip=../free-my-tv-remote-controller/release/web-remote-app-switcher-candidate.zip
+  -PwebRemoteZip=/Users/felipe_gomes/Documents/repos/free-my-tv-remote-controller/release/web-remote-app-switcher-candidate.zip
 ```
 
 The candidate APK is `app/build/outputs/apk/release/app-release.apk`. This is an unreleased source build; app/page release versions were not bumped. The default build still uses the pinned Controller 0.2.3 until the normal release/pin workflow is completed; use the local zip to include this button meanwhile.
@@ -29,4 +29,4 @@ The candidate APK is `app/build/outputs/apk/release/app-release.apk`. This is an
 - Actual iPhone/Safari → authenticated bridge → overlay → keys → same underlying app, including an older bridge and unavailable/busy cases.
 - Two phones, app-changing Shortcut Buttons, external navigation, service loss/revocation, sleep/wake and memory before/open/after on the 2 GB target.
 
-The implementation is available for review, but ticket 04 is not resolved and nothing has been published, pinned or installed on the owner's physical TV.
+The initial implementation pass did not publish, pin or install on the physical TV. Subsequently, the owner requested a TV installation: **0.6.4-multitarefas is now installed on the TCL**, and the owner confirmed the basic iPhone opening/Back flow with Disney+ visible underneath. See the [TV installation and smoke test](tv-install-test.md). Ticket 04 remains open for the rest of the matrix above; no public release or pin change was made.

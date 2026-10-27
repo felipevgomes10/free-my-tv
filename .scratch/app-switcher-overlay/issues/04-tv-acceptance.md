@@ -17,3 +17,5 @@
 ## Comments
 
 **2026-10-26:** Local automated/emulator validation is recorded in ../acceptance-results.md. Physical TCL/iPhone, protected playback and target memory checks have not run.
+
+**2026-10-26, TV installation requested by the owner:** Built both projects and installed release `0.6.4-multitarefas` with dex metadata on the TCL. The owner confirmed the iPhone button opens over Disney+ with the app visible and Back dismisses only the switcher. Post-test: Disney+ resumed, no overlay remaining, Home alive without a current-process fatal exception, ~116 MiB PSS after dismissal. See [the recorded smoke test](../tv-install-test.md). The broader playback/lifecycle/memory matrix remains pending; this ticket is not resolved by the smoke test alone.
