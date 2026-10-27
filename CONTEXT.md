@@ -143,7 +143,7 @@ An app the owner has used that is still alive in the background and resumes wher
 _Avoid_: Running app, recent app, task
 
 **App Switcher** (Alternador de apps):
-The row of Open Apps, most recent first, opened by pressing Home twice; where the owner switches to or closes an Open App. Closing force stops the app; apps playing media can't be closed.
+The row of Open Apps, most recent first, opened by pressing Home twice or by the Web Remote's dedicated Multitarefas button; where the owner switches to or closes an Open App. The dedicated button shows it over the current app, keeping that app visible; Back dismisses it. Closing force stops the app; apps playing media can't be closed, and the app beneath this overlay cannot be closed from it.
 _Avoid_: Recents, multitasking view, task manager
 
 **Open App Limit** (Limite de apps abertos):
