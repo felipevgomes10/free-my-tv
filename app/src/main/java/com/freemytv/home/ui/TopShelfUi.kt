@@ -135,10 +135,10 @@ private fun TopShelfWords(entry: UpNextEntry, appLabel: String) {
         Text(
             entry.title ?: stringResource(R.string.up_next_app, appLabel),
             color = Tokens.TextPrimary,
-            fontSize = 36.sp,
-            lineHeight = 38.sp,
+            fontSize = 28.sp,
+            lineHeight = 32.sp,
             fontWeight = FontWeight.Bold,
-            letterSpacing = (-0.9).sp,
+            letterSpacing = (-0.5).sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
