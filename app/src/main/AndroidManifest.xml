@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- A replacement Home uses CATEGORY_HOME rather than a TV app launcher entry. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingLeanbackLauncher">
 
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <!-- Weather. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Setup warnings on Android 13+; posting also checks the runtime grant. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- APK Drop shows the TV's address on the home network. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

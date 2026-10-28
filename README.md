@@ -289,11 +289,14 @@ Checks Setup and Restore against fake TV states: only missing steps are planned,
 
 ```bash
 ./gradlew testDebugUnitTest   # the Home's unit tests (JVM)
+./gradlew lintRelease        # Android and Compose static analysis
 ./gradlew assembleDebug       # a debug APK for the emulator
 python3 scripts/check-up-next-focus.py  # scroll out and back into Up Next on a debug emulator
 ```
 
 The Home is Kotlin with [Compose for TV](https://developer.android.com/training/tv/playback/compose). All of Android sits behind one interface, `TvPlatform`. The tests drive the real feature code against a `FakeTvPlatform` on the JVM, with no device needed. Gradle needs JDK 17: point `JAVA_HOME` at it if your default Java is newer.
+
+Lint is pinned separately to 8.8.2 in `gradle.properties` to fix false positives on Compose `produceState` assignments. This uses the [documented standalone lint version override](https://developer.android.com/develop/ui/compose/tooling/lint), keeping the app's AGP and Compose versions unchanged. The manifest documents the specific `MissingLeanbackLauncher` exception because this app is a replacement Home with a `CATEGORY_HOME` entry.
 
 ```
 app/src/main/java/com/freemytv/home/

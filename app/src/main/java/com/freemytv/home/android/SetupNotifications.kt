@@ -1,11 +1,14 @@
 package com.freemytv.home.android
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import com.freemytv.home.MainActivity
 import com.freemytv.home.R
 import com.freemytv.home.setup.SetupCheck
@@ -16,6 +19,9 @@ object SetupNotifications {
     private const val CHANNEL = "setup"
 
     fun post(context: Context, check: SetupCheck) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) return
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(NotificationChannel(CHANNEL, context.getString(R.string.section_setup), NotificationManager.IMPORTANCE_DEFAULT))
         val (title, text) = when (check) {

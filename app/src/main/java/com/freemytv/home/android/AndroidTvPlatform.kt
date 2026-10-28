@@ -374,7 +374,14 @@ class AndroidTvPlatform(private val context: Context) : TvPlatform {
                 packageName = info.packageName,
                 label = app?.loadLabel(packageManager)?.toString() ?: info.packageName,
                 version = info.versionName.orEmpty(),
-                installer = runCatching { packageManager.getInstallSourceInfo(info.packageName).installingPackageName }.getOrNull(),
+                installer = runCatching {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        packageManager.getInstallSourceInfo(info.packageName).installingPackageName
+                    } else {
+                        @Suppress("DEPRECATION")
+                        packageManager.getInstallerPackageName(info.packageName)
+                    }
+                }.getOrNull(),
                 isSystem = app != null && app.flags and ApplicationInfo.FLAG_SYSTEM != 0,
             )
         }
